@@ -11,17 +11,18 @@ public class TextBuffer : IDisposable
     /// 
     /// </summary>
     public const int TextLength = 1024;
+
     public const int BufferLength = TextLength * 2;
 
     private TextReader textReader;
     private char[] buffer = new char[BufferLength];
     private string? text = null;
-    
+
     /// <summary>
     /// 원본에 대한 현재 인덱스
     /// </summary>
     public long Index { get; private set; }
-    
+
     /// <summary>
     /// 원본에 대한 마지막 인덱스
     /// </summary>
@@ -40,6 +41,7 @@ public class TextBuffer : IDisposable
     public TextBuffer(TextReader textReader)
     {
         this.textReader = textReader;
+        MakeText();
     }
 
     /// <summary>
@@ -77,11 +79,6 @@ public class TextBuffer : IDisposable
     /// <returns></returns>
     public string GetText()
     {
-        if (text == null)
-        {
-            MakeText();
-        }
-
         return text ?? "";
     }
 
@@ -101,19 +98,10 @@ public class TextBuffer : IDisposable
     /// <param name="length"></param>
     public void Cutout(int length)
     {
-        if (text != null)
-        {
-            var count = Math.Min(length, bufferLastIndex - bufferIndex);
-            Index += count;
-            bufferIndex += count;
-            MakeText();
-        }
-        else
-        {
-            Index += length;
-            bufferIndex += length;
-            MakeText();
-        }
+        var count = Math.Min(length, bufferLastIndex - bufferIndex);
+        Index += count;
+        bufferIndex += count;
+        MakeText();
     }
 
     public void Dispose()
