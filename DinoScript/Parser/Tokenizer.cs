@@ -62,6 +62,10 @@ public class Tokenizer : IDisposable
         this.textBuffer = new TextBuffer(textReader);
     }
 
+    /// <summary>
+    /// 다음 토큰을 가져옵니다.
+    /// </summary>
+    /// <returns></returns>
     public Token? Next()
     {
         var text = textBuffer.GetText();
