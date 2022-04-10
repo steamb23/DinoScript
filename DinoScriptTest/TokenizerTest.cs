@@ -6,7 +6,7 @@ using System.IO;
 using DinoScript.Parser;
 using Xunit;
 
-namespace DinoScriptTest;
+namespace DinoScript.Test;
 
 public class TokenizerTest
 {
@@ -115,16 +115,23 @@ public class TokenizerTest
                 MakeTestToken(TokenType.Punctuator,
                     "("),
                 MakeTestToken(TokenType.WhiteSpace,
-                    " \t"),
+                    " "),
+                MakeTestToken(TokenType.WhiteSpace,
+                    "\t"),
                 MakeTestToken(TokenType.Punctuator,
                     ")")
             }
         }
     };
 
+    /// <summary>
+    /// 토큰화가 예상대로 진행되는지 테스트합니다.
+    /// </summary>
+    /// <param name="text"></param>
+    /// <param name="tokens"></param>
     [Theory]
     [MemberData(nameof(TokenTestDataList))]
-    public void Token(string text, Token[] tokens)
+    public void TokenizeTest(string text, Token[] tokens)
     {
         var tokenizer = new Tokenizer(new StringReader(text));
 
