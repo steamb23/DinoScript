@@ -1,7 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using JetBrains.Annotations;
 
-namespace DinoScript.Parser;
+namespace DinoScript.Syntax;
 
 public class TokenDefinition
 {

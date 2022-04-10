@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using System.Text.RegularExpressions;
+using DinoScript.Syntax;
 
 namespace DinoScript.Parser;
 
