@@ -25,7 +25,7 @@ public class TextBufferTest
     }
 
     [Fact]
-    public void GetTextTest()
+    public void GetTextMethodTest()
     {
         using var stringReader = new StringReader(testText);
         var textBuffer = new TextBuffer(stringReader);
@@ -36,7 +36,7 @@ public class TextBufferTest
     }
 
     [Fact]
-    public void CutoutTest()
+    public void CutoutMethodTest()
     {
         using var stringReader = new StringReader(testText);
         var textBuffer = new TextBuffer(stringReader);
@@ -49,7 +49,7 @@ public class TextBufferTest
     }
 
     [Fact]
-    public void NextTextTest()
+    public void NextTextMethodTest()
     {
         using var stringReader = new StringReader(testText);
         var textBuffer = new TextBuffer(stringReader);
