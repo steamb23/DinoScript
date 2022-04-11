@@ -10,4 +10,10 @@
       <PackageReference Include="JetBrains.Annotations" Version="2022.1.0-eap3" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Update="Parser\SyntaxParser_Actions.cs">
+        <DependentUpon>SyntaxParser.cs</DependentUpon>
+      </Compile>
+    </ItemGroup>
+
 </Project>
