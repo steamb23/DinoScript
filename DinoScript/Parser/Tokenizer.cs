@@ -11,6 +11,8 @@ public class Tokenizer : IDisposable
 {
     private TextBuffer textBuffer;
 
+    private Token? currentToken;
+
     private int lines = 0;
     private int columns = 0;
 
@@ -64,6 +66,18 @@ public class Tokenizer : IDisposable
     }
 
     /// <summary>
+    /// 현재 토큰을 가져옵니다.
+    /// </summary>
+    /// <returns></returns>
+    public Token? Current()
+    {
+        // 현재 토큰이 없을 경우 다음 토큰을 가져오는 것을 시도
+        if (currentToken == null)
+            return Next();
+        return currentToken;
+    }
+
+    /// <summary>
     /// 다음 토큰을 가져옵니다.
     /// </summary>
     /// <returns></returns>
@@ -74,7 +88,7 @@ public class Tokenizer : IDisposable
         // 문자열의 끝
         if (string.IsNullOrEmpty(text))
         {
-            return null;
+            return currentToken = null;
         }
 
         // 줄 및 열 백업
@@ -113,9 +127,10 @@ public class Tokenizer : IDisposable
                 }
 
                 textBuffer.Cutout(match.Value.Length);
-                return MakeToken(tokenDefinition.Type, match.Value, currentLines, currentColumns);
+                return currentToken = MakeToken(tokenDefinition.Type, match.Value, currentLines, currentColumns);
             }
         }
+
         // 규격 외 문자 스킵 후 재시도
         foreach (var regex in skipRegexes)
         {
@@ -128,7 +143,23 @@ public class Tokenizer : IDisposable
         }
 
         // 알 수 없는 토큰
-        return MakeToken(TokenType.UnexpectedToken, text[0].ToString(), currentLines, currentColumns);
+        return currentToken = MakeToken(TokenType.UnexpectedToken, text[0].ToString(), currentLines, currentColumns);
+    }
+
+    /// <summary>
+    /// 공백을 제외한 다음 토큰을 가져옵니다.
+    /// </summary>
+    /// <returns></returns>
+    public Token? NextWithIgnoreWhiteSpace()
+    {
+        Token? token;
+
+        while ((token = Next())?.Type == TokenType.WhiteSpace)
+        {
+            // 공백 제거
+        }
+
+        return token;
     }
 
     /// <summary>
@@ -209,7 +240,7 @@ public class Tokenizer : IDisposable
             default:
                 return InternalMakeToken(text);
         }
-        
+
         Token InternalMakeToken<T>(T value)
         {
             return new Token<T>
