@@ -59,11 +59,22 @@ public partial class SyntaxParser
     {
         // <Identity>
         var token = Tokenizer.Next();
-        if (token is { Type: TokenType.Identifier })
+
+        switch (token?.Type)
         {
-            SyntaxStack.Push(
-                ISyntaxNode.Make(SyntaxKind.AccessExpression, ISyntaxNode.Make(token)));
-            return true;
+            case TokenType.Identifier:
+            case TokenType.NumberLiteral:
+                // 
+                if (token.Type == TokenType.Identifier && token is Token<string> stringToken)
+                {
+                    // 심볼 테이블에 존재하는지 체크
+                    if (stringToken.Value != null && !SymbolTable.ContainsKey(stringToken.Value))
+                        return false;
+                }
+
+                SyntaxStack.Push(
+                    ISyntaxNode.Make(SyntaxKind.AccessExpression, ISyntaxNode.Make(token)));
+                return true;
         }
 
         return false;
