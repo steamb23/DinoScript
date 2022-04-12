@@ -141,9 +141,9 @@ public partial class SyntaxParser
 
             if (token.Type != TokenType.Operator)
             {
-                // 오퍼레이터 토큰이 아니면 PrimaryExpression만 포함
-                // <PrimaryExpression>
-                SyntaxStack.Push(ISyntaxNode.Make(SyntaxKind.MultiplicativeExpression, new[]
+                // 오퍼레이터 토큰이 아니면 MultiplicativeExpression만 포함
+                // <MultiplicativeExpression>
+                SyntaxStack.Push(ISyntaxNode.Make(SyntaxKind.AddictiveExpression, new[]
                 {
                     SyntaxStack.Pop()
                 }));
@@ -160,7 +160,7 @@ public partial class SyntaxParser
                     SyntaxStack.Push(ISyntaxNode.Make(token));
                     if (MultiplicativeExpressionAction())
                     {
-                        SyntaxStack.Push(ISyntaxNode.Make(SyntaxKind.MultiplicativeExpression, SyntaxStack, 3));
+                        SyntaxStack.Push(ISyntaxNode.Make(SyntaxKind.AddictiveExpression, SyntaxStack, 3));
                         return true;
                     }
 
