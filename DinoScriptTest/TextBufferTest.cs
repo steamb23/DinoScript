@@ -8,7 +8,7 @@ namespace DinoScript.Test;
 
 public class TextBufferTest
 {
-    private string testText;
+    private readonly string testText;
 
     public TextBufferTest()
     {
@@ -16,7 +16,7 @@ public class TextBufferTest
         var builder = new StringBuilder();
         const int start = 0xac00;
         const int end = 0xd7a3;
-        foreach (var i in Enumerable.Range(start, end - start))
+        foreach (var i in Enumerable.Range(start, end - start + 1))
         {
             builder.Append((char)i);
         }
