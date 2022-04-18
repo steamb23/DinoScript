@@ -8,7 +8,9 @@ public class CodeGenerator
 
     private Stack<IntermediateCode> expressionStack = new();
     private Queue<IntermediateCode> expressionQueue = new();
-    
+
+    public IReadOnlyList<IntermediateCode> Codes => codes;
+
     /// <summary>
     /// 토큰의 값을 코드 큐에 넣습니다.
     /// </summary>

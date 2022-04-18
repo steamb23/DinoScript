@@ -18,6 +18,11 @@ public partial class SyntaxParser
     {
         Tokenizer = new Tokenizer(textReader);
     }
+
+    public void Next()
+    {
+        Root();
+    }
     
     bool Root()
     {

@@ -1,4 +1,5 @@
 ﻿using System.Runtime.InteropServices;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace DinoScript.Code;
@@ -10,7 +11,7 @@ namespace DinoScript.Code;
 public struct IntermediateCode
 {
     public Opcode Opcode { get; }
-    
+
     public IReadOnlyList<object> Operands { get; }
 
     private IntermediateCode(Opcode opcode, params object[] operand)
@@ -30,5 +31,19 @@ public struct IntermediateCode
             default:
                 throw new ArgumentException(null, nameof(opcode));
         }
+    }
+
+    public override string ToString()
+    {
+        var builder = new StringBuilder();
+        builder.Append('{');
+        builder.Append(Opcode);
+        if (Operands.Count > 0)
+        {
+            builder.Append(", ");
+            builder.Append(string.Join(", ", Operands));
+        }
+        builder.Append('}');
+        return builder.ToString();
     }
 }

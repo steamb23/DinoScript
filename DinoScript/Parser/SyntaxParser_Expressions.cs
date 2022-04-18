@@ -19,11 +19,15 @@ public partial class SyntaxParser
         
         if (token?.Value == "(")
         {
+            // 토큰 넘어가기
+            Tokenizer.NextWithIgnoreWhiteSpace();
             var expression = Expression();
-            token = Tokenizer.NextWithIgnoreWhiteSpace();
+            token = Tokenizer.Current();
             // TODO: 오류 메시지 처리를 위한 루아 스크립트의 check_match함수와 유사한 함수 구현 필요.
             if (token?.Value == ")")
+            {
                 return true;
+            }
         }
 
         return false;
