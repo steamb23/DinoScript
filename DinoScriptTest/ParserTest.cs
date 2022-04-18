@@ -23,7 +23,7 @@ public class ParserTest
     {
         new object[]
         {
-            "1+2*3+4",
+            "1 + 2 * 3 + 4",
             new[]
             {
                 Make(Opcode.LoadConstant, 1),
@@ -76,6 +76,21 @@ public class ParserTest
                 Make(Opcode.Add),
                 Make(Opcode.Divide),
             }
+        },
+        // 예외
+        new object[]
+        {
+            "(1+2)*(3@4)",
+            new[]
+            {
+                Make(Opcode.LoadConstant, 1),
+                Make(Opcode.LoadConstant, 2),
+                Make(Opcode.Add),
+                Make(Opcode.LoadConstant, 3),
+                Make(Opcode.LoadConstant, 4),
+                Make(Opcode.Add),
+                Make(Opcode.Divide),
+            }
         }
     };
 
@@ -83,17 +98,25 @@ public class ParserTest
     [MemberData(nameof(ExpressionTestDataList))]
     public void ExpressionTest(string text, InternalCode[] expectedCodes)
     {
-        var textReader = new StringReader(text);
-        var parser = new SyntaxParser(textReader, ParserMode.Expression);
-
-        parser.Next();
-
-        var codes = parser.CodeGenerator.Codes;
-        for (int i = 0; i < expectedCodes.Length; i++)
+        try
         {
-            Assert.Equal(expectedCodes[i].Opcode, codes[i].Opcode);
-            Assert.Equal(expectedCodes[i].Operands, codes[i].Operands);
-            testOutputHelper.WriteLine(expectedCodes[i].ToString());
+            var textReader = new StringReader(text);
+            var parser = new SyntaxParser(textReader, ParserMode.Expression);
+
+            parser.Next();
+
+            var codes = parser.CodeGenerator.Codes;
+            for (int i = 0; i < expectedCodes.Length; i++)
+            {
+                Assert.Equal(expectedCodes[i].Opcode, codes[i].Opcode);
+                Assert.Equal(expectedCodes[i].Operands, codes[i].Operands);
+                testOutputHelper.WriteLine(expectedCodes[i].ToString());
+            }
+        }
+        catch (SyntaxErrorException e)
+        {
+            testOutputHelper.WriteLine("문법 오류 예외 체크");
+            testOutputHelper.WriteLine(e.ToString());
         }
     }
 }

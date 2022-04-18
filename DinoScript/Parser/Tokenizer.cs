@@ -143,6 +143,8 @@ public class Tokenizer : IDisposable
         }
 
         // 알 수 없는 토큰
+        currentToken = MakeToken(TokenType.UnexpectedToken, text[0].ToString(), currentLines, currentColumns);
+        throw new SyntaxErrorException(currentToken);
         return currentToken = MakeToken(TokenType.UnexpectedToken, text[0].ToString(), currentLines, currentColumns);
     }
 
@@ -248,8 +250,8 @@ public class Tokenizer : IDisposable
                 Type = tokenType,
                 Value = value,
                 Text = text,
-                Lines = tokeLines,
-                Columns = tokenColumns
+                Lines = tokeLines + 1,
+                Columns = tokenColumns + 1
             };
         }
     }

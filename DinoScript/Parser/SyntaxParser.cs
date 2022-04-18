@@ -27,23 +27,17 @@ public partial class SyntaxParser
         Root();
     }
     
-    bool Root()
+    void Root()
     {
         switch (ParserMode)
         {
             case ParserMode.Expression:
             {
-                if (Expression())
-                {
-                    return true;
-                }
-
+                Expression();
                 break;
             }
             case ParserMode.Statement:
                 throw new NotImplementedException();
         }
-
-        return false;
     }
 }

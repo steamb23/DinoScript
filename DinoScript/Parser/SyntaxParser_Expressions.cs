@@ -10,62 +10,58 @@ public partial class SyntaxParser
     // 해당 액션에 맞는 구문 노드가 생성되었을 경우 true,
     // 그렇지 않을 경우 구문 오류를 뜻하는 false를 반환합니다.
 
-    bool Expression()
+    void Expression()
     {
-        // <MultiplicativeExpression>
-        if (SubExpression(out _))
-        {
-            return true;
-        }
-
-        return false;
+        SubExpression(out _);
     }
-    
-    bool GroupExpression()
+
+    void GroupExpression()
     {
         var token = Tokenizer.Current();
-        
+
         if (token?.Value == "(")
         {
             // 토큰 넘어가기
             Tokenizer.NextWithIgnoreWhiteSpace();
-            var expression = Expression();
+            Expression();
             token = Tokenizer.Current();
             // TODO: 오류 메시지 처리를 위한 루아 스크립트의 check_match함수와 유사한 함수 구현 필요.
             if (token?.Value == ")")
             {
-                return true;
+                return;
             }
+
+            throw new SyntaxErrorException(Tokenizer.Current(), "Grouped expressions must end with a ')'.");
         }
 
-        return false;
+        // 내부 오류
+        throw new SyntaxErrorException(Tokenizer.Current(), $"{token} is not group expression.");
     }
 
-    bool PrimaryExpression()
+    void PrimaryExpression()
     {
         // PreAccessExpression{ . PostAccessExpression}
-        bool AccessExpression()
+        void AccessExpression()
         {
-            bool PreAccessExpression()
+            var token = Tokenizer.Current();
+
+            void PreAccessExpression()
             {
                 // <Identity>
-                var token = Tokenizer.Current();
-
                 switch (token?.Type)
                 {
                     case TokenType.Mark:
                     {
-                        return GroupExpression();
+                        GroupExpression();
+                        return;
                     }
                 }
 
-                return PostAccessExpression();
+                PostAccessExpression();
             }
 
-            bool PostAccessExpression()
+            void PostAccessExpression()
             {
-                var token = Tokenizer.Current();
-
                 switch (token?.Type)
                 {
                     case TokenType.Identifier:
@@ -75,34 +71,23 @@ public partial class SyntaxParser
                         {
                             // 심볼 테이블에 존재하는지 체크
                             if (token.Value != null && !SymbolTable.ContainsKey(token.Value))
-                                return false;
+                                throw new SyntaxErrorException(token, $"'{token.Value}' symbol does not exist.");
                         }
 
                         // 토큰에 해당하는 값을 코드 생성 큐에 추가함
                         CodeGenerator.AccessTokenEnqueue(token);
-                        return true;
+                        return;
                     }
                 }
 
-                return false;
+                throw new SyntaxErrorException(token);
             }
 
-            if (PreAccessExpression())
-            {
-                // TODO: { . PostAccessExpression}에 대한 구현 예정
-                return true;
-            }
-
-            return false;
-        }
+            PreAccessExpression();
+        } // end of AccessExpression
 
         // <AccessExpression>
-        if (AccessExpression())
-        {
-            return true;
-        }
-
-        return false;
+        AccessExpression();
     }
 
 
@@ -114,7 +99,7 @@ public partial class SyntaxParser
         ["-"] = (uint)ExpressionTypes.Addictive,
     };
 
-    
+
     /// <summary>
     /// 우선 순위에 의한 하위 표현식 구조를 표현합니다.
     /// </summary>
@@ -122,46 +107,31 @@ public partial class SyntaxParser
     /// <param name="priority">연산자의 우선순위입니다. 값이 작을 수록 높은 연산 우선 순위를 나타냅니다.</param>
     /// <returns></returns>
     /// <exception cref="NotImplementedException"></exception>
-    bool SubExpression(out Token? binaryOperator, uint? priority = uint.MaxValue)
+    void SubExpression(out Token? binaryOperator, uint? priority = uint.MaxValue)
     {
         // (<PrimaryExpression>|<UnaryExpression>){ BinaryOperator SubExpression}
 
         // TODO: UnaryExpression에 대한 코드 추가 필요 (Lua스크립트의 lparser 코드 참조)
-        bool ok = PrimaryExpression();
+        PrimaryExpression();
 
-        if (ok)
+        binaryOperator = GetNextBinaryOperatorToken();
+
+        // 확인된 이항 연산자 우선순위가 현재 표현식 우선순위 보다 높으면 재귀 처리
+        // 토큰이 연산자가 아닐경우 GetNextBinaryOperatorToken에 의해 null 임
+        while (binaryOperator?.Value != null &&
+               binaryOperatorPriorityTable[binaryOperator.Value] <= priority)
         {
-            binaryOperator = GetNextBinaryOperatorToken();
+            // 연산자를 코드 생성 스택에 우선 푸시해둠.
+            CodeGenerator.OperatorTokenPush(binaryOperator);
+            Tokenizer.NextWithIgnoreWhiteSpace();
 
-            // 확인된 이항 연산자 우선순위가 현재 표현식 우선순위 보다 높으면 재귀 처리
-            // 토큰이 연산자가 아닐경우 GetNextBinaryOperatorToken에 의해 null 임
-            while (binaryOperator?.Value != null &&
-                   binaryOperatorPriorityTable[binaryOperator.Value] <= priority)
-            {
-                // 연산자를 코드 생성 스택에 우선 푸시해둠.
-                CodeGenerator.OperatorTokenPush(binaryOperator);
-                Tokenizer.NextWithIgnoreWhiteSpace();
-                if (SubExpression(out var nextOperator, binaryOperatorPriorityTable[binaryOperator.Value]))
-                {
-                    // SubExpression의 재귀가 끝나면 식을 코드화함
-                    CodeGenerator.GenerateExpression();
-                    // 처리되지 않은 오퍼레이터를 받아 다시 처리 시작
-                    binaryOperator = nextOperator;
-                }
-                else
-                {
-                    // 하위 표현식이 오지 않을 경우 문법 오류
-                    return false;
-                }
-            }
-            
-            // 연산자가 처리되지 않았지만 표현식이 정상적으로 끝날 수 있음
-            return true;
+            SubExpression(out var nextOperator, binaryOperatorPriorityTable[binaryOperator.Value]);
+
+            // SubExpression의 재귀가 끝나면 식을 코드화함
+            CodeGenerator.GenerateExpression();
+            // 처리되지 않은 오퍼레이터를 받아 다시 처리 시작
+            binaryOperator = nextOperator;
         }
-
-        // 표현식이 성립되지 않음
-        binaryOperator = null;
-        return false;
     }
 
     Token? GetNextBinaryOperatorToken()
@@ -171,6 +141,14 @@ public partial class SyntaxParser
             return null;
 
         bool isBinaryOperator = token.Type == TokenType.Operator;
+
+        switch (token.Type)
+        {
+            case TokenType.Error:
+            case TokenType.UnexpectedToken:
+                throw new SyntaxErrorException(token);
+        }
+
         return isBinaryOperator ? token : null;
     }
 }
