@@ -84,7 +84,7 @@ public class ParserTest
     public void ExpressionTest(string text, InternalCode[] expectedCodes)
     {
         var textReader = new StringReader(text);
-        var parser = new SyntaxParser(textReader);
+        var parser = new SyntaxParser(textReader, ParserMode.Expression);
 
         parser.Next();
 

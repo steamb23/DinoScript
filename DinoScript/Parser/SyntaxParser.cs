@@ -13,10 +13,13 @@ public partial class SyntaxParser
     private List<InternalCode> codes = new();
 
     public CodeGenerator CodeGenerator { get; } = new();
+    
+    public ParserMode ParserMode { get; }
 
-    public SyntaxParser(TextReader textReader)
+    public SyntaxParser(TextReader textReader, ParserMode parserMode = ParserMode.Statement)
     {
         Tokenizer = new Tokenizer(textReader);
+        ParserMode = parserMode;
     }
 
     public void Next()
@@ -26,10 +29,19 @@ public partial class SyntaxParser
     
     bool Root()
     {
-        // <Expression>
-        if (Expression())
+        switch (ParserMode)
         {
-            return true;
+            case ParserMode.Expression:
+            {
+                if (Expression())
+                {
+                    return true;
+                }
+
+                break;
+            }
+            case ParserMode.Statement:
+                throw new NotImplementedException();
         }
 
         return false;
