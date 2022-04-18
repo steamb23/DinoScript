@@ -15,7 +15,7 @@ public enum TokenType
     Identifier,
     Keyword,
     Operator,
-    Punctuator,
+    Mark,
     BooleanLiteral,
     NumberLiteral,
     CharacterLiteral,

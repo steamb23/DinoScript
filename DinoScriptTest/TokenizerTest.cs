@@ -80,7 +80,7 @@ public class TokenizerTest
             "( a + b ) * 10",
             new[]
             {
-                MakeTestToken(TokenType.Punctuator,
+                MakeTestToken(TokenType.Mark,
                     "("),
                 MakeTestToken(TokenType.WhiteSpace,
                     " "),
@@ -96,7 +96,7 @@ public class TokenizerTest
                     "b"),
                 MakeTestToken(TokenType.WhiteSpace,
                     " "),
-                MakeTestToken(TokenType.Punctuator,
+                MakeTestToken(TokenType.Mark,
                     ")"),
                 MakeTestToken(TokenType.WhiteSpace,
                     " "),
@@ -113,13 +113,13 @@ public class TokenizerTest
             "( \t)",
             new[]
             {
-                MakeTestToken(TokenType.Punctuator,
+                MakeTestToken(TokenType.Mark,
                     "("),
                 MakeTestToken(TokenType.WhiteSpace,
                     " "),
                 MakeTestToken(TokenType.WhiteSpace,
                     "\t"),
-                MakeTestToken(TokenType.Punctuator,
+                MakeTestToken(TokenType.Mark,
                     ")")
             }
         }

@@ -11,7 +11,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Update="Parser\SyntaxParser_Actions.cs">
+      <Compile Update="Parser\SyntaxParser_Expressions.cs">
         <DependentUpon>SyntaxParser.cs</DependentUpon>
       </Compile>
     </ItemGroup>

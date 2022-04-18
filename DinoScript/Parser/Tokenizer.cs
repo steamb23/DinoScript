@@ -39,7 +39,7 @@ public class Tokenizer : IDisposable
             "^(\\p{Lu}|\\p{Ll}|\\p{Lt}|\\p{Lm}|\\p{Lo}|\\p{Nl})(\\p{Lu}|\\p{Ll}|\\p{Lt}|\\p{Lm}|\\p{Lo}|\\p{Nl}|\\d)*"),
         new(TokenType.Operator,
             "^(\\+|-|\\*|/|%|\\^|==|!=|<=|>=|<|>|\\?|:|\\+\\+|--|!)"),
-        new(TokenType.Punctuator,
+        new(TokenType.Mark,
             "^(\\(|\\)|\\[|\\])"),
         new(TokenType.NumberLiteral,
             "^(0x(\\d|a|b|c|d|e|f|A|B|C|D|E|F|_)+|0b(0|1|_)+|(\\d|_)+)"),
@@ -241,9 +241,9 @@ public class Tokenizer : IDisposable
                 return InternalMakeToken(text);
         }
 
-        Token InternalMakeToken<T>(T value)
+        Token InternalMakeToken(string? value)
         {
-            return new Token<T>
+            return new Token
             {
                 Type = tokenType,
                 Value = value,
