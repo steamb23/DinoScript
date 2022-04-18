@@ -10,9 +10,17 @@ public partial class SyntaxParser
     // 해당 액션에 맞는 구문 노드가 생성되었을 경우 true,
     // 그렇지 않을 경우 구문 오류를 뜻하는 false를 반환합니다.
 
+    bool Expression()
+    {
+        // <MultiplicativeExpression>
+        if (SubExpression(out _))
+        {
+            return true;
+        }
 
-    #region Expression
-
+        return false;
+    }
+    
     bool GroupExpression()
     {
         var token = Tokenizer.Current();
@@ -164,18 +172,5 @@ public partial class SyntaxParser
 
         bool isBinaryOperator = token.Type == TokenType.Operator;
         return isBinaryOperator ? token : null;
-    }
-
-    #endregion
-
-    bool Expression()
-    {
-        // <MultiplicativeExpression>
-        if (SubExpression(out _))
-        {
-            return true;
-        }
-
-        return false;
     }
 }
