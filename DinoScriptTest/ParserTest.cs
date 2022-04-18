@@ -8,7 +8,7 @@ using Xunit.Abstractions;
 
 namespace DinoScript.Test;
 
-using static IntermediateCode;
+using static InternalCode;
 
 public class ParserTest
 {
@@ -26,12 +26,12 @@ public class ParserTest
             "1+2*3+4",
             new[]
             {
-                Make(Opcode.Push, 1),
-                Make(Opcode.Push, 2),
-                Make(Opcode.Push, 3),
+                Make(Opcode.LoadConstant, 1),
+                Make(Opcode.LoadConstant, 2),
+                Make(Opcode.LoadConstant, 3),
                 Make(Opcode.Multiply),
                 Make(Opcode.Add),
-                Make(Opcode.Push, 4),
+                Make(Opcode.LoadConstant, 4),
                 Make(Opcode.Add),
             }
         },
@@ -40,10 +40,10 @@ public class ParserTest
             "1+2*(3+4)",
             new[]
             {
-                Make(Opcode.Push, 1),
-                Make(Opcode.Push, 2),
-                Make(Opcode.Push, 3),
-                Make(Opcode.Push, 4),
+                Make(Opcode.LoadConstant, 1),
+                Make(Opcode.LoadConstant, 2),
+                Make(Opcode.LoadConstant, 3),
+                Make(Opcode.LoadConstant, 4),
                 Make(Opcode.Add),
                 Make(Opcode.Multiply),
                 Make(Opcode.Add),
@@ -54,11 +54,11 @@ public class ParserTest
             "(1+2)*(3+4)",
             new[]
             {
-                Make(Opcode.Push, 1),
-                Make(Opcode.Push, 2),
+                Make(Opcode.LoadConstant, 1),
+                Make(Opcode.LoadConstant, 2),
                 Make(Opcode.Add),
-                Make(Opcode.Push, 3),
-                Make(Opcode.Push, 4),
+                Make(Opcode.LoadConstant, 3),
+                Make(Opcode.LoadConstant, 4),
                 Make(Opcode.Add),
                 Make(Opcode.Multiply),
             }
@@ -68,11 +68,11 @@ public class ParserTest
             "(1+2)/(3+4)",
             new[]
             {
-                Make(Opcode.Push, 1),
-                Make(Opcode.Push, 2),
+                Make(Opcode.LoadConstant, 1),
+                Make(Opcode.LoadConstant, 2),
                 Make(Opcode.Add),
-                Make(Opcode.Push, 3),
-                Make(Opcode.Push, 4),
+                Make(Opcode.LoadConstant, 3),
+                Make(Opcode.LoadConstant, 4),
                 Make(Opcode.Add),
                 Make(Opcode.Divide),
             }
@@ -81,7 +81,7 @@ public class ParserTest
 
     [Theory]
     [MemberData(nameof(ExpressionTestDataList))]
-    public void ExpressionTest(string text, IntermediateCode[] expectedCodes)
+    public void ExpressionTest(string text, InternalCode[] expectedCodes)
     {
         var textReader = new StringReader(text);
         var parser = new SyntaxParser(textReader);

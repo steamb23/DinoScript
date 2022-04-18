@@ -4,12 +4,12 @@ namespace DinoScript.Code;
 
 public class CodeGenerator
 {
-    private List<IntermediateCode> codes = new();
+    private List<InternalCode> codes = new();
 
-    private Stack<IntermediateCode> expressionStack = new();
-    private Queue<IntermediateCode> expressionQueue = new();
+    private Stack<InternalCode> expressionStack = new();
+    private Queue<InternalCode> expressionQueue = new();
 
-    public IReadOnlyList<IntermediateCode> Codes => codes;
+    public IReadOnlyList<InternalCode> Codes => codes;
 
     /// <summary>
     /// 토큰의 값을 코드 큐에 넣습니다.
@@ -17,10 +17,10 @@ public class CodeGenerator
     /// <param name="token"></param>
     public void AccessTokenEnqueue(Token token)
     {
-        IntermediateCode code = token.Type switch
+        InternalCode code = token.Type switch
         {
-            TokenType.NumberLiteral => IntermediateCode.Make(Opcode.Push, double.Parse(token.Value!)),
-            _ => IntermediateCode.Make(Opcode.NoOperation)
+            TokenType.NumberLiteral => InternalCode.Make(Opcode.LoadConstant, double.Parse(token.Value!)),
+            _ => InternalCode.Make(Opcode.NoOperation)
         };
 
         expressionQueue.Enqueue(code);
@@ -41,7 +41,7 @@ public class CodeGenerator
             _ => Opcode.NoOperation
         };
 
-        expressionStack.Push(IntermediateCode.Make(opcode));
+        expressionStack.Push(InternalCode.Make(opcode));
     }
 
     /// <summary>

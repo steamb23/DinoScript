@@ -10,7 +10,7 @@ public partial class SyntaxParser
     // TODO: 심볼테이블 형식 변경 예정
     private Dictionary<string, object> SymbolTable { get; } = new();
 
-    private List<IntermediateCode> codes = new();
+    private List<InternalCode> codes = new();
 
     public CodeGenerator CodeGenerator { get; } = new();
 
