@@ -91,6 +91,20 @@ public class ParserTest
                 Make(Opcode.Add),
                 Make(Opcode.Divide),
             }
+        },
+        new object[]
+        {
+        "(1+2)*(3+4)\n",
+        new[]
+        {
+            Make(Opcode.LoadConstant, 1),
+            Make(Opcode.LoadConstant, 2),
+            Make(Opcode.Add),
+            Make(Opcode.LoadConstant, 3),
+            Make(Opcode.LoadConstant, 4),
+            Make(Opcode.Add),
+            Make(Opcode.Multiply),
+        }
         }
     };
 
@@ -101,7 +115,7 @@ public class ParserTest
         try
         {
             var textReader = new StringReader(text);
-            var parser = new SyntaxParser(textReader, ParserMode.Expression);
+            var parser = new SyntaxParser(textReader, ParserMode.ExpressionTest);
 
             parser.Next();
 

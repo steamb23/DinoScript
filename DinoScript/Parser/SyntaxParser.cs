@@ -3,7 +3,7 @@ using DinoScript.Syntax;
 
 namespace DinoScript.Parser;
 
-public partial class SyntaxParser
+public partial class SyntaxParser : IDisposable
 {
     private Tokenizer Tokenizer { get; }
 
@@ -16,7 +16,7 @@ public partial class SyntaxParser
     
     public ParserMode ParserMode { get; }
 
-    public SyntaxParser(TextReader textReader, ParserMode parserMode = ParserMode.Statement)
+    public SyntaxParser(TextReader textReader, ParserMode parserMode = ParserMode.Full)
     {
         Tokenizer = new Tokenizer(textReader);
         ParserMode = parserMode;
@@ -31,13 +31,18 @@ public partial class SyntaxParser
     {
         switch (ParserMode)
         {
-            case ParserMode.Expression:
+            case ParserMode.ExpressionTest:
             {
                 Expression();
                 break;
             }
-            case ParserMode.Statement:
+            case ParserMode.Full:
                 throw new NotImplementedException();
         }
+    }
+
+    public void Dispose()
+    {
+        Tokenizer.Dispose();
     }
 }
