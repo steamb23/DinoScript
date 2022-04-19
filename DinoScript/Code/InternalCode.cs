@@ -1,6 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
+using DinoScript.Syntax;
 
 namespace DinoScript.Code;
 
@@ -13,21 +14,24 @@ public readonly struct InternalCode
     public Opcode Opcode { get; }
 
     public IReadOnlyList<object> Operands { get; }
+    
+    public Token Token { get; }
 
-    private InternalCode(Opcode opcode, params object[] operand)
+    private InternalCode(Opcode opcode, Token token, params object[] operand)
     {
         Opcode = opcode;
         Operands = operand;
+        Token = token;
     }
 
-    public static InternalCode Make(Opcode opcode) => new InternalCode(opcode);
+    public static InternalCode Make(Opcode opcode, Token token) => new InternalCode(opcode, token);
 
-    public static InternalCode Make(Opcode opcode, double value)
+    public static InternalCode Make(Opcode opcode, Token token, double value)
     {
         switch (opcode)
         {
             case Opcode.LoadConstant:
-                return new InternalCode(opcode, value);
+                return new InternalCode(opcode, token, value);
             default:
                 throw new ArgumentException(null, nameof(opcode));
         }
