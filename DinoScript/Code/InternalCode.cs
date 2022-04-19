@@ -30,7 +30,7 @@ public readonly struct InternalCode
     {
         switch (opcode)
         {
-            case Opcode.LoadConstant:
+            case Opcode.LoadConstantNumber:
                 return new InternalCode(opcode, token, value);
             default:
                 throw new ArgumentException(null, nameof(opcode));

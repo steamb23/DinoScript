@@ -4,9 +4,9 @@ public enum Opcode
 {
     NoOperation,
     /// <summary>
-    /// 데이터 상수를 계산 스택에 푸시합니다.
+    /// 상수를 계산 스택에 푸시합니다.
     /// </summary>
-    LoadConstant,
+    LoadConstantNumber,
     /// <summary>
     /// 계산 스택 맨 위에 있는 값을 제거합니다.
     /// </summary>

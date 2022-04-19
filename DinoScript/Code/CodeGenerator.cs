@@ -19,7 +19,7 @@ public class CodeGenerator
     {
         InternalCode code = token.Type switch
         {
-            TokenType.NumberLiteral => InternalCode.Make(Opcode.LoadConstant, token, double.Parse(token.Value!)),
+            TokenType.NumberLiteral => InternalCode.Make(Opcode.LoadConstantNumber, token, double.Parse(token.Value!)),
             _ => InternalCode.Make(Opcode.NoOperation, token)
         };
 
