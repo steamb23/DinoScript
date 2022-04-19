@@ -26,13 +26,13 @@ public class ParserTest
             "1 + 2 * 3 + 4",
             new[]
             {
-                Make(Opcode.LoadConstant, 1),
-                Make(Opcode.LoadConstant, 2),
-                Make(Opcode.LoadConstant, 3),
-                Make(Opcode.Multiply),
-                Make(Opcode.Add),
-                Make(Opcode.LoadConstant, 4),
-                Make(Opcode.Add),
+                Make(Opcode.LoadConstant, null, 1),
+                Make(Opcode.LoadConstant, null, 2),
+                Make(Opcode.LoadConstant, null, 3),
+                Make(Opcode.Multiply, null),
+                Make(Opcode.Add, null),
+                Make(Opcode.LoadConstant, null, 4),
+                Make(Opcode.Add, null),
             }
         },
         new object[]
@@ -40,13 +40,13 @@ public class ParserTest
             "1+2*(3+4)",
             new[]
             {
-                Make(Opcode.LoadConstant, 1),
-                Make(Opcode.LoadConstant, 2),
-                Make(Opcode.LoadConstant, 3),
-                Make(Opcode.LoadConstant, 4),
-                Make(Opcode.Add),
-                Make(Opcode.Multiply),
-                Make(Opcode.Add),
+                Make(Opcode.LoadConstant, null, 1),
+                Make(Opcode.LoadConstant, null, 2),
+                Make(Opcode.LoadConstant, null, 3),
+                Make(Opcode.LoadConstant, null, 4),
+                Make(Opcode.Add, null),
+                Make(Opcode.Multiply, null),
+                Make(Opcode.Add, null),
             }
         },
         new object[]
@@ -54,13 +54,13 @@ public class ParserTest
             "(1+2)*(3+4)",
             new[]
             {
-                Make(Opcode.LoadConstant, 1),
-                Make(Opcode.LoadConstant, 2),
-                Make(Opcode.Add),
-                Make(Opcode.LoadConstant, 3),
-                Make(Opcode.LoadConstant, 4),
-                Make(Opcode.Add),
-                Make(Opcode.Multiply),
+                Make(Opcode.LoadConstant, null, 1),
+                Make(Opcode.LoadConstant, null, 2),
+                Make(Opcode.Add, null),
+                Make(Opcode.LoadConstant, null, 3),
+                Make(Opcode.LoadConstant, null, 4),
+                Make(Opcode.Add, null),
+                Make(Opcode.Multiply, null),
             }
         },
         new object[]
@@ -68,13 +68,13 @@ public class ParserTest
             "(1+2)/(3+4)",
             new[]
             {
-                Make(Opcode.LoadConstant, 1),
-                Make(Opcode.LoadConstant, 2),
-                Make(Opcode.Add),
-                Make(Opcode.LoadConstant, 3),
-                Make(Opcode.LoadConstant, 4),
-                Make(Opcode.Add),
-                Make(Opcode.Divide),
+                Make(Opcode.LoadConstant, null, 1),
+                Make(Opcode.LoadConstant, null, 2),
+                Make(Opcode.Add, null),
+                Make(Opcode.LoadConstant, null, 3),
+                Make(Opcode.LoadConstant, null, 4),
+                Make(Opcode.Add, null),
+                Make(Opcode.Divide, null),
             }
         },
         // 예외
@@ -83,13 +83,13 @@ public class ParserTest
             "(1+2)*(3@4)",
             new[]
             {
-                Make(Opcode.LoadConstant, 1),
-                Make(Opcode.LoadConstant, 2),
-                Make(Opcode.Add),
-                Make(Opcode.LoadConstant, 3),
-                Make(Opcode.LoadConstant, 4),
-                Make(Opcode.Add),
-                Make(Opcode.Divide),
+                Make(Opcode.LoadConstant, null, 1),
+                Make(Opcode.LoadConstant, null, 2),
+                Make(Opcode.Add, null),
+                Make(Opcode.LoadConstant, null, 3),
+                Make(Opcode.LoadConstant, null, 4),
+                Make(Opcode.Add, null),
+                Make(Opcode.Divide, null),
             }
         },
         new object[]
@@ -97,13 +97,13 @@ public class ParserTest
         "(1+2)*(3+4)\n",
         new[]
         {
-            Make(Opcode.LoadConstant, 1),
-            Make(Opcode.LoadConstant, 2),
-            Make(Opcode.Add),
-            Make(Opcode.LoadConstant, 3),
-            Make(Opcode.LoadConstant, 4),
-            Make(Opcode.Add),
-            Make(Opcode.Multiply),
+            Make(Opcode.LoadConstant, null, 1),
+            Make(Opcode.LoadConstant, null, 2),
+            Make(Opcode.Add, null),
+            Make(Opcode.LoadConstant, null, 3),
+            Make(Opcode.LoadConstant, null, 4),
+            Make(Opcode.Add, null),
+            Make(Opcode.Multiply, null),
         }
         }
     };

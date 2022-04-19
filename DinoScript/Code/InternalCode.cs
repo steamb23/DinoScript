@@ -15,18 +15,18 @@ public readonly struct InternalCode
 
     public IReadOnlyList<object> Operands { get; }
     
-    public Token Token { get; }
+    public Token? Token { get; }
 
-    private InternalCode(Opcode opcode, Token token, params object[] operand)
+    private InternalCode(Opcode opcode, Token? token, params object[] operand)
     {
         Opcode = opcode;
         Operands = operand;
         Token = token;
     }
 
-    public static InternalCode Make(Opcode opcode, Token token) => new InternalCode(opcode, token);
+    public static InternalCode Make(Opcode opcode, Token? token) => new InternalCode(opcode, token);
 
-    public static InternalCode Make(Opcode opcode, Token token, double value)
+    public static InternalCode Make(Opcode opcode, Token? token, double value)
     {
         switch (opcode)
         {
