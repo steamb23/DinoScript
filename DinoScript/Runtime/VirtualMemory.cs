@@ -4,11 +4,11 @@ public class VirtualMemory
 {
     private readonly Dictionary<ulong, object> objectTable = new();
 
-    // id 난독화에 사용될 임의의 값
-    private readonly ulong randomizeValue = unchecked((ulong)Random.Shared.NextInt64());
+    // address 난독화에 사용될 임의의 값
+    private readonly ulong randomizeValue = unchecked((ulong)Random.Shared.NextInt64(long.MinValue, long.MaxValue));
 
     // 데이터 추가 및 관리에 사용되는 내부 아이디
-    private ulong autoId = 0;
+    private ulong autoAddress = 0;
 
     public VirtualStack Stack { get; }
 
@@ -17,11 +17,11 @@ public class VirtualMemory
         Stack = new VirtualStack(stackSize);
     }
 
-    public object this[ulong id] => objectTable[id];
+    public object this[ulong address] => objectTable[unchecked(address - randomizeValue)];
 
     public ulong Add(object item)
     {
-        if (!objectTable.TryAdd(autoId, item))
+        if (!objectTable.TryAdd(autoAddress, item))
         {
             // 추가에 실패했을 경우 objectTable 순회하면서 빈 아이디 공간 찾기
             // 단, 이 경우는 정말 최악의 경우이며 발생 했을 경우 큰 성능 문제가 될 수도 있음
@@ -37,8 +37,8 @@ public class VirtualMemory
                 if (distance > 1)
                 {
                     // 빈공간 찾음
-                    autoId = unchecked(previousId + 1);
-                    objectTable.Add(autoId, item);
+                    autoAddress = unchecked(previousId + 1);
+                    objectTable.Add(autoAddress, item);
                     break;
                 }
 
@@ -46,13 +46,13 @@ public class VirtualMemory
             }
         }
 
-        return unchecked(autoId++ + randomizeValue);
+        return unchecked(autoAddress++ + randomizeValue);
     }
 
-    public bool Remove(ulong id)
+    public bool Remove(ulong address)
     {
-        id = unchecked(id - randomizeValue);
+        address = unchecked(address - randomizeValue);
 
-        return objectTable.Remove(id);
+        return objectTable.Remove(address);
     }
 }
