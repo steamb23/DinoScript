@@ -13,6 +13,8 @@ public partial class SyntaxParser
     void Expression()
     {
         SubExpression(out _);
+        // 표현식 코드 생성이 안됬을 경우 강제 생성 (PrimaryExpression만 있고 연산자가 없는 경우)
+        CodeGenerator.GenerateExpression();
     }
 
     void GroupExpression()
