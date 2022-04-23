@@ -20,6 +20,7 @@ public class VirtualStack
     public byte this[ulong address] => stackArray[unchecked(address - randomizeValue)];
 
     #region StackFrame
+
     /// <summary>
     /// 현재 스택 커서 위치에 스택 프레임을 생성합니다.
     /// </summary>
@@ -41,6 +42,7 @@ public class VirtualStack
 
         stackCursor = resultCursor;
     }
+
     #endregion
 
     #region Push
@@ -74,6 +76,13 @@ public class VirtualStack
 
     #region Peek
 
+    public double PeekDouble()
+    {
+        Span<byte> buffer = stackalloc byte[sizeof(double)];
+        Peek(buffer);
+        return BitConverter.ToDouble(buffer);
+    }
+
     private void Peek(Span<byte> buffer)
     {
         var length = buffer.Length;
@@ -90,6 +99,13 @@ public class VirtualStack
         Span<byte> arraySpan = stackArray.AsSpan(stackCursor - length, length);
         arraySpan.Fill(0);
         stackCursor -= length;
+    }
+
+    public double PopDouble()
+    {
+        Span<byte> buffer = stackalloc byte[sizeof(double)];
+        Pop(buffer);
+        return BitConverter.ToDouble(buffer);
     }
 
     private void Pop(Span<byte> buffer)
