@@ -1,6 +1,6 @@
 ﻿namespace DinoScript.Code;
 
-public enum Opcode
+public enum Opcode : byte
 {
     NoOperation,
     /// <summary>
