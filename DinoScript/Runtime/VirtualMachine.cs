@@ -14,7 +14,7 @@ public partial class VirtualMachine : IDisposable
     {
         options ??= VirtualMachineOptions.Default;
 
-        memory = new VirtualMemory(options.StackSize);
+        Memory = new VirtualMemory(options.StackSize);
 
         Parser = new SyntaxParser(textReader, options.ParserMode);
         internalCodeIndex = 0;

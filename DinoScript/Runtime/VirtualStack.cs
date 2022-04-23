@@ -19,6 +19,13 @@ public class VirtualStack
 
     public byte this[ulong address] => stackArray[unchecked(address - randomizeValue)];
 
+    public byte[] CopyToArray()
+    {
+        var arr = new byte[stackCursor];
+        stackArray.CopyTo(arr, 0);
+        return arr;
+    }
+
     #region StackFrame
 
     /// <summary>

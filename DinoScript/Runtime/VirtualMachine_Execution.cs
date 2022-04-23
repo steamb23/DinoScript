@@ -4,7 +4,7 @@ namespace DinoScript.Runtime;
 
 public partial class VirtualMachine
 {
-    private VirtualMemory memory;
+    public VirtualMemory Memory { get; }
 
     /// <summary>
     /// 코드를 실행합니다.
@@ -18,36 +18,36 @@ public partial class VirtualMachine
                 // 아무 것도 실행하지 않음
                 break;
             case Opcode.LoadConstantNumber:
-                memory.Stack.Push((double)code.Operands[0]);
+                Memory.Stack.Push((double)code.Operands[0]);
                 break;
             case Opcode.Pop:
                 break;
             case Opcode.Add:
             {
-                var v1 = memory.Stack.PopDouble();
-                var v2 = memory.Stack.PopDouble();
-                memory.Stack.Push(v2 + v1);
+                var v1 = Memory.Stack.PopDouble();
+                var v2 = Memory.Stack.PopDouble();
+                Memory.Stack.Push(v2 + v1);
                 break;
             }
             case Opcode.Subtract:
             {
-                var v1 = memory.Stack.PopDouble();
-                var v2 = memory.Stack.PopDouble();
-                memory.Stack.Push(v2 - v1);
+                var v1 = Memory.Stack.PopDouble();
+                var v2 = Memory.Stack.PopDouble();
+                Memory.Stack.Push(v2 - v1);
                 break;
             }
             case Opcode.Multiply:
             {
-                var v1 = memory.Stack.PopDouble();
-                var v2 = memory.Stack.PopDouble();
-                memory.Stack.Push(v2 * v1);
+                var v1 = Memory.Stack.PopDouble();
+                var v2 = Memory.Stack.PopDouble();
+                Memory.Stack.Push(v2 * v1);
                 break;
             }
             case Opcode.Divide:
             {
-                var v1 = memory.Stack.PopDouble();
-                var v2 = memory.Stack.PopDouble();
-                memory.Stack.Push(v2 / v1);
+                var v1 = Memory.Stack.PopDouble();
+                var v2 = Memory.Stack.PopDouble();
+                Memory.Stack.Push(v2 / v1);
                 break;
             }
         }
