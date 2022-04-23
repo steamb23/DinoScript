@@ -9,19 +9,14 @@ public partial class VirtualMachine : IDisposable
     private int internalCodeIndex = 0;
 
     public SyntaxParser? Parser { get; private set; }
-    
-    public VirtualMachine()
-    {
-    }
 
-    public VirtualMachine(TextReader textReader, ParserMode parserMode = ParserMode.Full)
+    public VirtualMachine(TextReader textReader, VirtualMachineOptions? options = null)
     {
-        Initialize(textReader, parserMode);
-    }
+        options ??= VirtualMachineOptions.Default;
 
-    public void Initialize(TextReader textReader, ParserMode parserMode = ParserMode.Full)
-    {
-        Parser = new SyntaxParser(textReader, parserMode);
+        memory = new VirtualMemory(options.StackSize);
+
+        Parser = new SyntaxParser(textReader, options.ParserMode);
         internalCodeIndex = 0;
     }
 
