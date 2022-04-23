@@ -59,7 +59,7 @@ public class TextBuffer : IDisposable
     {
         int count = bufferLastIndex - bufferIndex;
         // count가 1024보다 작을 경우 텍스트 버퍼 작업
-        if (count < TextLength && isEndOfTextReader)
+        if (count < TextLength && !isEndOfTextReader)
         {
             int read = 0;
 
@@ -73,7 +73,7 @@ public class TextBuffer : IDisposable
 
             read = textReader.Read(buffer, bufferLastIndex, TextLength);
 
-            if (read == -1)
+            if (read <= 0)
             {
                 isEndOfTextReader = true;
             }

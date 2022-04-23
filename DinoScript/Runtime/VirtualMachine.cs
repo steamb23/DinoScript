@@ -25,7 +25,7 @@ public partial class VirtualMachine : IDisposable
     /// </summary>
     public void Next()
     {
-        if (internalCodeIndex < InternalCodes!.Count)
+        if (internalCodeIndex < InternalCodes.Count)
         {
             RunCode(InternalCodes[internalCodeIndex]);
             internalCodeIndex++;
@@ -46,7 +46,7 @@ public partial class VirtualMachine : IDisposable
     /// </summary>
     public void Run()
     {
-        while (!Parser.IsEndOfText)
+        while (internalCodeIndex < InternalCodes.Count || !Parser.IsEndOfText)
         {
             Next();
         }
