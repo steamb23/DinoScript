@@ -13,6 +13,7 @@ public partial class VirtualMachine
     {
         switch (code.Opcode)
         {
+            default:
             case Opcode.NoOperation:
                 // 아무 것도 실행하지 않음
                 break;
@@ -49,8 +50,6 @@ public partial class VirtualMachine
                 memory.Stack.Push(v2 / v1);
                 break;
             }
-            default:
-                throw new NotImplementedException();
         }
     }
 }
