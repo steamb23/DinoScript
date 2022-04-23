@@ -42,7 +42,7 @@ public class Tokenizer : IDisposable
         new(TokenType.Mark,
             "^(\\(|\\)|\\[|\\])"),
         new(TokenType.NumberLiteral,
-            "^(0x(\\d|a|b|c|d|e|f|A|B|C|D|E|F|_)+|0b(0|1|_)+|(\\d|_)+)"),
+            "^(0x(\\d|a|b|c|d|e|f|A|B|C|D|E|F|_)+|0b(0|1|_)+|(\\d|_)+\\.?(\\d|_)*)"),
         new(TokenType.CharacterLiteral,
             // 'singleCharacter'
             "^('[^']?)'"),
