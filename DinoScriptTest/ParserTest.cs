@@ -105,6 +105,14 @@ public class ParserTest
                 Make(Opcode.Add, null),
                 Make(Opcode.Multiply, null),
             }
+        },
+        new object[]
+        {
+            "100_100.100_100",
+            new[]
+            {
+                Make(Opcode.LoadConstantNumber, null, 100_100.100_100),
+            }
         }
     };
 
