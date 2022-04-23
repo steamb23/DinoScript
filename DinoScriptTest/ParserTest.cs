@@ -94,17 +94,17 @@ public class ParserTest
         },
         new object[]
         {
-        "(1+2)*(3+4)\n",
-        new[]
-        {
-            Make(Opcode.LoadConstantNumber, null, 1),
-            Make(Opcode.LoadConstantNumber, null, 2),
-            Make(Opcode.Add, null),
-            Make(Opcode.LoadConstantNumber, null, 3),
-            Make(Opcode.LoadConstantNumber, null, 4),
-            Make(Opcode.Add, null),
-            Make(Opcode.Multiply, null),
-        }
+            "(1+2)*(3+4)\n",
+            new[]
+            {
+                Make(Opcode.LoadConstantNumber, null, 1),
+                Make(Opcode.LoadConstantNumber, null, 2),
+                Make(Opcode.Add, null),
+                Make(Opcode.LoadConstantNumber, null, 3),
+                Make(Opcode.LoadConstantNumber, null, 4),
+                Make(Opcode.Add, null),
+                Make(Opcode.Multiply, null),
+            }
         }
     };
 
