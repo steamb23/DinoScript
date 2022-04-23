@@ -7,9 +7,6 @@ namespace DinoScript.Parser;
 /// </summary>
 public class TextBuffer : IDisposable
 {
-    /// <summary>
-    /// 
-    /// </summary>
     public const int TextLength = 1024;
 
     public const int BufferLength = TextLength * 2;
@@ -17,6 +14,17 @@ public class TextBuffer : IDisposable
     private TextReader textReader;
     private char[] buffer = new char[BufferLength];
     private string? text = null;
+
+    /// <summary>
+    /// textReader가 끝에 도달했는지 나타냅니다.
+    /// </summary>
+    private bool isEndOfTextReader;
+
+    /// <summary>
+    /// 텍스트의 끝에 도달했는지 여부를 가져옵니다.
+    /// </summary>
+    public bool IsEndOfText => isEndOfTextReader &&
+                               bufferLastIndex - bufferIndex <= 0;
 
     /// <summary>
     /// 원본에 대한 현재 인덱스
@@ -45,13 +53,13 @@ public class TextBuffer : IDisposable
     }
 
     /// <summary>
-    /// 텍스트를 반환할 수 있도록 <see cref="TextReader"/>에서 문자열을 읽어 저장해둡니다.
+    /// 텍스트를 반환할 수 있도록 <see cref="TextReader"/>에서 문자열을 읽어 저장해두거나 정렬합니다.
     /// </summary>
     private void MakeText()
     {
         int count = bufferLastIndex - bufferIndex;
         // count가 1024보다 작을 경우 텍스트 버퍼 작업
-        if (count < TextLength)
+        if (count < TextLength && isEndOfTextReader)
         {
             int read = 0;
 
@@ -64,6 +72,11 @@ public class TextBuffer : IDisposable
             }
 
             read = textReader.Read(buffer, bufferLastIndex, TextLength);
+
+            if (read == -1)
+            {
+                isEndOfTextReader = true;
+            }
 
             bufferLastIndex += read;
             LastIndex += read;

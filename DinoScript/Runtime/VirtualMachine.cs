@@ -41,10 +41,11 @@ public partial class VirtualMachine : IDisposable
         // 내부 코드가 부족할 경우 추가 파싱 시도
         else
         {
-            // TODO: Parser가 EOT에 도달했는지 체크 할 수 있도록 수정 필요
-            Parser.Next();
-            // EOT가 아닐 경우 재귀 호출
-            Next();
+            if (Parser.Next())
+            {
+                // EOT가 아닐 경우 재귀 호출
+                Next();
+            }
         }
     }
 

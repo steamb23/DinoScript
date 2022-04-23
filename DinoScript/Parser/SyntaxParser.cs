@@ -13,7 +13,7 @@ public partial class SyntaxParser : IDisposable
     private List<InternalCode> codes = new();
 
     public CodeGenerator CodeGenerator { get; } = new();
-    
+
     public ParserMode ParserMode { get; }
 
     public SyntaxParser(TextReader textReader, ParserMode parserMode = ParserMode.Full)
@@ -22,11 +22,18 @@ public partial class SyntaxParser : IDisposable
         ParserMode = parserMode;
     }
 
-    public void Next()
+    /// <summary>
+    /// 토큰을 읽어 다음 내부 코드를 생성합니다.
+    /// </summary>
+    /// <returns>토크나이저의 텍스트가 끝에 도달하면 false입니다.</returns>
+    public bool Next()
     {
+        if (Tokenizer.IsEndOfText)
+            return false;
         Root();
+        return true;
     }
-    
+
     void Root()
     {
         switch (ParserMode)

@@ -65,6 +65,8 @@ public class Tokenizer : IDisposable
         this.textBuffer = new TextBuffer(textReader);
     }
 
+    public bool IsEndOfText => textBuffer.IsEndOfText;
+
     /// <summary>
     /// 현재 토큰을 가져옵니다.
     /// </summary>
