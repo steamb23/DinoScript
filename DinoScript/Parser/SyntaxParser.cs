@@ -22,6 +22,8 @@ public partial class SyntaxParser : IDisposable
         ParserMode = parserMode;
     }
 
+    public bool IsEndOfText => Tokenizer.IsEndOfText;
+
     /// <summary>
     /// 토큰을 읽어 다음 내부 코드를 생성합니다.
     /// </summary>

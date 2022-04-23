@@ -5,10 +5,10 @@ namespace DinoScript.Runtime;
 
 public partial class VirtualMachine : IDisposable
 {
-    public IReadOnlyList<InternalCode>? InternalCodes => Parser?.CodeGenerator.Codes;
+    public IReadOnlyList<InternalCode> InternalCodes => Parser.CodeGenerator.Codes;
     private int internalCodeIndex = 0;
 
-    public SyntaxParser? Parser { get; private set; }
+    public SyntaxParser Parser { get; private set; }
 
     public VirtualMachine(TextReader textReader, VirtualMachineOptions? options = null)
     {
@@ -25,9 +25,6 @@ public partial class VirtualMachine : IDisposable
     /// </summary>
     public void Next()
     {
-        if (Parser == null)
-            return;
-
         if (internalCodeIndex < InternalCodes!.Count)
         {
             RunCode(InternalCodes[internalCodeIndex]);
@@ -41,6 +38,17 @@ public partial class VirtualMachine : IDisposable
                 // EOT가 아닐 경우 재귀 호출
                 Next();
             }
+        }
+    }
+
+    /// <summary>
+    /// 처음부터 끝까지 모든 코드를 실행합니다.
+    /// </summary>
+    public void Run()
+    {
+        while (!Parser.IsEndOfText)
+        {
+            Next();
         }
     }
 
