@@ -1,0 +1,3 @@
+[submodule "TerraText"]
+	path = TerraText
+	url = https://github.com/steamb23/TerraText.git
