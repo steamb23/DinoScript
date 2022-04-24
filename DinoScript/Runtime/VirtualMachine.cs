@@ -17,6 +17,7 @@ public partial class VirtualMachine : IDisposable
         Memory = new VirtualMemory(options.StackSize);
 
         Parser = new SyntaxParser(textReader, options.ParserMode);
+        textReader.ReadLine();
         internalCodeIndex = 0;
     }
 
@@ -51,6 +52,8 @@ public partial class VirtualMachine : IDisposable
             Next();
         }
     }
+
+    public ResultView Result => new ResultView(Memory);
 
     public void Dispose()
     {

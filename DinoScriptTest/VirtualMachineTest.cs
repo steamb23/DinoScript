@@ -51,7 +51,7 @@ public class VirtualMachineTest
         vm.Run();
 
         // 결과값 가져오기
-        var result = vm.Memory.Stack.PeekDouble();
+        var result = vm.Result.Double ?? double.NaN;
 
         testOutputHelper.WriteLine($"expectedValue: {expectedValue}, actualValue: {result}");
 

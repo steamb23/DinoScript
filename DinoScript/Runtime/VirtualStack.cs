@@ -4,9 +4,6 @@ public class VirtualStack
 {
     public const int DefaultStackSize = 1024 * 1024;
 
-    // address 난독화에 사용될 임의의 값
-    private readonly ulong randomizeValue = unchecked((ulong)Random.Shared.NextInt64(long.MinValue, long.MaxValue));
-
     private readonly byte[] stackArray;
     private readonly Stack<int> stackFrame = new(64);
 
@@ -17,7 +14,7 @@ public class VirtualStack
         stackArray = new byte[DefaultStackSize];
     }
 
-    public byte this[ulong address] => stackArray[unchecked(address - randomizeValue)];
+    public byte this[int index] => stackArray[index];
 
     public byte[] CopyToArray()
     {
@@ -54,7 +51,7 @@ public class VirtualStack
 
     #region Push
 
-    private void Push(byte value)
+    internal void Push(byte value)
     {
         stackArray[stackCursor] = value;
         stackCursor += 1;
@@ -90,22 +87,39 @@ public class VirtualStack
         return BitConverter.ToDouble(buffer);
     }
 
-    private void Peek(Span<byte> buffer)
+    internal int Peek(Span<byte> buffer)
     {
         var length = buffer.Length;
-        Span<byte> arraySpan = stackArray.AsSpan(stackCursor - length, length);
+        var index = stackCursor - length;
+        if (index < 0)
+        {
+            length -= index;
+            index = 0;
+        }
+        
+        Span<byte> arraySpan = stackArray.AsSpan(index, length);
         arraySpan.CopyTo(buffer);
+
+        return length;
     }
 
     #endregion
 
     #region Pop
 
-    public void Pop(int length = 1)
+    public int Pop(int length = 1)
     {
-        Span<byte> arraySpan = stackArray.AsSpan(stackCursor - length, length);
+        var index = stackCursor - length;
+        if (index < 0)
+        {
+            length -= index;
+            index = 0;
+        }
+        Span<byte> arraySpan = stackArray.AsSpan(index, length);
         arraySpan.Fill(0);
         stackCursor -= length;
+
+        return length;
     }
 
     public double PopDouble()
@@ -115,14 +129,22 @@ public class VirtualStack
         return BitConverter.ToDouble(buffer);
     }
 
-    private void Pop(Span<byte> buffer)
+    internal int Pop(Span<byte> buffer)
     {
         var length = buffer.Length;
-        Span<byte> arraySpan = stackArray.AsSpan(stackCursor - length, length);
+        var index = stackCursor - length;
+        if (index < 0)
+        {
+            length -= index;
+            index = 0;
+        }
+        Span<byte> arraySpan = stackArray.AsSpan(index, length);
         arraySpan.CopyTo(buffer);
 
         arraySpan.Fill(0);
         stackCursor -= length;
+
+        return length;
     }
 
     #endregion

@@ -19,6 +19,8 @@ public class VirtualMemory
 
     public object this[ulong address] => objectTable[unchecked(address - randomizeValue)];
 
+    public bool TryGet(ulong address, out object? @object) => objectTable.TryGetValue(address, out @object);
+
     public ulong Add(object item)
     {
         if (!objectTable.TryAdd(autoAddress, item))
