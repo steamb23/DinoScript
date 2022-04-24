@@ -21,7 +21,7 @@ public class Tokenizer : IDisposable
 
     // Regex 문법 테스트시 http://regexstorm.net/tester 참조
     // 주의: EndOfLine과 StringLiteral을 제외한 나머지 토큰은 토큰 내에 개행이 올 수 없습니다.
-    private readonly List<TokenDefinition> tokenDefinitions = new()
+    private static readonly List<TokenDefinition> tokenDefinitions = new()
     {
         // Regex 지옥... 죽여줘...
         // // 문자열 리터럴은 수동 처리
