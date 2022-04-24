@@ -55,8 +55,20 @@ public partial class VirtualMachine : IDisposable
 
     public ResultView Result => new ResultView(Memory);
 
+    private void ReleaseUnmanagedResources()
+    {
+        Memory.Stack.Dispose();
+    }
+
     public void Dispose()
     {
         Parser?.Dispose();
+        ReleaseUnmanagedResources();
+        GC.SuppressFinalize(this);
+    }
+
+    ~VirtualMachine()
+    {
+        ReleaseUnmanagedResources();
     }
 }

@@ -37,6 +37,7 @@ public class ExpressionTestScene : Scene
                 stopwatch.Stop();
                 Console.WriteLine($"결과: {machine.Result.Double}");
                 Console.WriteLine($"실행 시간: {stopwatch.Elapsed.TotalMilliseconds} ms");
+                machine.Dispose();
             }
             catch (Exception e)
             {

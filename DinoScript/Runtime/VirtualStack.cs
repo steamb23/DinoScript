@@ -1,8 +1,12 @@
-﻿namespace DinoScript.Runtime;
+﻿using System.Buffers;
 
-public class VirtualStack
+namespace DinoScript.Runtime;
+
+public class VirtualStack : IDisposable
 {
     public const int DefaultStackSize = 1024 * 1024;
+
+    private static ArrayPool<byte> arrayPool = ArrayPool<byte>.Shared;
 
     private readonly byte[] stackArray;
     private readonly Stack<int> stackFrame = new(64);
@@ -11,14 +15,14 @@ public class VirtualStack
 
     public VirtualStack(int stackSize = DefaultStackSize)
     {
-        stackArray = new byte[DefaultStackSize];
+        stackArray = arrayPool.Rent(DefaultStackSize);
     }
 
     public byte this[int index] => stackArray[index];
 
     public byte[] CopyToArray()
     {
-        var arr = new byte[stackCursor];
+        var arr = new byte[DefaultStackSize];
         stackArray.CopyTo(arr, 0);
         return arr;
     }
@@ -96,7 +100,7 @@ public class VirtualStack
             length -= index;
             index = 0;
         }
-        
+
         Span<byte> arraySpan = stackArray.AsSpan(index, length);
         arraySpan.CopyTo(buffer);
 
@@ -115,6 +119,7 @@ public class VirtualStack
             length -= index;
             index = 0;
         }
+
         Span<byte> arraySpan = stackArray.AsSpan(index, length);
         arraySpan.Fill(0);
         stackCursor -= length;
@@ -138,6 +143,7 @@ public class VirtualStack
             length -= index;
             index = 0;
         }
+
         Span<byte> arraySpan = stackArray.AsSpan(index, length);
         arraySpan.CopyTo(buffer);
 
@@ -148,4 +154,20 @@ public class VirtualStack
     }
 
     #endregion
+
+    private void ReleaseUnmanagedResources()
+    {
+        arrayPool.Return(stackArray);
+    }
+
+    public void Dispose()
+    {
+        ReleaseUnmanagedResources();
+        GC.SuppressFinalize(this);
+    }
+
+    ~VirtualStack()
+    {
+        ReleaseUnmanagedResources();
+    }
 }
