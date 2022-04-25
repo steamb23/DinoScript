@@ -13,10 +13,10 @@ public class MainScene : Scene
         switch (option.SelectWithInputForm())
         {
             case 0:
-                SceneManager.ReserveChildScene(new ExpressionTestScene());
+                SceneManager!.ReserveChildScene(new ExpressionTestScene());
                 break;
             default:
-                SceneManager.ReserveExit();
+                SceneManager!.ReserveExit();
                 break;
         }
     }

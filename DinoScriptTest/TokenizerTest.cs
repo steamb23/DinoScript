@@ -19,11 +19,7 @@ public class TokenizerTest
 
     private static Token MakeTestToken(TokenType tokenType, string value)
     {
-        return new Token()
-        {
-            Type = tokenType,
-            Value = value
-        };
+        return new Token(tokenType, value);
     }
 
     public static IEnumerable<object[]> TokenTestDataList => new[]

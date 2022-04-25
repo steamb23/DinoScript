@@ -1,24 +1,25 @@
 ﻿using System.Text.RegularExpressions;
 using JetBrains.Annotations;
 
-namespace DinoScript.Syntax;
-
-public class TokenDefinition
+namespace DinoScript.Syntax
 {
-    /// <summary>
-    /// 정규표현식을 가져옵니다.
-    /// </summary>
-    public Regex Regex { get; }
-
-    /// <summary>
-    /// 토큰의 타입을 가져옵니다.
-    /// </summary>
-    public TokenType Type { get; }
-
-    public TokenDefinition(TokenType tokenType,[RegexPattern] string pattern, RegexOptions regexOptions = RegexOptions.Compiled| RegexOptions.Singleline)
+    public class TokenDefinition
     {
-        Type = tokenType;
+        /// <summary>
+        /// 정규표현식을 가져옵니다.
+        /// </summary>
+        public Regex Regex { get; }
 
-        Regex = new Regex(pattern, regexOptions);
+        /// <summary>
+        /// 토큰의 타입을 가져옵니다.
+        /// </summary>
+        public TokenType Type { get; }
+
+        public TokenDefinition(TokenType tokenType,[RegexPattern] string pattern, RegexOptions regexOptions = RegexOptions.Compiled| RegexOptions.Singleline)
+        {
+            Type = tokenType;
+
+            Regex = new Regex(pattern, regexOptions);
+        }
     }
 }

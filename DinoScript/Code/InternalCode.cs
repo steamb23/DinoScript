@@ -1,53 +1,56 @@
-﻿using System.Runtime.InteropServices;
+﻿using System;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using DinoScript.Syntax;
 
-namespace DinoScript.Code;
-
-/// <summary>
-/// 다이노스크립트의 중간 코드를 나타냅니다.
-/// </summary>
-[StructLayout(LayoutKind.Sequential)]
-public readonly struct InternalCode
+namespace DinoScript.Code
 {
-    public Opcode Opcode { get; }
+    /// <summary>
+    /// 다이노스크립트의 중간 코드를 나타냅니다.
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential)]
+    public readonly struct InternalCode
+    {
+        public Opcode Opcode { get; }
 
-    public IReadOnlyList<object> Operands { get; }
+        public IReadOnlyList<object> Operands { get; }
     
-    public Token? Token { get; }
+        public Token? Token { get; }
 
-    private InternalCode(Opcode opcode, Token? token, params object[] operand)
-    {
-        Opcode = opcode;
-        Operands = operand;
-        Token = token;
-    }
-
-    public static InternalCode Make(Opcode opcode, Token? token) => new InternalCode(opcode, token);
-
-    public static InternalCode Make(Opcode opcode, Token? token, double value)
-    {
-        switch (opcode)
+        private InternalCode(Opcode opcode, Token? token, params object[] operand)
         {
-            case Opcode.LoadConstantNumber:
-                return new InternalCode(opcode, token, value);
-            default:
-                throw new ArgumentException(null, nameof(opcode));
+            Opcode = opcode;
+            Operands = operand;
+            Token = token;
         }
-    }
 
-    public override string ToString()
-    {
-        var builder = new StringBuilder();
-        builder.Append('{');
-        builder.Append(Opcode);
-        if (Operands.Count > 0)
+        public static InternalCode Make(Opcode opcode, Token? token) => new InternalCode(opcode, token);
+
+        public static InternalCode Make(Opcode opcode, Token? token, double value)
         {
-            builder.Append(", ");
-            builder.Append(string.Join(", ", Operands));
+            switch (opcode)
+            {
+                case Opcode.LoadConstantNumber:
+                    return new InternalCode(opcode, token, value);
+                default:
+                    throw new ArgumentException(null, nameof(opcode));
+            }
         }
-        builder.Append('}');
-        return builder.ToString();
+
+        public override string ToString()
+        {
+            var builder = new StringBuilder();
+            builder.Append('{');
+            builder.Append(Opcode);
+            if (Operands.Count > 0)
+            {
+                builder.Append(", ");
+                builder.Append(string.Join(", ", Operands));
+            }
+            builder.Append('}');
+            return builder.ToString();
+        }
     }
 }

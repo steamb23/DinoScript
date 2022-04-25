@@ -1,13 +1,14 @@
-﻿namespace DinoScript.Parser;
-
-public enum ParserMode
+﻿namespace DinoScript.Parser
 {
-    /// <summary>
-    /// 전체 구성으로 동작합니다.
-    /// </summary>
-    Full,
-    /// <summary>
-    /// 표현식 테스트 모드로 동작합니다.
-    /// </summary>
-    ExpressionTest
+    public enum ParserMode
+    {
+        /// <summary>
+        /// 전체 구성으로 동작합니다.
+        /// </summary>
+        Full,
+        /// <summary>
+        /// 표현식 테스트 모드로 동작합니다.
+        /// </summary>
+        ExpressionTest
+    }
 }

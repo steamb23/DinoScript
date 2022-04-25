@@ -2,6 +2,7 @@
 using TerraText;
 using DinoScript;
 using DinoScript.Parser;
+using DinoScript.Runtime;
 
 namespace DinoScriptExample;
 
@@ -30,10 +31,9 @@ public class ExpressionTestScene : Scene
             try
             {
                 stopwatch.Restart();
-                var machine = Script.Run(input, new()
-                {
-                    ParserMode = ParserMode.ExpressionTest
-                });
+                var machine = Script.Run(input, new VirtualMachineOptions(
+                    ParserMode.ExpressionTest)
+                );
                 stopwatch.Stop();
                 Console.WriteLine($"결과: {machine.Result.Double}");
                 Console.WriteLine($"실행 시간: {stopwatch.Elapsed.TotalMilliseconds} ms");

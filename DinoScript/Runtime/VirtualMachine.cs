@@ -1,74 +1,78 @@
-﻿using DinoScript.Code;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using DinoScript.Code;
 using DinoScript.Parser;
 
-namespace DinoScript.Runtime;
-
-public partial class VirtualMachine : IDisposable
+namespace DinoScript.Runtime
 {
-    public IReadOnlyList<InternalCode> InternalCodes => Parser.CodeGenerator.Codes;
-    private int internalCodeIndex = 0;
-
-    public SyntaxParser Parser { get; private set; }
-
-    public VirtualMachine(TextReader textReader, VirtualMachineOptions? options = null)
+    public partial class VirtualMachine : IDisposable
     {
-        options ??= VirtualMachineOptions.Default;
+        public IReadOnlyList<InternalCode> InternalCodes => Parser.CodeGenerator.Codes;
+        private int internalCodeIndex = 0;
 
-        Memory = new VirtualMemory(options.StackSize);
+        public SyntaxParser Parser { get; private set; }
 
-        Parser = new SyntaxParser(textReader, options.ParserMode);
-        textReader.ReadLine();
-        internalCodeIndex = 0;
-    }
-
-    /// <summary>
-    /// 다음 코드를 실행합니다.
-    /// </summary>
-    public void Next()
-    {
-        if (internalCodeIndex < InternalCodes.Count)
+        public VirtualMachine(TextReader textReader, VirtualMachineOptions? options = null)
         {
-            RunCode(InternalCodes[internalCodeIndex]);
-            internalCodeIndex++;
+            options ??= VirtualMachineOptions.Default;
+
+            Memory = new VirtualMemory(options.StackSize);
+
+            Parser = new SyntaxParser(textReader, options.ParserMode);
+            textReader.ReadLine();
+            internalCodeIndex = 0;
         }
-        // 내부 코드가 부족할 경우 추가 파싱 시도
-        else
+
+        /// <summary>
+        /// 다음 코드를 실행합니다.
+        /// </summary>
+        public void Next()
         {
-            if (Parser.Next())
+            if (internalCodeIndex < InternalCodes.Count)
             {
-                // EOT가 아닐 경우 재귀 호출
+                RunCode(InternalCodes[internalCodeIndex]);
+                internalCodeIndex++;
+            }
+            // 내부 코드가 부족할 경우 추가 파싱 시도
+            else
+            {
+                if (Parser.Next())
+                {
+                    // EOT가 아닐 경우 재귀 호출
+                    Next();
+                }
+            }
+        }
+
+        /// <summary>
+        /// 처음부터 끝까지 모든 코드를 실행합니다.
+        /// </summary>
+        public void Run()
+        {
+            while (internalCodeIndex < InternalCodes.Count || !Parser.IsEndOfText)
+            {
                 Next();
             }
         }
-    }
 
-    /// <summary>
-    /// 처음부터 끝까지 모든 코드를 실행합니다.
-    /// </summary>
-    public void Run()
-    {
-        while (internalCodeIndex < InternalCodes.Count || !Parser.IsEndOfText)
+        public ResultView Result => new ResultView(Memory);
+
+        private void ReleaseUnmanagedResources()
         {
-            Next();
+            Memory.Stack.Dispose();
         }
-    }
 
-    public ResultView Result => new ResultView(Memory);
+        public void Dispose()
+        {
+            Parser?.Dispose();
+            ReleaseUnmanagedResources();
+            GC.SuppressFinalize(this);
+        }
 
-    private void ReleaseUnmanagedResources()
-    {
-        Memory.Stack.Dispose();
-    }
-
-    public void Dispose()
-    {
-        Parser?.Dispose();
-        ReleaseUnmanagedResources();
-        GC.SuppressFinalize(this);
-    }
-
-    ~VirtualMachine()
-    {
-        ReleaseUnmanagedResources();
+        ~VirtualMachine()
+        {
+            ReleaseUnmanagedResources();
+        }
     }
 }

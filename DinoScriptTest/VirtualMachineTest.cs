@@ -43,10 +43,9 @@ public class VirtualMachineTest
     [MemberData(nameof(ExpressionTestDataList))]
     public void ExpressionTest(string text, double expectedValue)
     {
-        var vm = new VirtualMachine(new StringReader(text), new()
-        {
-            ParserMode = ParserMode.ExpressionTest,
-        });
+        var vm = new VirtualMachine(new StringReader(text), new VirtualMachineOptions(
+            parserMode: ParserMode.ExpressionTest)
+        );
 
         vm.Run();
 

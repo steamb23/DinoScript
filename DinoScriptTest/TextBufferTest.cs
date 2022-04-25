@@ -54,7 +54,6 @@ public class TextBufferTest
         using var stringReader = new StringReader(testText);
         var textBuffer = new TextBuffer(stringReader);
 
-        const int cutoutLength = 3;
         textBuffer.NextText();
 
         var text = textBuffer.GetText();
