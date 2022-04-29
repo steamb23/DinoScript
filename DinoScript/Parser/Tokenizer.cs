@@ -45,7 +45,7 @@ namespace DinoScript.Parser
             new TokenDefinition(TokenType.Mark,
                 "^(\\(|\\)|\\[|\\])"),
             new TokenDefinition(TokenType.NumberLiteral,
-                "^(0x(\\d|a|b|c|d|e|f|A|B|C|D|E|F|_)+|0b(0|1|_)+|(\\d|_)+\\.?(\\d|_)*)"),
+                "^(0x[0-9a-fA-F_]+|0b[01_]+|[0-9_]+\.?[0-9_]*)"),
             new TokenDefinition(TokenType.CharacterLiteral,
                 // 'singleCharacter'
                 "^('[^']?)'"),
