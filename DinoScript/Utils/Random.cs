@@ -10,11 +10,11 @@ namespace DinoScript.Utils
          * 이 정적 함수들은 내부 메모리 관리에만 관여됩니다.
          */
 #if NET6_0_OR_GREATER
-    public static System.Random Shared
-    {
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => System.Random.Shared;
-    }
+        public static System.Random Shared
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => System.Random.Shared;
+        }
 #else
         public static System.Random Shared { get; } = new System.Random();
 #endif

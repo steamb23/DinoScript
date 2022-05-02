@@ -57,7 +57,7 @@ namespace DinoScript.Runtime
 
         #region Push
 
-        internal void Push(byte value)
+        public void Push(byte value)
         {
             stackArray[stackCursor] = value;
             stackCursor += 1;
@@ -69,9 +69,16 @@ namespace DinoScript.Runtime
 
             Span<byte> buffer = stackalloc byte[size];
             if (BitConverter.TryWriteBytes(buffer, value))
-            {
                 Push(buffer);
-            }
+        }
+
+        public void Push(bool value)
+        {
+            const int size = sizeof(bool);
+
+            Span<byte> buffer = stackalloc byte[size];
+            if (BitConverter.TryWriteBytes(buffer, value))
+                Push(buffer);
         }
 
         private void Push(Span<byte> buffer)
@@ -129,11 +136,25 @@ namespace DinoScript.Runtime
             return length;
         }
 
+        public byte PopByte()
+        {
+            Span<byte> buffer = stackalloc byte[sizeof(byte)];
+            Pop(buffer);
+            return buffer[0];
+        }
+
         public double PopDouble()
         {
             Span<byte> buffer = stackalloc byte[sizeof(double)];
             Pop(buffer);
             return BitConverter.ToDouble(buffer);
+        }
+
+        public bool PopBoolean()
+        {
+            Span<byte> buffer = stackalloc byte[sizeof(bool)];
+            Pop(buffer);
+            return BitConverter.ToBoolean(buffer);
         }
 
         internal int Pop(Span<byte> buffer)

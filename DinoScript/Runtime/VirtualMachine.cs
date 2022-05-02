@@ -32,7 +32,6 @@ namespace DinoScript.Runtime
             if (internalCodeIndex < InternalCodes.Count)
             {
                 RunCode(InternalCodes[internalCodeIndex]);
-                internalCodeIndex++;
             }
             // 내부 코드가 부족할 경우 추가 파싱 시도
             else
