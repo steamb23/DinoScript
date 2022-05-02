@@ -1,4 +1,5 @@
-﻿using System.Reflection.Emit;
+﻿using System;
+using System.Reflection.Emit;
 using DinoScript.Code;
 
 namespace DinoScript.Runtime
@@ -85,8 +86,8 @@ namespace DinoScript.Runtime
                 }
                 case Opcode.BranchIfTrue:
                 {
-                    var v1 = Memory.Stack.PopBoolean();
-                    if (v1)
+                    var v1 = Memory.Stack.Pop();
+                    if (v1 != 0)
                         internalCodeIndex = (int)code.Operands[0];
                     else
                         internalCodeIndex++;
@@ -94,8 +95,8 @@ namespace DinoScript.Runtime
                 }
                 case Opcode.BranchIfFalse:
                 {
-                    var v1 = Memory.Stack.PopBoolean();
-                    if (!v1)
+                    var v1 = Memory.Stack.Pop();
+                    if (v1 == 0)
                         internalCodeIndex = (int)code.Operands[0];
                     else
                         internalCodeIndex++;

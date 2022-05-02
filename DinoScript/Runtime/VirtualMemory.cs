@@ -17,7 +17,7 @@ namespace DinoScript.Runtime
 
         public VirtualStack Stack { get; }
 
-        public VirtualMemory(int stackSize = VirtualStack.DefaultStackSize)
+        public VirtualMemory(int stackSize = VirtualStack.MinimalStackSize)
         {
             Stack = new VirtualStack(stackSize);
         }

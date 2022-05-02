@@ -8,22 +8,19 @@ namespace DinoScript
     /// </summary>
     public class ResultView
     {
-        const int FullSize = sizeof(long);
-
-        private byte[] buffer = new byte[FullSize];
-        private int bufferSize = 0;
+        private long value = 0;
 
         private VirtualMemory? memory = null;
 
-        public ResultView(VirtualMemory memory)
+        internal ResultView(VirtualMemory memory)
         {
-            bufferSize = memory.Stack.Peek(buffer);
+            value = memory.Stack.Peek();
             this.memory = memory;
         }
 
-        public ResultView(Span<byte> buffer, VirtualMemory? memory = null)
+        internal ResultView(long value, VirtualMemory? memory = null)
         {
-            buffer.CopyTo(this.buffer);
+            this.value = value;
             this.memory = memory;
         }
 
@@ -32,11 +29,10 @@ namespace DinoScript
         {
             get
             {
-                if (memory == null || bufferSize != FullSize)
+                if (memory == null)
                     return null;
 
-                var int64Result = BitConverter.ToUInt64(buffer);
-                memory.TryGet(int64Result, out var resultObject);
+                memory.TryGet(unchecked((ulong)value), out var resultObject);
 
                 return resultObject;
             }
@@ -44,6 +40,6 @@ namespace DinoScript
 
         public string? String => Object as string;
 
-        public double? Double => bufferSize == FullSize ? BitConverter.ToDouble(buffer) : (double?)null;
+        public double? Double => BitConverter.Int64BitsToDouble(value);
     }
 }

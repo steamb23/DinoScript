@@ -4,27 +4,25 @@ using System.Collections.Generic;
 
 namespace DinoScript.Runtime
 {
-    public class VirtualStack : IDisposable
+    public class VirtualStack
     {
-        public const int DefaultStackSize = 1024 * 1024;
+        public const int MinimalStackSize = 64;
 
-        private static ArrayPool<byte> arrayPool = ArrayPool<byte>.Shared;
 
-        private readonly byte[] stackArray;
-        private readonly Stack<int> stackFrame = new Stack<int>(64);
+        private readonly List<long> stackArray;
+        private readonly Stack<int> stackFrame;
 
-        private int stackCursor = 0;
-
-        public VirtualStack(int stackSize = DefaultStackSize)
+        public VirtualStack(int stackSize = MinimalStackSize)
         {
-            stackArray = arrayPool.Rent(DefaultStackSize);
+            stackArray = new List<long>(stackSize);
+            stackFrame = new Stack<int>(MinimalStackSize / 4);
         }
 
-        public byte this[int index] => stackArray[index];
+        public long this[int index] => stackArray[index];
 
-        public byte[] CopyToArray()
+        public long[] CopyToArray()
         {
-            var arr = new byte[DefaultStackSize];
+            var arr = new long[stackArray.Count];
             stackArray.CopyTo(arr, 0);
             return arr;
         }
@@ -36,7 +34,7 @@ namespace DinoScript.Runtime
         /// </summary>
         public void PushStackFrame()
         {
-            stackFrame.Push(stackCursor);
+            stackFrame.Push(stackArray.Count);
         }
 
         /// <summary>
@@ -47,151 +45,38 @@ namespace DinoScript.Runtime
             var stackFrameCursor = stackFrame.Pop();
             var resultCursor = stackFrameCursor + returnValueLength;
 
-            Span<byte> arraySpan = stackArray.AsSpan(resultCursor, stackCursor - resultCursor);
-            arraySpan.Fill(0);
-
-            stackCursor = resultCursor;
-        }
-
-        #endregion
-
-        #region Push
-
-        public void Push(byte value)
-        {
-            stackArray[stackCursor] = value;
-            stackCursor += 1;
-        }
-
-        public void Push(double value)
-        {
-            const int size = sizeof(double);
-
-            Span<byte> buffer = stackalloc byte[size];
-            if (BitConverter.TryWriteBytes(buffer, value))
-                Push(buffer);
-        }
-
-        public void Push(bool value)
-        {
-            const int size = sizeof(bool);
-
-            Span<byte> buffer = stackalloc byte[size];
-            if (BitConverter.TryWriteBytes(buffer, value))
-                Push(buffer);
-        }
-
-        private void Push(Span<byte> buffer)
-        {
-            var length = buffer.Length;
-            Span<byte> arraySpan = stackArray.AsSpan(stackCursor, length);
-            buffer.CopyTo(arraySpan);
-            stackCursor += length;
-        }
-
-        #endregion
-
-        #region Peek
-
-        public double PeekDouble()
-        {
-            Span<byte> buffer = stackalloc byte[sizeof(double)];
-            Peek(buffer);
-            return BitConverter.ToDouble(buffer);
-        }
-
-        internal int Peek(Span<byte> buffer)
-        {
-            var length = buffer.Length;
-            var index = stackCursor - length;
-            if (index < 0)
-            {
-                length -= index;
-                index = 0;
-            }
-
-            Span<byte> arraySpan = stackArray.AsSpan(index, length);
-            arraySpan.CopyTo(buffer);
-
-            return length;
+            stackArray.RemoveRange(resultCursor, stackArray.Count - resultCursor);
         }
 
         #endregion
 
         #region Pop
 
-        public int Pop(int length = 1)
+        public long Pop()
         {
-            var index = stackCursor - length;
-            if (index < 0)
-            {
-                length -= index;
-                index = 0;
-            }
-
-            Span<byte> arraySpan = stackArray.AsSpan(index, length);
-            arraySpan.Fill(0);
-            stackCursor -= length;
-
-            return length;
+            var value = Peek();
+            stackArray.RemoveAt(stackArray.Count - 1);
+            return value;
         }
 
-        public byte PopByte()
-        {
-            Span<byte> buffer = stackalloc byte[sizeof(byte)];
-            Pop(buffer);
-            return buffer[0];
-        }
-
-        public double PopDouble()
-        {
-            Span<byte> buffer = stackalloc byte[sizeof(double)];
-            Pop(buffer);
-            return BitConverter.ToDouble(buffer);
-        }
-
-        public bool PopBoolean()
-        {
-            Span<byte> buffer = stackalloc byte[sizeof(bool)];
-            Pop(buffer);
-            return BitConverter.ToBoolean(buffer);
-        }
-
-        internal int Pop(Span<byte> buffer)
-        {
-            var length = buffer.Length;
-            var index = stackCursor - length;
-            if (index < 0)
-            {
-                length -= index;
-                index = 0;
-            }
-
-            Span<byte> arraySpan = stackArray.AsSpan(index, length);
-            arraySpan.CopyTo(buffer);
-
-            arraySpan.Fill(0);
-            stackCursor -= length;
-
-            return length;
-        }
+        public double PopDouble() => BitConverter.Int64BitsToDouble(Pop());
 
         #endregion
 
-        private void ReleaseUnmanagedResources()
-        {
-            arrayPool.Return(stackArray);
-        }
+        #region Peek
 
-        public void Dispose()
-        {
-            ReleaseUnmanagedResources();
-            GC.SuppressFinalize(this);
-        }
+        public long Peek() => stackArray[^1];
 
-        ~VirtualStack()
-        {
-            ReleaseUnmanagedResources();
-        }
+        public double PeekDouble() => BitConverter.Int64BitsToDouble(Peek());
+
+        #endregion
+
+        #region Push
+
+        public void Push(long value) => stackArray.Add(value);
+
+        public void Push(double value) => Push(BitConverter.DoubleToInt64Bits(value));
+
+        #endregion
     }
 }

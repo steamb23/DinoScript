@@ -6,7 +6,7 @@ namespace DinoScript.Runtime
     {
         public VirtualMachineOptions(
             ParserMode parserMode = ParserMode.Full,
-            int stackSize = VirtualStack.DefaultStackSize)
+            int stackSize = VirtualStack.MinimalStackSize)
         {
             this.ParserMode = parserMode;
             this.StackSize = stackSize;
