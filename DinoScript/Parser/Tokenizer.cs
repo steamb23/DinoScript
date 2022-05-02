@@ -32,29 +32,29 @@ namespace DinoScript.Parser
             //     // "{singleCharacter}"
             //     "^\"[^\"]*\""),
             new TokenDefinition(TokenType.EndOfLine,
-                "^(\r?\n|\r|\u0085|\u2028|\u2029)"),
+                "^(?:\r?\n|\r|\u0085|\u2028|\u2029)"),
             new TokenDefinition(TokenType.WhiteSpace,
-                "^( +|\t+|\u3000+)"),
+                "^(?: +|\t+|\u3000+)"),
             new TokenDefinition(TokenType.Keyword,
-                "^(func|for|in|if|else|var|null|true|false|do|until|while|not|this|get|set)"),
+                "^(?:func|for|in|if|else|var|null|true|false|do|until|while|not|this|get|set)"),
             new TokenDefinition(TokenType.Identifier,
                 // letter{letter|decimalDigit}
-                "^(\\p{Lu}|\\p{Ll}|\\p{Lt}|\\p{Lm}|\\p{Lo}|\\p{Nl})(\\p{Lu}|\\p{Ll}|\\p{Lt}|\\p{Lm}|\\p{Lo}|\\p{Nl}|\\d)*"),
+                "^(?:\\p{Lu}|\\p{Ll}|\\p{Lt}|\\p{Lm}|\\p{Lo}|\\p{Nl})(\\p{Lu}|\\p{Ll}|\\p{Lt}|\\p{Lm}|\\p{Lo}|\\p{Nl}|\\d)*"),
             new TokenDefinition(TokenType.Operator,
-                "^(\\+|-|\\*|/|%|\\^|==|!=|<=|>=|<|>|\\?|:|\\+\\+|--|!)"),
+                "^(?:\\+|-|\\*|/|%|\\^|==|!=|<=|>=|<|>|\\?|:|\\+\\+|--|!)"),
             new TokenDefinition(TokenType.Mark,
-                "^(\\(|\\)|\\[|\\])"),
+                "^(?:\\(|\\)|\\[|\\])"),
             new TokenDefinition(TokenType.NumberLiteral,
-                "^(0x(\\d|a|b|c|d|e|f|A|B|C|D|E|F|_)+|0b(0|1|_)+|(\\d|_)+\\.?(\\d|_)*)"),
+                "^(?:0x[0-9a-fA-F_]+|0b[01_]+|[0-9_]+\\.?[0-9_]*)"),
             new TokenDefinition(TokenType.CharacterLiteral,
                 // 'singleCharacter'
-                "^('[^']?)'"),
+                "^(?:'[^']?)'"),
             new TokenDefinition(TokenType.BooleanLiteral,
-                "^(true|false)"),
+                "^(?:true|false)"),
             new TokenDefinition(TokenType.NullLiteral,
-                "^(null)"),
+                "^(?:null)"),
             new TokenDefinition(TokenType.UndefinedLiteral,
-                "^(undefined)")
+                "^(?:undefined)")
         };
 
         // 규격 외 공백 문자 제거
