@@ -11,6 +11,10 @@
         /// </summary>
         LoadConstantNumber,
         /// <summary>
+        /// 로컬 변수를 계산 스택에 푸시합니다.
+        /// </summary>
+        LoadLocal,
+        /// <summary>
         /// 계산 스택 맨 위에 있는 값을 제거합니다.
         /// </summary>
         Pop,

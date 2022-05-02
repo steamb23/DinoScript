@@ -8,7 +8,7 @@ namespace DinoScript
     /// </summary>
     public class ResultView
     {
-        private long value = 0;
+        private readonly DinoValue value;
 
         private VirtualMemory? memory = null;
 
@@ -18,11 +18,13 @@ namespace DinoScript
             this.memory = memory;
         }
 
-        internal ResultView(long value, VirtualMemory? memory = null)
+        internal ResultView(DinoValue value, VirtualMemory? memory = null)
         {
             this.value = value;
             this.memory = memory;
         }
+
+        public DinoValue Value => value;
 
         // TODO: 추후 스크립트 내에 객체 혹은 테이블 구현이 추가될 경우 적절한 변환 필요
         public object? Object
@@ -32,7 +34,7 @@ namespace DinoScript
                 if (memory == null)
                     return null;
 
-                memory.TryGet(unchecked((ulong)value), out var resultObject);
+                memory.TryGet(unchecked((ulong)value.Int64), out var resultObject);
 
                 return resultObject;
             }
@@ -40,6 +42,6 @@ namespace DinoScript
 
         public string? String => Object as string;
 
-        public double? Double => BitConverter.Int64BitsToDouble(value);
+        public double? Double => value.Double;
     }
 }

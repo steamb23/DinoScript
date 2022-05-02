@@ -9,20 +9,20 @@ namespace DinoScript.Runtime
         public const int MinimalStackSize = 64;
 
 
-        private readonly List<long> stackArray;
+        private readonly List<DinoValue> stackArray;
         private readonly Stack<int> stackFrame;
 
         public VirtualStack(int stackSize = MinimalStackSize)
         {
-            stackArray = new List<long>(stackSize);
+            stackArray = new List<DinoValue>(stackSize);
             stackFrame = new Stack<int>(MinimalStackSize / 4);
         }
 
-        public long this[int index] => stackArray[index];
+        public DinoValue this[int index] => stackArray[index];
 
-        public long[] CopyToArray()
+        public DinoValue[] CopyToArray()
         {
-            var arr = new long[stackArray.Count];
+            var arr = new DinoValue[stackArray.Count];
             stackArray.CopyTo(arr, 0);
             return arr;
         }
@@ -52,30 +52,24 @@ namespace DinoScript.Runtime
 
         #region Pop
 
-        public long Pop()
+        public DinoValue Pop()
         {
             var value = Peek();
             stackArray.RemoveAt(stackArray.Count - 1);
             return value;
         }
 
-        public double PopDouble() => BitConverter.Int64BitsToDouble(Pop());
-
         #endregion
 
         #region Peek
 
-        public long Peek() => stackArray[^1];
-
-        public double PeekDouble() => BitConverter.Int64BitsToDouble(Peek());
+        public DinoValue Peek() => stackArray[^1];
 
         #endregion
 
         #region Push
 
-        public void Push(long value) => stackArray.Add(value);
-
-        public void Push(double value) => Push(BitConverter.DoubleToInt64Bits(value));
+        public void Push(DinoValue value) =>stackArray.Add(value);
 
         #endregion
     }

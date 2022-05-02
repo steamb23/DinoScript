@@ -27,7 +27,7 @@ namespace DinoScript.Runtime
 
                 case Opcode.LoadConstantNumber:
                 {
-                    Memory.Stack.Push((double)code.Operands[0]);
+                    Memory.Stack.Push(DinoValue.Number((double)code.Operands[0]));
                     internalCodeIndex++;
                     break;
                 }
@@ -44,33 +44,33 @@ namespace DinoScript.Runtime
                 }
                 case Opcode.Add:
                 {
-                    var v1 = Memory.Stack.PopDouble();
-                    var v2 = Memory.Stack.PopDouble();
-                    Memory.Stack.Push(v2 + v1);
+                    var v1 = Memory.Stack.Pop().Double;
+                    var v2 = Memory.Stack.Pop().Double;
+                    Memory.Stack.Push(DinoValue.Number(v2 + v1));
                     internalCodeIndex++;
                     break;
                 }
                 case Opcode.Subtract:
                 {
-                    var v1 = Memory.Stack.PopDouble();
-                    var v2 = Memory.Stack.PopDouble();
-                    Memory.Stack.Push(v2 - v1);
+                    var v1 = Memory.Stack.Pop().Double;
+                    var v2 = Memory.Stack.Pop().Double;
+                    Memory.Stack.Push(DinoValue.Number(v2 - v1));
                     internalCodeIndex++;
                     break;
                 }
                 case Opcode.Multiply:
                 {
-                    var v1 = Memory.Stack.PopDouble();
-                    var v2 = Memory.Stack.PopDouble();
-                    Memory.Stack.Push(v2 * v1);
+                    var v1 = Memory.Stack.Pop().Double;
+                    var v2 = Memory.Stack.Pop().Double;
+                    Memory.Stack.Push(DinoValue.Number(v2 * v1));
                     internalCodeIndex++;
                     break;
                 }
                 case Opcode.Divide:
                 {
-                    var v1 = Memory.Stack.PopDouble();
-                    var v2 = Memory.Stack.PopDouble();
-                    Memory.Stack.Push(v2 / v1);
+                    var v1 = Memory.Stack.Pop().Double;
+                    var v2 = Memory.Stack.Pop().Double;
+                    Memory.Stack.Push(DinoValue.Number(v2 / v1));
                     internalCodeIndex++;
                     break;
                 }
@@ -87,7 +87,7 @@ namespace DinoScript.Runtime
                 case Opcode.BranchIfTrue:
                 {
                     var v1 = Memory.Stack.Pop();
-                    if (v1 != 0)
+                    if (v1.Int64 != 0)
                         internalCodeIndex = (int)code.Operands[0];
                     else
                         internalCodeIndex++;
@@ -96,7 +96,7 @@ namespace DinoScript.Runtime
                 case Opcode.BranchIfFalse:
                 {
                     var v1 = Memory.Stack.Pop();
-                    if (v1 == 0)
+                    if (v1.Int64 == 0)
                         internalCodeIndex = (int)code.Operands[0];
                     else
                         internalCodeIndex++;
