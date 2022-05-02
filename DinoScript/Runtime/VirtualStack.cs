@@ -18,7 +18,11 @@ namespace DinoScript.Runtime
             stackFrame = new Stack<int>(MinimalStackSize / 4);
         }
 
-        public DinoValue this[int index] => stackArray[index];
+        public DinoValue this[int index]
+        {
+            get => stackArray[index];
+            set => stackArray[index] = value;
+        }
 
         public DinoValue[] CopyToArray()
         {
@@ -32,7 +36,7 @@ namespace DinoScript.Runtime
         /// <summary>
         /// 현재 스택 커서 위치에 스택 프레임을 생성합니다.
         /// </summary>
-        public void PushStackFrame()
+        public void CreateStackFrame()
         {
             stackFrame.Push(stackArray.Count);
         }
@@ -40,13 +44,15 @@ namespace DinoScript.Runtime
         /// <summary>
         /// 스택 프레임을 제거하고 해당 스택 프레임 위치까지 스택 데이터를 지웁니다. 리턴 값이 있을 경우 그 부분의 데이터는 남깁니다.
         /// </summary>
-        public void PopStackFrame(int returnValueLength = 0)
+        public void RemoveStackFrame(bool hasReturnValue)
         {
             var stackFrameCursor = stackFrame.Pop();
-            var resultCursor = stackFrameCursor + returnValueLength;
+            var resultCursor = stackFrameCursor + (hasReturnValue ? 1 : 0);
 
             stackArray.RemoveRange(resultCursor, stackArray.Count - resultCursor);
         }
+
+        public int CurrentStackFrameIndex => stackFrame.TryPeek(out var result) ? result : 0;
 
         #endregion
 
@@ -69,7 +75,7 @@ namespace DinoScript.Runtime
 
         #region Push
 
-        public void Push(DinoValue value) =>stackArray.Add(value);
+        public void Push(DinoValue value) => stackArray.Add(value);
 
         #endregion
     }

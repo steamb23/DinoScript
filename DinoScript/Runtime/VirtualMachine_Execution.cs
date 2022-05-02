@@ -32,6 +32,22 @@ namespace DinoScript.Runtime
                     break;
                 }
 
+                case Opcode.LoadFromLocal:
+                {
+                    var localIndex = (int)code.Operands[0];
+                    var stackIndex = Memory.Stack.CurrentStackFrameIndex;
+                    Memory.Stack.Push(Memory.Stack[stackIndex]);
+                    break;
+                }
+
+                case Opcode.StoreToLocal:
+                {
+                    var localIndex = (int)code.Operands[0];
+                    var stackIndex = Memory.Stack.CurrentStackFrameIndex;
+                    Memory.Stack[stackIndex] = Memory.Stack.Pop();
+                    break;
+                }
+
                 #endregion
 
                 #region 실수 사칙연산
