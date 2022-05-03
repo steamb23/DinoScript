@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
+using DinoScript.Parser;
 using DinoScript.Syntax;
 
 namespace DinoScript.Code
@@ -10,6 +12,14 @@ namespace DinoScript.Code
         private Stack<InternalCode> expressionStack = new Stack<InternalCode>();
         private Queue<InternalCode> expressionQueue = new Queue<InternalCode>();
 
+        private InternalCode lastEnqueuedCode;
+
+        private void Enqueue(InternalCode code)
+        {
+            expressionQueue.Enqueue(code);
+            lastEnqueuedCode = code;
+        }
+
         public IReadOnlyList<InternalCode> Codes => codes;
 
         /// <summary>
@@ -20,11 +30,37 @@ namespace DinoScript.Code
         {
             InternalCode code = token.Type switch
             {
-                TokenType.NumberLiteral => InternalCode.Make(Opcode.LoadConstantNumber, token, double.Parse(token.Value!)),
+                TokenType.NumberLiteral => InternalCode.Make(Opcode.LoadConstantNumber, token,
+                    double.Parse(token.Value!)),
                 _ => InternalCode.Make(Opcode.NoOperation, token)
             };
 
-            expressionQueue.Enqueue(code);
+            Enqueue(code);
+        }
+
+        public void PostfixUnaryTokenEnqueue(Token token)
+        {
+            var lastEnqueuedCode = this.lastEnqueuedCode;
+            var code = token.Value switch
+            {
+                "++" => InternalCode.Make(Opcode.Add, token, (double)1),
+                "--" => InternalCode.Make(Opcode.Subtract, token, (double)1),
+                _ => InternalCode.Make(Opcode.NoOperation, token)
+            };
+
+            switch (lastEnqueuedCode.Opcode)
+            {
+                case Opcode.LoadFromLocal:
+                    // 식이 아닌 단일로 쓰였을 경우 최적화 필요
+                    Enqueue(lastEnqueuedCode);
+                    Enqueue(code);
+                    Enqueue(FlipLoadAndStore(lastEnqueuedCode));
+                    break;
+                default:
+                    // 에러
+                    throw new SyntaxErrorException(token,
+                        "Postfix in-decrement operators can only follow variable accesses.");
+            }
         }
 
         /// <summary>
@@ -54,6 +90,17 @@ namespace DinoScript.Code
             expressionQueue.Clear();
             codes.AddRange(expressionStack);
             expressionStack.Clear();
+        }
+
+        private InternalCode FlipLoadAndStore(InternalCode code)
+        {
+            switch (code.Opcode)
+            {
+                case Opcode.LoadFromLocal:
+                    return InternalCode.Make(code.Opcode, code.Token);
+                default:
+                    return code;
+            }
         }
     }
 }

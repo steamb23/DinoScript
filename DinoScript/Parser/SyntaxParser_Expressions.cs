@@ -90,6 +90,23 @@ namespace DinoScript.Parser
                 PreAccessExpression();
             } // end of AccessExpression
 
+            void PostfixIncrementExpression()
+            {
+                // 후위 증감 표현
+                AccessExpression();
+                var token = Tokenizer.NextWithIgnoreWhiteSpace();
+                switch (token?.Value)
+                {
+                    case "++":
+                    case "--":
+                        CodeGenerator.PostfixUnaryTokenEnqueue(token);
+                        Tokenizer.NextWithIgnoreWhiteSpace();
+                        return;
+                    default:
+                        return;
+                }
+            }
+
             // <AccessExpression>
             AccessExpression();
         }
@@ -118,7 +135,7 @@ namespace DinoScript.Parser
             // TODO: UnaryExpression에 대한 코드 추가 필요 (Lua스크립트의 lparser 코드 참조)
             PrimaryExpression();
 
-            binaryOperator = GetNextBinaryOperatorToken();
+            binaryOperator = GetBinaryOperatorToken();
 
             // 확인된 이항 연산자 우선순위가 현재 표현식 우선순위 보다 높으면 재귀 처리
             // 토큰이 연산자가 아닐경우 GetNextBinaryOperatorToken에 의해 null 임
@@ -138,13 +155,13 @@ namespace DinoScript.Parser
             }
         }
 
-        Token? GetNextBinaryOperatorToken()
+        Token? GetOperatorToken()
         {
-            var token = Tokenizer.NextWithIgnoreWhiteSpace();
+            var token = Tokenizer.Current();
             if (token == null)
                 return null;
 
-            bool isBinaryOperator = token.Type == TokenType.Operator;
+            bool isOperator = token.Type == TokenType.Operator;
 
             switch (token.Type)
             {
@@ -153,7 +170,29 @@ namespace DinoScript.Parser
                     throw new SyntaxErrorException(token);
             }
 
-            return isBinaryOperator ? token : null;
+            return isOperator ? token : null;
+        }
+
+        Token? GetUnaryOperatorToken()
+        {
+            // 전위 단항 연산자를 나타냅니다.
+            var operatorToken = GetOperatorToken();
+            switch (operatorToken?.Value)
+            {
+                case "--":
+                case "++":
+                case "+":
+                case "-":
+                case "!":
+                    return operatorToken;
+                default:
+                    return null;
+            }
+        }
+
+        Token? GetBinaryOperatorToken()
+        {
+            return GetOperatorToken();
         }
     }
 }

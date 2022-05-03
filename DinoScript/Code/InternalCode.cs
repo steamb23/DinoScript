@@ -16,7 +16,7 @@ namespace DinoScript.Code
         public Opcode Opcode { get; }
 
         public IReadOnlyList<object> Operands { get; }
-    
+
         public Token? Token { get; }
 
         private InternalCode(Opcode opcode, Token? token, params object[] operand)
@@ -39,6 +39,18 @@ namespace DinoScript.Code
             }
         }
 
+        public static InternalCode Make(Opcode opcode, Token? token, ulong value)
+        {
+            switch (opcode)
+            {
+                case Opcode.LoadFromLocal:
+                case Opcode.StoreToLocal:
+                    return new InternalCode(opcode, token, value);
+                default:
+                    throw new ArgumentException(null, nameof(opcode));
+            }
+        }
+
         public override string ToString()
         {
             var builder = new StringBuilder();
@@ -49,6 +61,7 @@ namespace DinoScript.Code
                 builder.Append(", ");
                 builder.Append(string.Join(", ", Operands));
             }
+
             builder.Append('}');
             return builder.ToString();
         }

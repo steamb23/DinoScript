@@ -26,12 +26,12 @@ public class ParserTest
             "1 + 2 * 3 + 4",
             new[]
             {
-                Make(Opcode.LoadConstantNumber, null, 1),
-                Make(Opcode.LoadConstantNumber, null, 2),
-                Make(Opcode.LoadConstantNumber, null, 3),
+                Make(Opcode.LoadConstantNumber, null, (double)1),
+                Make(Opcode.LoadConstantNumber, null, (double)2),
+                Make(Opcode.LoadConstantNumber, null, (double)3),
                 Make(Opcode.Multiply, null),
                 Make(Opcode.Add, null),
-                Make(Opcode.LoadConstantNumber, null, 4),
+                Make(Opcode.LoadConstantNumber, null, (double)4),
                 Make(Opcode.Add, null),
             }
         },
@@ -40,10 +40,10 @@ public class ParserTest
             "1+2*(3+4)",
             new[]
             {
-                Make(Opcode.LoadConstantNumber, null, 1),
-                Make(Opcode.LoadConstantNumber, null, 2),
-                Make(Opcode.LoadConstantNumber, null, 3),
-                Make(Opcode.LoadConstantNumber, null, 4),
+                Make(Opcode.LoadConstantNumber, null, (double)1),
+                Make(Opcode.LoadConstantNumber, null, (double)2),
+                Make(Opcode.LoadConstantNumber, null, (double)3),
+                Make(Opcode.LoadConstantNumber, null, (double)4),
                 Make(Opcode.Add, null),
                 Make(Opcode.Multiply, null),
                 Make(Opcode.Add, null),
@@ -54,11 +54,11 @@ public class ParserTest
             "(1+2)*(3+4)",
             new[]
             {
-                Make(Opcode.LoadConstantNumber, null, 1),
-                Make(Opcode.LoadConstantNumber, null, 2),
+                Make(Opcode.LoadConstantNumber, null, (double)1),
+                Make(Opcode.LoadConstantNumber, null, (double)2),
                 Make(Opcode.Add, null),
-                Make(Opcode.LoadConstantNumber, null, 3),
-                Make(Opcode.LoadConstantNumber, null, 4),
+                Make(Opcode.LoadConstantNumber, null, (double)3),
+                Make(Opcode.LoadConstantNumber, null, (double)4),
                 Make(Opcode.Add, null),
                 Make(Opcode.Multiply, null),
             }
@@ -68,11 +68,11 @@ public class ParserTest
             "(1+2)/(3+4)",
             new[]
             {
-                Make(Opcode.LoadConstantNumber, null, 1),
-                Make(Opcode.LoadConstantNumber, null, 2),
+                Make(Opcode.LoadConstantNumber, null, (double)1),
+                Make(Opcode.LoadConstantNumber, null, (double)2),
                 Make(Opcode.Add, null),
-                Make(Opcode.LoadConstantNumber, null, 3),
-                Make(Opcode.LoadConstantNumber, null, 4),
+                Make(Opcode.LoadConstantNumber, null, (double)3),
+                Make(Opcode.LoadConstantNumber, null, (double)4),
                 Make(Opcode.Add, null),
                 Make(Opcode.Divide, null),
             }
@@ -83,11 +83,11 @@ public class ParserTest
             "(1+2)*(3@4)",
             new[]
             {
-                Make(Opcode.LoadConstantNumber, null, 1),
-                Make(Opcode.LoadConstantNumber, null, 2),
+                Make(Opcode.LoadConstantNumber, null, (double)1),
+                Make(Opcode.LoadConstantNumber, null, (double)2),
                 Make(Opcode.Add, null),
-                Make(Opcode.LoadConstantNumber, null, 3),
-                Make(Opcode.LoadConstantNumber, null, 4),
+                Make(Opcode.LoadConstantNumber, null, (double)3),
+                Make(Opcode.LoadConstantNumber, null, (double)4),
                 Make(Opcode.Add, null),
                 Make(Opcode.Divide, null),
             }
@@ -97,11 +97,11 @@ public class ParserTest
             "(1+2)*(3+4)\n",
             new[]
             {
-                Make(Opcode.LoadConstantNumber, null, 1),
-                Make(Opcode.LoadConstantNumber, null, 2),
+                Make(Opcode.LoadConstantNumber, null, (double)1),
+                Make(Opcode.LoadConstantNumber, null, (double)2),
                 Make(Opcode.Add, null),
-                Make(Opcode.LoadConstantNumber, null, 3),
-                Make(Opcode.LoadConstantNumber, null, 4),
+                Make(Opcode.LoadConstantNumber, null, (double)3),
+                Make(Opcode.LoadConstantNumber, null, (double)4),
                 Make(Opcode.Add, null),
                 Make(Opcode.Multiply, null),
             }
