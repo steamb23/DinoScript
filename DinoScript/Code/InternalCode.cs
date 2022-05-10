@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Text.RegularExpressions;
 using DinoScript.Syntax;
 
 namespace DinoScript.Code

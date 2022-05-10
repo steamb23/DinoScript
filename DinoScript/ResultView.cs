@@ -1,5 +1,4 @@
-﻿using System;
-using DinoScript.Runtime;
+﻿using DinoScript.Runtime;
 
 namespace DinoScript
 {

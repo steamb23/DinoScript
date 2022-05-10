@@ -1,6 +1,4 @@
-﻿using DinoScript.Parser;
-
-namespace DinoScript.Syntax
+﻿namespace DinoScript.Syntax
 {
     /// <summary>
     /// 토큰을 나타냅니다.
