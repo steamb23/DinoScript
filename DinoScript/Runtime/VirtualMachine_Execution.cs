@@ -1,4 +1,5 @@
-﻿using DinoScript.Code;
+﻿using System;
+using DinoScript.Code;
 
 namespace DinoScript.Runtime
 {
@@ -85,6 +86,21 @@ namespace DinoScript.Runtime
                     var v1 = Memory.Stack.Pop().Double;
                     var v2 = Memory.Stack.Pop().Double;
                     Memory.Stack.Push(DinoValue.Number(v2 / v1));
+                    internalCodeIndex++;
+                    break;
+                }
+                case Opcode.Modulo:
+                {
+                    var v1 = Memory.Stack.Pop().Double;
+                    var v2 = Memory.Stack.Pop().Double;
+                    Memory.Stack.Push(DinoValue.Number(v2 % v1));
+                    internalCodeIndex++;
+                    break;
+                }
+                case Opcode.Negative:
+                {
+                    var v1 = Memory.Stack.Pop().Double;
+                    Memory.Stack.Push(DinoValue.Number(-v1));
                     internalCodeIndex++;
                     break;
                 }

@@ -99,6 +99,7 @@ namespace DinoScript.Parser
             {
                 [BinaryOperator.Multiply] = (uint)ExpressionTypes.Multiplicative,
                 [BinaryOperator.Divide] = (uint)ExpressionTypes.Multiplicative,
+                [BinaryOperator.Modulo] = (uint)ExpressionTypes.Multiplicative,
                 [BinaryOperator.Add] = (uint)ExpressionTypes.Addictive,
                 [BinaryOperator.Subtract] = (uint)ExpressionTypes.Addictive,
             };
@@ -187,7 +188,7 @@ namespace DinoScript.Parser
                 "-" => BinaryOperator.Subtract,
                 "*" => BinaryOperator.Multiply,
                 "/" => BinaryOperator.Divide,
-                "%" => BinaryOperator.Remain,
+                "%" => BinaryOperator.Modulo,
                 _ => BinaryOperator.NoBinaryOperator
             };
         }

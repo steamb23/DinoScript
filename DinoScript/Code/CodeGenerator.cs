@@ -62,6 +62,7 @@ namespace DinoScript.Code
                 BinaryOperator.Subtract => Opcode.Subtract,
                 BinaryOperator.Multiply => Opcode.Multiply,
                 BinaryOperator.Divide => Opcode.Divide,
+                BinaryOperator.Modulo => Opcode.Modulo,
                 _ => Opcode.NoOperation
             };
 

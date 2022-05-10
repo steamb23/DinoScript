@@ -8,7 +8,7 @@
         Subtract,
         Multiply,
         Divide,
-        Remain
+        Modulo
     }
 
     public enum UnaryOperator

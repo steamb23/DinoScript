@@ -33,6 +33,26 @@ public class VirtualMachineTest
         {
             "1.0 / 3.0",
             1.0 / 3.0
+        },
+        new object[]
+        {
+            "1.0 % 3.0",
+            1.0 % 3.0
+        },
+        new object[]
+        {
+            "4.0 % 3.0",
+            4.0 % 3.0
+        },
+        new object[]
+        {
+            "4.5 % 3.1",
+            4.5 % 3.1
+        },
+        new object[]
+        {
+            "-1.0",
+            -1.0
         }
     };
 

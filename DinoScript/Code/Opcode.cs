@@ -52,6 +52,10 @@
         /// </summary>
         Divide,
         /// <summary>
+        /// 계산 스택 맨 위의 값 두 개의 나머지를 구해서 계산 스택에 푸시합니다.
+        /// </summary>
+        Modulo,
+        /// <summary>
         /// 계산 스택 맨 위의 값을 음수로 만들고 계산 스택에 푸시합니다.
         /// </summary>
         Negative,
