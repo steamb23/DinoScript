@@ -38,7 +38,7 @@ namespace DinoScript.Parser
             return true;
         }
 
-        void Root()
+        private void Root()
         {
             switch (ParserMode)
             {

@@ -9,7 +9,7 @@ namespace DinoScript.Runtime
         /// <summary>
         /// 코드를 실행합니다.
         /// </summary>
-        void RunCode(InternalCode code)
+        private void RunCode(InternalCode code)
         {
             switch (code.Opcode)
             {

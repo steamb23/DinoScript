@@ -11,14 +11,14 @@ namespace DinoScript.Parser
         // 해당 액션에 맞는 구문 노드가 생성되었을 경우 true,
         // 그렇지 않을 경우 구문 오류를 뜻하는 false를 반환합니다.
 
-        void Expression()
+        private void Expression()
         {
             SubExpression(out _, uint.MaxValue);
             // 표현식 코드 생성이 안됬을 경우 강제 생성 (PrimaryExpression만 있고 연산자가 없는 경우)
             CodeGenerator.GenerateExpression();
         }
 
-        void GroupExpression()
+        private void GroupExpression()
         {
             var token = Tokenizer.Current();
 
@@ -41,7 +41,7 @@ namespace DinoScript.Parser
             throw new SyntaxErrorException(Tokenizer.Current(), $"{token} is not group expression.");
         }
 
-        void PrimaryExpression()
+        private void PrimaryExpression()
         {
             // PreAccessExpression{ . PostAccessExpression}
             void AccessExpression()
@@ -110,7 +110,7 @@ namespace DinoScript.Parser
         /// <param name="priority">연산자의 우선순위입니다. 값이 작을 수록 높은 연산 우선 순위를 나타냅니다.</param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        void SubExpression(out BinaryOperator binaryOperator, uint priority)
+        private void SubExpression(out BinaryOperator binaryOperator, uint priority)
         {
             // (<PrimaryExpression>|<UnaryExpression>){ BinaryOperator SubExpression}
 
@@ -149,7 +149,7 @@ namespace DinoScript.Parser
             }
         }
 
-        Token? GetOperatorToken()
+        private Token? GetOperatorToken()
         {
             var token = Tokenizer.Current();
             if (token == null)
@@ -167,7 +167,7 @@ namespace DinoScript.Parser
             return isOperator ? token : null;
         }
 
-        UnaryOperator CheckUnaryOperator(Token? token)
+        private UnaryOperator CheckUnaryOperator(Token? token)
         {
             return token?.Value switch
             {
@@ -178,7 +178,7 @@ namespace DinoScript.Parser
             };
         }
 
-        BinaryOperator CheckBinaryOperator(Token? token)
+        private BinaryOperator CheckBinaryOperator(Token? token)
         {
             return token?.Value switch
             {
