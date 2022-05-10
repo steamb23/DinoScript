@@ -120,6 +120,7 @@ namespace DinoScript.Parser
             if (unaryOperator != UnaryOperator.NoUnaryOperator)
             {
                 // UnaryExpression
+                Tokenizer.NextWithIgnoreWhiteSpace();
                 SubExpression(out _, (uint)ExpressionTypes.Unary);
                 CodeGenerator.UnaryTokenEnqueue(unaryOperator, token!);
             }
