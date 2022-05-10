@@ -112,6 +112,15 @@ public class ParserTest
             {
                 Make(Opcode.LoadConstantNumber, null, 100_100.100_100),
             }
+        },
+        new object[]
+        {
+            "-10",
+            new[]
+            {
+                Make(Opcode.LoadConstantNumber, null, (double)10),
+                Make(Opcode.Negative, null)
+            }
         }
     };
 
@@ -127,6 +136,7 @@ public class ParserTest
             parser.Next();
 
             var codes = parser.CodeGenerator.Codes;
+            Assert.Equal(codes.Count, expectedCodes.Length);
             for (int i = 0; i < expectedCodes.Length; i++)
             {
                 Assert.Equal(expectedCodes[i].Opcode, codes[i].Opcode);
