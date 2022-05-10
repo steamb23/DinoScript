@@ -2,6 +2,7 @@
 {
     public enum BinaryOperator
     {
+        NoBinaryOperator,
         // 수식 연산자
         Add,
         Subtract,
@@ -12,6 +13,7 @@
 
     public enum UnaryOperator
     {
+        NoUnaryOperator,
         Not,
         Minus,
         Plus,

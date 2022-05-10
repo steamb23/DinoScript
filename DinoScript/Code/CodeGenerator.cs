@@ -39,13 +39,13 @@ namespace DinoScript.Code
             Enqueue(code);
         }
 
-        public void UnaryTokenEnqueue(Token token)
+        public void UnaryTokenEnqueue(UnaryOperator unaryOperator, Token token)
         {
-            var code = token.Value switch
+            var code = unaryOperator switch
             {
-                "-" => InternalCode.Make(Opcode.Negative, token),
-                "+" => InternalCode.Make(Opcode.NoOperation, token),
-                "!" => InternalCode.Make(Opcode.NoOperation, token), // TODO: Equal 연산자 구현이 필요함
+                UnaryOperator.Minus => InternalCode.Make(Opcode.Negative, token),
+                UnaryOperator.Plus => InternalCode.Make(Opcode.NoOperation, token),
+                UnaryOperator.Not => InternalCode.Make(Opcode.NoOperation, token), // TODO: Equal 연산자 구현이 필요함
                 _ => InternalCode.Make(Opcode.NoOperation, token)
             };
 
@@ -56,14 +56,14 @@ namespace DinoScript.Code
         /// 토큰을 연산자로 재분류하고 코드 스택에 넣습니다.
         /// </summary>
         /// <param name="token"></param>
-        public void OperatorTokenPush(Token token)
+        public void OperatorTokenPush(BinaryOperator binaryOperator, Token token)
         {
-            var opcode = token.Value switch
+            var opcode = binaryOperator switch
             {
-                "+" => Opcode.Add,
-                "-" => Opcode.Subtract,
-                "*" => Opcode.Multiply,
-                "/" => Opcode.Divide,
+                BinaryOperator.Add => Opcode.Add,
+                BinaryOperator.Subtract => Opcode.Subtract,
+                BinaryOperator.Multiply => Opcode.Multiply,
+                BinaryOperator.Divide => Opcode.Divide,
                 _ => Opcode.NoOperation
             };
 

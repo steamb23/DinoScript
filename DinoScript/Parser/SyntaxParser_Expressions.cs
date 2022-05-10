@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using DinoScript.Code;
 using DinoScript.Syntax;
@@ -15,7 +16,7 @@ namespace DinoScript.Parser
 
         void Expression()
         {
-            SubExpression(out _);
+            SubExpression(out _, uint.MaxValue);
             // 표현식 코드 생성이 안됬을 경우 강제 생성 (PrimaryExpression만 있고 연산자가 없는 경우)
             CodeGenerator.GenerateExpression();
         }
@@ -96,20 +97,15 @@ namespace DinoScript.Parser
         }
 
 
-        private readonly IReadOnlyDictionary<string, uint> binaryOperatorPriorityTable = new Dictionary<string, uint>()
-        {
-            ["*"] = (uint)ExpressionTypes.Multiplicative,
-            ["/"] = (uint)ExpressionTypes.Multiplicative,
-            ["+"] = (uint)ExpressionTypes.Addictive,
-            ["-"] = (uint)ExpressionTypes.Addictive,
-        };
+        private readonly IReadOnlyDictionary<BinaryOperator, uint> binaryOperatorPriorityTable =
+            new Dictionary<BinaryOperator, uint>()
+            {
+                [BinaryOperator.Multiply] = (uint)ExpressionTypes.Multiplicative,
+                [BinaryOperator.Divide] = (uint)ExpressionTypes.Multiplicative,
+                [BinaryOperator.Add] = (uint)ExpressionTypes.Addictive,
+                [BinaryOperator.Subtract] = (uint)ExpressionTypes.Addictive,
+            };
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        void SubExpression(uint priority = uint.MaxValue)
-        {
-            SubExpression(out _, priority);
-        }
-        
         /// <summary>
         /// 우선 순위에 의한 하위 표현식 구조를 표현합니다.
         /// </summary>
@@ -117,33 +113,34 @@ namespace DinoScript.Parser
         /// <param name="priority">연산자의 우선순위입니다. 값이 작을 수록 높은 연산 우선 순위를 나타냅니다.</param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        void SubExpression(out Token? binaryOperator, uint priority = uint.MaxValue)
+        void SubExpression(out BinaryOperator binaryOperator, uint priority)
         {
             // (<PrimaryExpression>|<UnaryExpression>){ BinaryOperator SubExpression}
 
             // TODO: UnaryExpression에 대한 코드 추가 필요 (Lua스크립트의 lparser 코드 참조)
-            var unaryOperator = GetUnaryOperatorToken();
-            if (unaryOperator != null)
+            var token = Tokenizer.Current();
+            var unaryOperator = CheckUnaryOperator(token);
+            if (unaryOperator != UnaryOperator.NoUnaryOperator)
             {
                 // UnaryExpression
-                SubExpression((uint)ExpressionTypes.Unary);
-                CodeGenerator.UnaryTokenEnqueue(unaryOperator);
+                SubExpression(out _, (uint)ExpressionTypes.Unary);
+                CodeGenerator.UnaryTokenEnqueue(unaryOperator, token!);
             }
             else
             {
                 PrimaryExpression();
             }
 
-            binaryOperator = GetBinaryOperatorToken();
-
+            token = Tokenizer.NextWithIgnoreWhiteSpace();
+            binaryOperator = CheckBinaryOperator(token);
             // 확인된 이항 연산자 우선순위가 현재 표현식 우선순위 보다 높으면 재귀 처리
             // 토큰이 연산자가 아닐경우 GetNextBinaryOperatorToken에 의해 null 임
-            uint operatorPriority = 0;
-            while (binaryOperator?.Value != null &&
-                   (operatorPriority = binaryOperatorPriorityTable[binaryOperator.Value]) <= priority)
+            uint operatorPriority;
+            while (binaryOperator != BinaryOperator.NoBinaryOperator &&
+                   (operatorPriority = binaryOperatorPriorityTable[binaryOperator]) <= priority)
             {
                 // 연산자를 코드 생성 스택에 우선 푸시해둠.
-                CodeGenerator.OperatorTokenPush(binaryOperator);
+                CodeGenerator.OperatorTokenPush(binaryOperator, token!);
                 Tokenizer.NextWithIgnoreWhiteSpace();
 
                 SubExpression(out var nextOperator, operatorPriority);
@@ -173,24 +170,28 @@ namespace DinoScript.Parser
             return isOperator ? token : null;
         }
 
-        Token? GetUnaryOperatorToken()
+        UnaryOperator CheckUnaryOperator(Token? token)
         {
-            // 전위 단항 연산자를 나타냅니다.
-            var operatorToken = GetOperatorToken();
-            switch (operatorToken?.Value)
+            return token?.Value switch
             {
-                case "+":
-                case "-":
-                case "not":
-                    return operatorToken;
-                default:
-                    return null;
-            }
+                "not" => UnaryOperator.Not,
+                "-" => UnaryOperator.Minus,
+                "+" => UnaryOperator.Plus,
+                _ => UnaryOperator.NoUnaryOperator
+            };
         }
 
-        Token? GetBinaryOperatorToken()
+        BinaryOperator CheckBinaryOperator(Token? token)
         {
-            return GetOperatorToken();
+            return token?.Value switch
+            {
+                "+" => BinaryOperator.Add,
+                "-" => BinaryOperator.Subtract,
+                "*" => BinaryOperator.Multiply,
+                "/" => BinaryOperator.Divide,
+                "%" => BinaryOperator.Remain,
+                _ => BinaryOperator.NoBinaryOperator
+            };
         }
     }
 }
