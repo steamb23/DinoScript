@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using DinoScript.Code;
 using DinoScript.Syntax;
 
@@ -90,23 +91,6 @@ namespace DinoScript.Parser
                 PreAccessExpression();
             } // end of AccessExpression
 
-            void PostfixIncrementExpression()
-            {
-                // 후위 증감 표현
-                AccessExpression();
-                var token = Tokenizer.NextWithIgnoreWhiteSpace();
-                switch (token?.Value)
-                {
-                    case "++":
-                    case "--":
-                        CodeGenerator.PostfixUnaryTokenEnqueue(token);
-                        Tokenizer.NextWithIgnoreWhiteSpace();
-                        return;
-                    default:
-                        return;
-                }
-            }
-
             // <AccessExpression>
             AccessExpression();
         }
@@ -120,7 +104,12 @@ namespace DinoScript.Parser
             ["-"] = (uint)ExpressionTypes.Addictive,
         };
 
-
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        void SubExpression(uint priority = uint.MaxValue)
+        {
+            SubExpression(out _, priority);
+        }
+        
         /// <summary>
         /// 우선 순위에 의한 하위 표현식 구조를 표현합니다.
         /// </summary>
@@ -128,25 +117,36 @@ namespace DinoScript.Parser
         /// <param name="priority">연산자의 우선순위입니다. 값이 작을 수록 높은 연산 우선 순위를 나타냅니다.</param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        void SubExpression(out Token? binaryOperator, uint? priority = uint.MaxValue)
+        void SubExpression(out Token? binaryOperator, uint priority = uint.MaxValue)
         {
             // (<PrimaryExpression>|<UnaryExpression>){ BinaryOperator SubExpression}
 
             // TODO: UnaryExpression에 대한 코드 추가 필요 (Lua스크립트의 lparser 코드 참조)
-            PrimaryExpression();
+            var unaryOperator = GetUnaryOperatorToken();
+            if (unaryOperator != null)
+            {
+                // UnaryExpression
+                SubExpression((uint)ExpressionTypes.Unary);
+                CodeGenerator.UnaryTokenEnqueue(unaryOperator);
+            }
+            else
+            {
+                PrimaryExpression();
+            }
 
             binaryOperator = GetBinaryOperatorToken();
 
             // 확인된 이항 연산자 우선순위가 현재 표현식 우선순위 보다 높으면 재귀 처리
             // 토큰이 연산자가 아닐경우 GetNextBinaryOperatorToken에 의해 null 임
+            uint operatorPriority = 0;
             while (binaryOperator?.Value != null &&
-                   binaryOperatorPriorityTable[binaryOperator.Value] <= priority)
+                   (operatorPriority = binaryOperatorPriorityTable[binaryOperator.Value]) <= priority)
             {
                 // 연산자를 코드 생성 스택에 우선 푸시해둠.
                 CodeGenerator.OperatorTokenPush(binaryOperator);
                 Tokenizer.NextWithIgnoreWhiteSpace();
 
-                SubExpression(out var nextOperator, binaryOperatorPriorityTable[binaryOperator.Value]);
+                SubExpression(out var nextOperator, operatorPriority);
 
                 // SubExpression의 재귀가 끝나면 식을 코드화함
                 CodeGenerator.GenerateExpression();
@@ -179,11 +179,9 @@ namespace DinoScript.Parser
             var operatorToken = GetOperatorToken();
             switch (operatorToken?.Value)
             {
-                case "--":
-                case "++":
                 case "+":
                 case "-":
-                case "!":
+                case "not":
                     return operatorToken;
                 default:
                     return null;

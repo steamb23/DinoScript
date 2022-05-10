@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using DinoScript.Parser;
 using DinoScript.Syntax;
@@ -38,29 +39,17 @@ namespace DinoScript.Code
             Enqueue(code);
         }
 
-        public void PostfixUnaryTokenEnqueue(Token token)
+        public void UnaryTokenEnqueue(Token token)
         {
-            var lastEnqueuedCode = this.lastEnqueuedCode;
             var code = token.Value switch
             {
-                "++" => InternalCode.Make(Opcode.Add, token, (double)1),
-                "--" => InternalCode.Make(Opcode.Subtract, token, (double)1),
+                "-" => InternalCode.Make(Opcode.Negative, token),
+                "+" => InternalCode.Make(Opcode.NoOperation, token),
+                "!" => InternalCode.Make(Opcode.NoOperation, token), // TODO: Equal 연산자 구현이 필요함
                 _ => InternalCode.Make(Opcode.NoOperation, token)
             };
 
-            switch (lastEnqueuedCode.Opcode)
-            {
-                case Opcode.LoadFromLocal:
-                    // 식이 아닌 단일로 쓰였을 경우 최적화 필요
-                    Enqueue(lastEnqueuedCode);
-                    Enqueue(code);
-                    Enqueue(FlipLoadAndStore(lastEnqueuedCode));
-                    break;
-                default:
-                    // 에러
-                    throw new SyntaxErrorException(token,
-                        "Postfix in-decrement operators can only follow variable accesses.");
-            }
+            Enqueue(code);
         }
 
         /// <summary>

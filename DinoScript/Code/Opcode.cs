@@ -52,6 +52,10 @@
         /// </summary>
         Divide,
         /// <summary>
+        /// 계산 스택 맨 위의 값을 음수로 만들고 계산 스택에 푸시합니다.
+        /// </summary>
+        Negative,
+        /// <summary>
         /// 조건 없이 대상 명령 위치로 제어를 이동합니다.
         /// </summary>
         Branch,
