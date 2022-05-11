@@ -32,6 +32,8 @@ namespace DinoScript.Code
                 TokenType.NumberLiteral => long.TryParse(token.Value!, out var longValue)
                     ? InternalCode.Make(Opcode.LoadConstantInteger, token, longValue)
                     : InternalCode.Make(Opcode.LoadConstantNumber, token, double.Parse(token.Value!)),
+                TokenType.BooleanLiteral =>
+                    InternalCode.Make(Opcode.LoadConstantBoolean, token, bool.Parse(token.Value!) ? 1 : 0),
                 _ => InternalCode.Make(Opcode.NoOperation, token)
             };
 

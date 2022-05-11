@@ -48,6 +48,13 @@ namespace DinoScript.Runtime
                     break;
                 }
 
+                case Opcode.LoadConstantBoolean:
+                {
+                    Memory.Stack.Push(DinoValue.Boolean((long)code.Operands[0]));
+                    internalCodeIndex++;
+                    break;
+                }
+
                 case Opcode.LoadFromLocal:
                 {
                     var localIndex = (int)code.Operands[0];

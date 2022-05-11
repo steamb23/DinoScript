@@ -43,6 +43,7 @@ namespace DinoScript.Code
             switch (opcode)
             {
                 case Opcode.LoadConstantInteger:
+                case Opcode.LoadConstantBoolean:
                     return new InternalCode(opcode, token, value);
                 default:
                     throw new ArgumentException(null, nameof(opcode));

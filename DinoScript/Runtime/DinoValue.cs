@@ -27,6 +27,8 @@ namespace DinoScript.Runtime
 
         public static DinoValue Boolean(bool value) => new DinoValue(DinoType.Boolean, value ? 1 : 0);
 
+        public static DinoValue Boolean(long value) => new DinoValue(DinoType.Boolean, value);
+
         public static implicit operator DinoValue(double value) => Number(value);
 
         public static implicit operator DinoValue(long value) => Integer(value);
