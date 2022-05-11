@@ -36,10 +36,7 @@ namespace DinoScript.Parser
             new TokenDefinition(TokenType.WhiteSpace,
                 "^(?: +|\t+|\u3000+)"),
             new TokenDefinition(TokenType.Keyword,
-                "^(?:func|for|in|if|else|var|null|true|false|do|until|while|not|this|get|set)"),
-            new TokenDefinition(TokenType.Identifier,
-                // letter{letter|decimalDigit}
-                "^(?:\\p{Lu}|\\p{Ll}|\\p{Lt}|\\p{Lm}|\\p{Lo}|\\p{Nl})(\\p{Lu}|\\p{Ll}|\\p{Lt}|\\p{Lm}|\\p{Lo}|\\p{Nl}|\\d)*"),
+                "^(?:func|for|in|if|else|var|do|until|while|not|this|get|set)"),
             new TokenDefinition(TokenType.Operator,
                 "^(?:\\+|-|\\*|/|%|\\^|==|!=|<=|>=|<|>|\\?|:|\\+\\+|--|!)"),
             new TokenDefinition(TokenType.Mark,
@@ -54,7 +51,10 @@ namespace DinoScript.Parser
             new TokenDefinition(TokenType.NullLiteral,
                 "^(?:null)"),
             new TokenDefinition(TokenType.UndefinedLiteral,
-                "^(?:undefined)")
+                "^(?:undefined)"),
+            new TokenDefinition(TokenType.Identifier,
+                // letter{letter|decimalDigit}
+                "^(?:\\p{Lu}|\\p{Ll}|\\p{Lt}|\\p{Lm}|\\p{Lo}|\\p{Nl})(\\p{Lu}|\\p{Ll}|\\p{Lt}|\\p{Lm}|\\p{Lo}|\\p{Nl}|\\d)*"),
         };
 
         // 규격 외 공백 문자 제거
