@@ -100,8 +100,17 @@ namespace DinoScript.Parser
                 [BinaryOperator.Multiply] = (uint)ExpressionTypes.Multiplicative,
                 [BinaryOperator.Divide] = (uint)ExpressionTypes.Multiplicative,
                 [BinaryOperator.Modulo] = (uint)ExpressionTypes.Multiplicative,
+                
                 [BinaryOperator.Add] = (uint)ExpressionTypes.Addictive,
                 [BinaryOperator.Subtract] = (uint)ExpressionTypes.Addictive,
+                
+                [BinaryOperator.Equal] = (uint)ExpressionTypes.Equality,
+                [BinaryOperator.NotEqual] = (uint)ExpressionTypes.Equality,
+                
+                [BinaryOperator.GreaterThanOrEqual] = (uint)ExpressionTypes.Comparison,
+                [BinaryOperator.LessThanOrEqual] = (uint)ExpressionTypes.Comparison,
+                [BinaryOperator.GreaterThan] = (uint)ExpressionTypes.Comparison,
+                [BinaryOperator.LessThan] = (uint)ExpressionTypes.Comparison,
             };
 
         /// <summary>
