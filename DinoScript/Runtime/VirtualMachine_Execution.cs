@@ -260,6 +260,7 @@ namespace DinoScript.Runtime
                         }
                     }
 
+                    internalCodeIndex++;
                     break;
                 }
                 case Opcode.NotEqual:
@@ -290,6 +291,7 @@ namespace DinoScript.Runtime
                         }
                     }
 
+                    internalCodeIndex++;
                     break;
                 }
                 case Opcode.GreaterThanOrEqual:
@@ -320,6 +322,7 @@ namespace DinoScript.Runtime
                         }
                     }
 
+                    internalCodeIndex++;
                     break;
                 }
                 case Opcode.LessThanOrEqual:
@@ -350,6 +353,7 @@ namespace DinoScript.Runtime
                         }
                     }
 
+                    internalCodeIndex++;
                     break;
                 }
                 case Opcode.GreaterThan:
@@ -380,6 +384,7 @@ namespace DinoScript.Runtime
                         }
                     }
 
+                    internalCodeIndex++;
                     break;
                 }
                 case Opcode.LessThan:
@@ -410,6 +415,7 @@ namespace DinoScript.Runtime
                         }
                     }
 
+                    internalCodeIndex++;
                     break;
                 }
                 // ReSharper restore CompareOfFloatsByEqualityOperator
