@@ -15,9 +15,19 @@ namespace DinoScript.Runtime
             switch (code.Opcode)
             {
                 default:
+                {
+                    throw new NotImplementedException($"Opcode {code.Opcode}의 구현이 되지 않았습니다.");
+                }
                 case Opcode.NoOperation:
                 {
                     // 아무 것도 실행하지 않음
+                    internalCodeIndex++;
+                    break;
+                }
+
+                case Opcode.Pop:
+                {
+                    Memory.Stack.Pop();
                     internalCodeIndex++;
                     break;
                 }
@@ -49,14 +59,8 @@ namespace DinoScript.Runtime
 
                 #endregion
 
-                #region 실수 사칙연산
+                #region 수식 연산
 
-                case Opcode.Pop:
-                {
-                    Memory.Stack.Pop();
-                    internalCodeIndex++;
-                    break;
-                }
                 case Opcode.Add:
                 {
                     var v1 = Memory.Stack.Pop();
@@ -146,7 +150,7 @@ namespace DinoScript.Runtime
                             Memory.Stack.Push((long)v2 * (long)v1);
                         }
                     }
-                    
+
                     internalCodeIndex++;
                     break;
                 }
@@ -177,7 +181,7 @@ namespace DinoScript.Runtime
                             Memory.Stack.Push((long)v2 / (long)v1);
                         }
                     }
-                    
+
                     internalCodeIndex++;
                     break;
                 }
@@ -208,14 +212,14 @@ namespace DinoScript.Runtime
                             Memory.Stack.Push((long)v2 % (long)v1);
                         }
                     }
-                    
+
                     internalCodeIndex++;
                     break;
                 }
                 case Opcode.Negative:
                 {
                     var v1 = Memory.Stack.Pop();
-                    if (v1.Type== DinoType.Number)
+                    if (v1.Type == DinoType.Number)
                         Memory.Stack.Push(-(double)v1);
                     else
                         Memory.Stack.Push(-(long)v1);
