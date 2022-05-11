@@ -41,6 +41,13 @@ namespace DinoScript.Runtime
                     break;
                 }
 
+                case Opcode.LoadConstantInteger:
+                {
+                    Memory.Stack.Push(DinoValue.Integer((long)code.Operands[0]));
+                    internalCodeIndex++;
+                    break;
+                }
+
                 case Opcode.LoadFromLocal:
                 {
                     var localIndex = (int)code.Operands[0];
@@ -178,7 +185,7 @@ namespace DinoScript.Runtime
                         }
                         else
                         {
-                            Memory.Stack.Push((long)v1 / (long)v2);
+                            Memory.Stack.Push((double)(long)v1 / (long)v2);
                         }
                     }
 

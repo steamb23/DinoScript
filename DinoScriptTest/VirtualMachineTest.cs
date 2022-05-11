@@ -23,12 +23,12 @@ public class VirtualMachineTest
         new object[]
         {
             "1 + 2 * 3 + 4",
-            DinoValue.Number(1 + 2 * 3 + 4)
+            DinoValue.Integer(1 + 2 * 3 + 4)
         },
         new object[]
         {
             "10*0+10",
-            DinoValue.Number(10 * 0 + 10)
+            DinoValue.Integer(10 * 0 + 10)
         },
         new object[]
         {

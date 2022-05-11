@@ -18,6 +18,8 @@
         /// 상수를 계산 스택에 푸시합니다.
         /// </summary>
         LoadConstantNumber,
+        
+        LoadConstantInteger,
 
         /// <summary>
         /// 스택 프레임에서 지정된 인덱스의 로컬 변수를 계산 스택에 푸시합니다.

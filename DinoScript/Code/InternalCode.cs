@@ -38,6 +38,17 @@ namespace DinoScript.Code
             }
         }
 
+        public static InternalCode Make(Opcode opcode, Token? token, long value)
+        {
+            switch (opcode)
+            {
+                case Opcode.LoadConstantInteger:
+                    return new InternalCode(opcode, token, value);
+                default:
+                    throw new ArgumentException(null, nameof(opcode));
+            }
+        }
+
         public static InternalCode Make(Opcode opcode, Token? token, ulong value)
         {
             switch (opcode)

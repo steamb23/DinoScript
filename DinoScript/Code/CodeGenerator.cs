@@ -29,8 +29,9 @@ namespace DinoScript.Code
         {
             InternalCode code = token.Type switch
             {
-                TokenType.NumberLiteral => InternalCode.Make(Opcode.LoadConstantNumber, token,
-                    double.Parse(token.Value!)),
+                TokenType.NumberLiteral => long.TryParse(token.Value!, out var longValue)
+                    ? InternalCode.Make(Opcode.LoadConstantInteger, token, longValue)
+                    : InternalCode.Make(Opcode.LoadConstantNumber, token, double.Parse(token.Value!)),
                 _ => InternalCode.Make(Opcode.NoOperation, token)
             };
 
@@ -72,7 +73,7 @@ namespace DinoScript.Code
                 BinaryOperator.LessThanOrEqual => Opcode.LessThanOrEqual,
                 BinaryOperator.GreaterThan => Opcode.GreaterThan,
                 BinaryOperator.LessThan => Opcode.LessThan,
-                
+
                 _ => Opcode.NoOperation
             };
 
