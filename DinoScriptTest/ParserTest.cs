@@ -121,7 +121,95 @@ public class ParserTest
                 Make(Opcode.LoadConstantInteger, null, 10),
                 Make(Opcode.Negative, null)
             }
-        }
+        },
+        new object[]
+        {
+            "not true",
+            new[]
+            {
+                Make(Opcode.LoadConstantBoolean, null, 1),
+                Make(Opcode.LoadConstantBoolean, null, 0),
+                Make(Opcode.Equal, null),
+            }
+        },
+        new object[]
+        {
+            "10 > 5 and 30 > 15",
+            new[]
+            {
+                /*00*/Make(Opcode.LoadConstantInteger, null, 10),
+                /*01*/Make(Opcode.LoadConstantInteger, null, 5),
+                /*02*/Make(Opcode.GreaterThan, null),
+                /*03*/Make(Opcode.BranchIfFalse, null, 0x08),
+                /*04*/Make(Opcode.LoadConstantInteger, null, 30),
+                /*05*/Make(Opcode.LoadConstantInteger, null, 15),
+                /*06*/Make(Opcode.GreaterThan, null),
+                /*07*/Make(Opcode.Branch, null, 0x09),
+                /*08*/Make(Opcode.LoadConstantBoolean, null, 0), // 실패 처리
+                /*09*/Make(Opcode.NoOperation, null, 0),
+            }
+        },
+        new object[]
+        {
+            "10 > 5 and 30 > 15 and 50 > 25",
+            new[]
+            {
+                // and 체이닝
+                /*00*/Make(Opcode.LoadConstantInteger, null, 10),
+                /*01*/Make(Opcode.LoadConstantInteger, null, 5),
+                /*02*/Make(Opcode.GreaterThan, null),
+                /*03*/Make(Opcode.BranchIfFalse, null, 0x0c),
+                /*04*/Make(Opcode.LoadConstantInteger, null, 30),
+                /*05*/Make(Opcode.LoadConstantInteger, null, 15),
+                /*06*/Make(Opcode.GreaterThan, null),
+                /*07*/Make(Opcode.BranchIfFalse, null, 0x0c),
+                /*08*/Make(Opcode.LoadConstantInteger, null, 30),
+                /*09*/Make(Opcode.LoadConstantInteger, null, 15),
+                /*0A*/Make(Opcode.GreaterThan, null),
+                /*0B*/Make(Opcode.Branch, null, 0x0d),
+                /*0C*/Make(Opcode.LoadConstantBoolean, null, 0), // 실패 처리
+                /*0D*/Make(Opcode.NoOperation, null, 0),
+            }
+        },
+        new object[]
+        {
+            "10 > 5 or 30 > 15",
+            new[]
+            {
+                /*00*/Make(Opcode.LoadConstantInteger, null, 10),
+                /*01*/Make(Opcode.LoadConstantInteger, null, 5),
+                /*02*/Make(Opcode.GreaterThan, null),
+                /*03*/Make(Opcode.BranchIfTrue, null, 0x08),
+                /*04*/Make(Opcode.LoadConstantInteger, null, 30),
+                /*05*/Make(Opcode.LoadConstantInteger, null, 15),
+                /*06*/Make(Opcode.GreaterThan, null),
+                /*07*/Make(Opcode.Branch, null, 0x09),
+                /*08*/Make(Opcode.LoadConstantBoolean, null, 1), // 성공 처리
+                /*09*/Make(Opcode.NoOperation, null, 0),
+            }
+        },
+        new object[]
+        {
+            "10 > 5 or 30 > 15 or 50 > 25",
+            new[]
+            {
+                // or 체이닝
+                /*00*/Make(Opcode.LoadConstantInteger, null, 10),
+                /*01*/Make(Opcode.LoadConstantInteger, null, 5),
+                /*02*/Make(Opcode.GreaterThan, null),
+                /*03*/Make(Opcode.BranchIfTrue, null, 0x0c),
+                /*04*/Make(Opcode.LoadConstantInteger, null, 30),
+                /*05*/Make(Opcode.LoadConstantInteger, null, 15),
+                /*06*/Make(Opcode.GreaterThan, null),
+                /*07*/Make(Opcode.BranchIfTrue, null, 0x0c),
+                /*08*/Make(Opcode.LoadConstantInteger, null, 30),
+                /*09*/Make(Opcode.LoadConstantInteger, null, 15),
+                /*0A*/Make(Opcode.GreaterThan, null),
+                /*0B*/Make(Opcode.Branch, null, 0x0d),
+                /*0C*/Make(Opcode.LoadConstantBoolean, null, 1), // 성공 처리
+                /*0D*/Make(Opcode.NoOperation, null, 0),
+            }
+        },
     };
 
     [Theory]

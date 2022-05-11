@@ -49,6 +49,20 @@ namespace DinoScript.Runtime
         /// </summary>
         public void Run()
         {
+            var v1 = 10;
+            var v2 = 5;
+            var v3 = 30;
+            var v4 = 15;
+            var v5 = 50;
+            var v6 = 25;
+            bool a = v1 > v2 && v3 > v4;
+            bool b = v1 > v2 && v3 > v4 && v5 > v6;
+            bool c = v1 > v2 || v3 > v4;
+            bool d = v1 > v2 || v3 > v4 || v5 > v6;
+            bool f = v1 > v2 || v3 > v4 && v5 > v6;
+            bool g = v1 > v2 && v3 > v4 || v5 > v6;
+            Console.WriteLine(a);
+            Console.WriteLine(b);
             while (internalCodeIndex < InternalCodes.Count || !Parser.IsEndOfText)
             {
                 Next();
