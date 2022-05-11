@@ -59,11 +59,20 @@ namespace DinoScript.Code
         {
             var opcode = binaryOperator switch
             {
+                // 수식 연산자
                 BinaryOperator.Add => Opcode.Add,
                 BinaryOperator.Subtract => Opcode.Subtract,
                 BinaryOperator.Multiply => Opcode.Multiply,
                 BinaryOperator.Divide => Opcode.Divide,
                 BinaryOperator.Modulo => Opcode.Modulo,
+                // 비교 연산자
+                BinaryOperator.Equal => Opcode.Equal,
+                BinaryOperator.NotEqual => Opcode.NotEqual,
+                BinaryOperator.GreaterThanOrEqual => Opcode.GreaterThanOrEqual,
+                BinaryOperator.LessThanOrEqual => Opcode.LessThanOrEqual,
+                BinaryOperator.GreaterThan => Opcode.GreaterThan,
+                BinaryOperator.LessThan => Opcode.LessThan,
+                
                 _ => Opcode.NoOperation
             };
 

@@ -184,11 +184,20 @@ namespace DinoScript.Parser
         {
             return token?.Value switch
             {
+                // 수식 연산자
                 "+" => BinaryOperator.Add,
                 "-" => BinaryOperator.Subtract,
                 "*" => BinaryOperator.Multiply,
                 "/" => BinaryOperator.Divide,
                 "%" => BinaryOperator.Modulo,
+                // 비교 연산자
+                "==" => BinaryOperator.Equal,
+                "!=" => BinaryOperator.NotEqual,
+                ">=" => BinaryOperator.GreaterThanOrEqual,
+                "<=" => BinaryOperator.LessThanOrEqual,
+                ">" => BinaryOperator.GreaterThan,
+                "<" => BinaryOperator.LessThan,
+
                 _ => BinaryOperator.NoBinaryOperator
             };
         }

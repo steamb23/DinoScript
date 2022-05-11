@@ -8,7 +8,13 @@
         Subtract,
         Multiply,
         Divide,
-        Modulo
+        Modulo,
+        Equal,
+        NotEqual,
+        GreaterThanOrEqual,
+        LessThanOrEqual,
+        GreaterThan,
+        LessThan
     }
 
     public enum UnaryOperator
