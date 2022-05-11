@@ -22,5 +22,15 @@ namespace DinoScript.Runtime
         public ulong UInt64 => unchecked((ulong)value);
 
         public static DinoValue Number(double value) => new DinoValue(DinoType.Number, BitConverter.DoubleToInt64Bits(value));
+
+        public static DinoValue Integer(long value) => new DinoValue(DinoType.Integer, value);
+
+        public static implicit operator DinoValue(double value) => Number(value);
+
+        public static implicit operator DinoValue(long value) => Integer(value);
+
+        public static explicit operator double(DinoValue value) => value.Double;
+
+        public static explicit operator long(DinoValue value) => value.Int64;
     }
 }
