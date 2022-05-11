@@ -35,7 +35,19 @@ public class ExpressionTestScene : Scene
                     ParserMode.ExpressionTest)
                 );
                 stopwatch.Stop();
-                Console.WriteLine($"결과: {machine.Result.Double}");
+                var result = machine.Result;
+                switch (result.Value.Type)
+                {
+                    case DinoType.Integer:
+                        Console.WriteLine($"결과: ({result.Value.Type}) {(long)machine.Result.Value}");
+                        break;
+                    case DinoType.Number:
+                        Console.WriteLine($"결과: ({result.Value.Type}) {(double)machine.Result.Value}");
+                        break;
+                    case DinoType.Boolean:
+                        Console.WriteLine($"결과: ({result.Value.Type}) {(bool)machine.Result.Value}");
+                        break;
+                }
                 Console.WriteLine($"실행 시간: {stopwatch.Elapsed.TotalMilliseconds} ms");
                 machine.Dispose();
             }
