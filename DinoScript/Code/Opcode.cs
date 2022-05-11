@@ -90,13 +90,13 @@
         
         NotEqual,
         
-        GreaterThenOrEqual,
+        GreaterThanOrEqual,
         
-        LessThenOrEqual,
+        LessThanOrEqual,
         
-        GreaterThen,
+        GreaterThan,
         
-        LessThen,
+        LessThan,
 
         #endregion
 
@@ -123,21 +123,21 @@
         /// </remarks>
         BranchIfFalse,
 
-        #region 분기 축약
-
-        BranchEqual,
-
-        BranchNotEqual,
-
-        BranchGreaterThenOrEqual,
-
-        BranchLessThenOrEqual,
-
-        BranchGreaterThen,
-
-        BranchLessThen,
-
-        #endregion
+        // #region 분기 축약
+        //
+        // BranchEqual,
+        //
+        // BranchNotEqual,
+        //
+        // BranchGreaterThanOrEqual,
+        //
+        // BranchLessThanOrEqual,
+        //
+        // BranchGreaterThan,
+        //
+        // BranchLessThan,
+        //
+        // #endregion
 
         #endregion
     }
