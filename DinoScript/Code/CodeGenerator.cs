@@ -53,6 +53,7 @@ namespace DinoScript.Code
         /// <summary>
         /// 토큰을 연산자로 재분류하고 코드 스택에 넣습니다.
         /// </summary>
+        /// <param name="binaryOperator"></param>
         /// <param name="token"></param>
         public void OperatorTokenPush(BinaryOperator binaryOperator, Token token)
         {
