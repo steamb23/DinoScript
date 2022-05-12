@@ -211,6 +211,38 @@ public class ParserTest
                 /*0D*/Make(Opcode.NoOperation, null),
             }
         },
+        new object[]
+        {
+            "true and false or true",
+            new[]
+            {
+                /*00*/Make(Opcode.LoadConstantBoolean, null, (long)1),
+                /*01*/Make(Opcode.BranchIfFalse, null, 0x04), // and
+                /*02*/Make(Opcode.LoadConstantBoolean, null, (long)0),
+                /*03*/Make(Opcode.BranchIfTrue, null, 0x06), // or
+                /*04*/Make(Opcode.LoadConstantBoolean, null, (long)1),
+                /*05*/Make(Opcode.Branch, null, 0x07),
+                /*06*/Make(Opcode.LoadConstantBoolean, null, (long)1),
+                /*07*/Make(Opcode.NoOperation, null),
+            }
+        },
+        new object[]
+        {
+            "true or false and true",
+            new[]
+            {
+                /*00*/Make(Opcode.LoadConstantBoolean, null, (long)1),
+                /*01*/Make(Opcode.BranchIfTrue, null, 0x08), // or
+                /*02*/Make(Opcode.LoadConstantBoolean, null, (long)0),
+                /*03*/Make(Opcode.BranchIfFalse, null, 0x06), // and
+                /*04*/Make(Opcode.LoadConstantBoolean, null, (long)1),
+                /*05*/Make(Opcode.Branch, null, 0x07),
+                /*06*/Make(Opcode.LoadConstantBoolean, null, (long)0),
+                /*07*/Make(Opcode.Branch, null, 0x09),
+                /*08*/Make(Opcode.LoadConstantBoolean, null, (long)1),
+                /*09*/Make(Opcode.NoOperation, null),
+            }
+        }
     };
 
     [Theory]
@@ -237,6 +269,7 @@ public class ParserTest
             {
                 testOutputHelper.WriteLine(code.ToString());
             }
+
             Assert.Equal(expectedCodes.Length, codes.Count);
             for (int i = 0; i < expectedCodes.Length; i++)
             {
