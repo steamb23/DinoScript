@@ -50,6 +50,19 @@ namespace DinoScript.Code
             }
         }
 
+        public static InternalCode Make(Opcode opcode, Token? token, int value)
+        {
+            switch (opcode)
+            {
+                case Opcode.Branch:
+                case Opcode.BranchIfFalse:
+                case Opcode.BranchIfTrue:
+                    return new InternalCode(opcode, token, value);
+                default:
+                    throw new ArgumentException(null, nameof(opcode));
+            }
+        }
+
         public static InternalCode Make(Opcode opcode, Token? token, ulong value)
         {
             switch (opcode)

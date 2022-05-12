@@ -9,12 +9,16 @@
         Multiply,
         Divide,
         Modulo,
+        // 비교 연산자
         Equal,
         NotEqual,
         GreaterThanOrEqual,
         LessThanOrEqual,
         GreaterThan,
-        LessThan
+        LessThan,
+        // 논리 연산자
+        And,
+        Or
     }
 
     public enum UnaryOperator

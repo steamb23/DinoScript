@@ -4,6 +4,7 @@ using DinoScript.Code;
 using DinoScript.Parser;
 using Xunit;
 using Xunit.Abstractions;
+using Xunit.Sdk;
 
 namespace DinoScript.Test;
 
@@ -25,12 +26,12 @@ public class ParserTest
             "1 + 2 * 3 + 4",
             new[]
             {
-                Make(Opcode.LoadConstantInteger, null, 1),
-                Make(Opcode.LoadConstantInteger, null, 2),
-                Make(Opcode.LoadConstantInteger, null, 3),
+                Make(Opcode.LoadConstantInteger, null, (long)1),
+                Make(Opcode.LoadConstantInteger, null, (long)2),
+                Make(Opcode.LoadConstantInteger, null, (long)3),
                 Make(Opcode.Multiply, null),
                 Make(Opcode.Add, null),
-                Make(Opcode.LoadConstantInteger, null, 4),
+                Make(Opcode.LoadConstantInteger, null, (long)4),
                 Make(Opcode.Add, null),
             }
         },
@@ -39,10 +40,10 @@ public class ParserTest
             "1+2*(3+4)",
             new[]
             {
-                Make(Opcode.LoadConstantInteger, null, 1),
-                Make(Opcode.LoadConstantInteger, null, 2),
-                Make(Opcode.LoadConstantInteger, null, 3),
-                Make(Opcode.LoadConstantInteger, null, 4),
+                Make(Opcode.LoadConstantInteger, null, (long)1),
+                Make(Opcode.LoadConstantInteger, null, (long)2),
+                Make(Opcode.LoadConstantInteger, null, (long)3),
+                Make(Opcode.LoadConstantInteger, null, (long)4),
                 Make(Opcode.Add, null),
                 Make(Opcode.Multiply, null),
                 Make(Opcode.Add, null),
@@ -53,11 +54,11 @@ public class ParserTest
             "(1+2)*(3+4)",
             new[]
             {
-                Make(Opcode.LoadConstantInteger, null, 1),
-                Make(Opcode.LoadConstantInteger, null, 2),
+                Make(Opcode.LoadConstantInteger, null, (long)1),
+                Make(Opcode.LoadConstantInteger, null, (long)2),
                 Make(Opcode.Add, null),
-                Make(Opcode.LoadConstantInteger, null, 3),
-                Make(Opcode.LoadConstantInteger, null, 4),
+                Make(Opcode.LoadConstantInteger, null, (long)3),
+                Make(Opcode.LoadConstantInteger, null, (long)4),
                 Make(Opcode.Add, null),
                 Make(Opcode.Multiply, null),
             }
@@ -67,11 +68,11 @@ public class ParserTest
             "(1+2)/(3+4)",
             new[]
             {
-                Make(Opcode.LoadConstantInteger, null, 1),
-                Make(Opcode.LoadConstantInteger, null, 2),
+                Make(Opcode.LoadConstantInteger, null, (long)1),
+                Make(Opcode.LoadConstantInteger, null, (long)2),
                 Make(Opcode.Add, null),
-                Make(Opcode.LoadConstantInteger, null, 3),
-                Make(Opcode.LoadConstantInteger, null, 4),
+                Make(Opcode.LoadConstantInteger, null, (long)3),
+                Make(Opcode.LoadConstantInteger, null, (long)4),
                 Make(Opcode.Add, null),
                 Make(Opcode.Divide, null),
             }
@@ -82,11 +83,11 @@ public class ParserTest
             "(1+2)*(3@4)",
             new[]
             {
-                Make(Opcode.LoadConstantInteger, null, 1),
-                Make(Opcode.LoadConstantInteger, null, 2),
+                Make(Opcode.LoadConstantInteger, null, (long)1),
+                Make(Opcode.LoadConstantInteger, null, (long)2),
                 Make(Opcode.Add, null),
-                Make(Opcode.LoadConstantInteger, null, 3),
-                Make(Opcode.LoadConstantInteger, null, 4),
+                Make(Opcode.LoadConstantInteger, null, (long)3),
+                Make(Opcode.LoadConstantInteger, null, (long)4),
                 Make(Opcode.Add, null),
                 Make(Opcode.Divide, null),
             }
@@ -96,11 +97,11 @@ public class ParserTest
             "(1+2)*(3+4)\n",
             new[]
             {
-                Make(Opcode.LoadConstantInteger, null, 1),
-                Make(Opcode.LoadConstantInteger, null, 2),
+                Make(Opcode.LoadConstantInteger, null, (long)1),
+                Make(Opcode.LoadConstantInteger, null, (long)2),
                 Make(Opcode.Add, null),
-                Make(Opcode.LoadConstantInteger, null, 3),
-                Make(Opcode.LoadConstantInteger, null, 4),
+                Make(Opcode.LoadConstantInteger, null, (long)3),
+                Make(Opcode.LoadConstantInteger, null, (long)4),
                 Make(Opcode.Add, null),
                 Make(Opcode.Multiply, null),
             }
@@ -118,7 +119,7 @@ public class ParserTest
             "-10",
             new[]
             {
-                Make(Opcode.LoadConstantInteger, null, 10),
+                Make(Opcode.LoadConstantInteger, null, (long)10),
                 Make(Opcode.Negative, null)
             }
         },
@@ -127,8 +128,8 @@ public class ParserTest
             "not true",
             new[]
             {
-                Make(Opcode.LoadConstantBoolean, null, 1),
-                Make(Opcode.LoadConstantBoolean, null, 0),
+                Make(Opcode.LoadConstantBoolean, null, (long)1),
+                Make(Opcode.LoadConstantBoolean, null, (long)0),
                 Make(Opcode.Equal, null),
             }
         },
@@ -137,16 +138,16 @@ public class ParserTest
             "10 > 5 and 30 > 15",
             new[]
             {
-                /*00*/Make(Opcode.LoadConstantInteger, null, 10),
-                /*01*/Make(Opcode.LoadConstantInteger, null, 5),
+                /*00*/Make(Opcode.LoadConstantInteger, null, (long)10),
+                /*01*/Make(Opcode.LoadConstantInteger, null, (long)5),
                 /*02*/Make(Opcode.GreaterThan, null),
                 /*03*/Make(Opcode.BranchIfFalse, null, 0x08),
-                /*04*/Make(Opcode.LoadConstantInteger, null, 30),
-                /*05*/Make(Opcode.LoadConstantInteger, null, 15),
+                /*04*/Make(Opcode.LoadConstantInteger, null, (long)30),
+                /*05*/Make(Opcode.LoadConstantInteger, null, (long)15),
                 /*06*/Make(Opcode.GreaterThan, null),
                 /*07*/Make(Opcode.Branch, null, 0x09),
-                /*08*/Make(Opcode.LoadConstantBoolean, null, 0), // 실패 처리
-                /*09*/Make(Opcode.NoOperation, null, 0),
+                /*08*/Make(Opcode.LoadConstantBoolean, null, (long)0), // 실패 처리
+                /*09*/Make(Opcode.NoOperation, null),
             }
         },
         new object[]
@@ -155,20 +156,20 @@ public class ParserTest
             new[]
             {
                 // and 체이닝
-                /*00*/Make(Opcode.LoadConstantInteger, null, 10),
-                /*01*/Make(Opcode.LoadConstantInteger, null, 5),
+                /*00*/Make(Opcode.LoadConstantInteger, null, (long)10),
+                /*01*/Make(Opcode.LoadConstantInteger, null, (long)5),
                 /*02*/Make(Opcode.GreaterThan, null),
                 /*03*/Make(Opcode.BranchIfFalse, null, 0x0c),
-                /*04*/Make(Opcode.LoadConstantInteger, null, 30),
-                /*05*/Make(Opcode.LoadConstantInteger, null, 15),
+                /*04*/Make(Opcode.LoadConstantInteger, null, (long)30),
+                /*05*/Make(Opcode.LoadConstantInteger, null, (long)15),
                 /*06*/Make(Opcode.GreaterThan, null),
                 /*07*/Make(Opcode.BranchIfFalse, null, 0x0c),
-                /*08*/Make(Opcode.LoadConstantInteger, null, 30),
-                /*09*/Make(Opcode.LoadConstantInteger, null, 15),
+                /*08*/Make(Opcode.LoadConstantInteger, null, (long)50),
+                /*09*/Make(Opcode.LoadConstantInteger, null, (long)25),
                 /*0A*/Make(Opcode.GreaterThan, null),
                 /*0B*/Make(Opcode.Branch, null, 0x0d),
-                /*0C*/Make(Opcode.LoadConstantBoolean, null, 0), // 실패 처리
-                /*0D*/Make(Opcode.NoOperation, null, 0),
+                /*0C*/Make(Opcode.LoadConstantBoolean, null, (long)0), // 실패 처리
+                /*0D*/Make(Opcode.NoOperation, null),
             }
         },
         new object[]
@@ -176,16 +177,16 @@ public class ParserTest
             "10 > 5 or 30 > 15",
             new[]
             {
-                /*00*/Make(Opcode.LoadConstantInteger, null, 10),
-                /*01*/Make(Opcode.LoadConstantInteger, null, 5),
+                /*00*/Make(Opcode.LoadConstantInteger, null, (long)10),
+                /*01*/Make(Opcode.LoadConstantInteger, null, (long)5),
                 /*02*/Make(Opcode.GreaterThan, null),
                 /*03*/Make(Opcode.BranchIfTrue, null, 0x08),
-                /*04*/Make(Opcode.LoadConstantInteger, null, 30),
-                /*05*/Make(Opcode.LoadConstantInteger, null, 15),
+                /*04*/Make(Opcode.LoadConstantInteger, null, (long)30),
+                /*05*/Make(Opcode.LoadConstantInteger, null, (long)15),
                 /*06*/Make(Opcode.GreaterThan, null),
                 /*07*/Make(Opcode.Branch, null, 0x09),
-                /*08*/Make(Opcode.LoadConstantBoolean, null, 1), // 성공 처리
-                /*09*/Make(Opcode.NoOperation, null, 0),
+                /*08*/Make(Opcode.LoadConstantBoolean, null, (long)1), // 성공 처리
+                /*09*/Make(Opcode.NoOperation, null),
             }
         },
         new object[]
@@ -194,20 +195,20 @@ public class ParserTest
             new[]
             {
                 // or 체이닝
-                /*00*/Make(Opcode.LoadConstantInteger, null, 10),
-                /*01*/Make(Opcode.LoadConstantInteger, null, 5),
+                /*00*/Make(Opcode.LoadConstantInteger, null, (long)10),
+                /*01*/Make(Opcode.LoadConstantInteger, null, (long)5),
                 /*02*/Make(Opcode.GreaterThan, null),
                 /*03*/Make(Opcode.BranchIfTrue, null, 0x0c),
-                /*04*/Make(Opcode.LoadConstantInteger, null, 30),
-                /*05*/Make(Opcode.LoadConstantInteger, null, 15),
+                /*04*/Make(Opcode.LoadConstantInteger, null, (long)30),
+                /*05*/Make(Opcode.LoadConstantInteger, null, (long)15),
                 /*06*/Make(Opcode.GreaterThan, null),
                 /*07*/Make(Opcode.BranchIfTrue, null, 0x0c),
-                /*08*/Make(Opcode.LoadConstantInteger, null, 30),
-                /*09*/Make(Opcode.LoadConstantInteger, null, 15),
+                /*08*/Make(Opcode.LoadConstantInteger, null, (long)50),
+                /*09*/Make(Opcode.LoadConstantInteger, null, (long)25),
                 /*0A*/Make(Opcode.GreaterThan, null),
                 /*0B*/Make(Opcode.Branch, null, 0x0d),
-                /*0C*/Make(Opcode.LoadConstantBoolean, null, 1), // 성공 처리
-                /*0D*/Make(Opcode.NoOperation, null, 0),
+                /*0C*/Make(Opcode.LoadConstantBoolean, null, (long)1), // 성공 처리
+                /*0D*/Make(Opcode.NoOperation, null),
             }
         },
     };
@@ -224,12 +225,23 @@ public class ParserTest
             parser.Next();
 
             var codes = parser.CodeGenerator.Codes;
-            Assert.Equal(codes.Count, expectedCodes.Length);
+            testOutputHelper.WriteLine("Actual: ");
+            foreach (var code in codes)
+            {
+                testOutputHelper.WriteLine(code.ToString());
+            }
+
+            testOutputHelper.WriteLine("");
+            testOutputHelper.WriteLine("Expected: ");
+            foreach (var code in expectedCodes)
+            {
+                testOutputHelper.WriteLine(code.ToString());
+            }
+            Assert.Equal(expectedCodes.Length, codes.Count);
             for (int i = 0; i < expectedCodes.Length; i++)
             {
                 Assert.Equal(expectedCodes[i].Opcode, codes[i].Opcode);
                 Assert.Equal(expectedCodes[i].Operands, codes[i].Operands);
-                testOutputHelper.WriteLine(expectedCodes[i].ToString());
             }
         }
         catch (SyntaxErrorException e)

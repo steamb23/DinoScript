@@ -15,7 +15,7 @@ namespace DinoScript.Parser
         {
             SubExpression(out _, uint.MaxValue);
             // 표현식 코드 생성이 안됬을 경우 강제 생성 (PrimaryExpression만 있고 연산자가 없는 경우)
-            CodeGenerator.GenerateExpression();
+            CodeGenerator.GenerateExpression(BinaryOperator.NoBinaryOperator);
         }
 
         private void GroupExpression()
@@ -112,6 +112,9 @@ namespace DinoScript.Parser
                 [BinaryOperator.LessThanOrEqual] = (uint)ExpressionTypes.Comparison,
                 [BinaryOperator.GreaterThan] = (uint)ExpressionTypes.Comparison,
                 [BinaryOperator.LessThan] = (uint)ExpressionTypes.Comparison,
+                
+                [BinaryOperator.And] = (uint)ExpressionTypes.LogicalAnd,
+                [BinaryOperator.Or] = (uint)ExpressionTypes.LogicalOr,
             };
 
         /// <summary>
@@ -155,7 +158,7 @@ namespace DinoScript.Parser
                 SubExpression(out var nextOperator, operatorPriority);
 
                 // SubExpression의 재귀가 끝나면 식을 코드화함
-                CodeGenerator.GenerateExpression();
+                CodeGenerator.GenerateExpression(binaryOperator, token);
                 // 처리되지 않은 오퍼레이터를 받아 다시 처리 시작
                 binaryOperator = nextOperator;
             }
@@ -207,6 +210,9 @@ namespace DinoScript.Parser
                 "<=" => BinaryOperator.LessThanOrEqual,
                 ">" => BinaryOperator.GreaterThan,
                 "<" => BinaryOperator.LessThan,
+                // 논리 연산자
+                "and" => BinaryOperator.And,
+                "or" => BinaryOperator.Or,
 
                 _ => BinaryOperator.NoBinaryOperator
             };
