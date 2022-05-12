@@ -49,6 +49,12 @@ public class ExpressionTestScene : Scene
                         break;
                 }
                 Console.WriteLine($"실행 시간: {stopwatch.Elapsed.TotalMilliseconds} ms");
+                Console.WriteLine("생성된 코드:");
+                foreach (var code in machine.InternalCodes)
+                {
+                    Console.WriteLine(code);
+                }
+                Console.WriteLine("-----------");
                 machine.Dispose();
             }
             catch (Exception e)
