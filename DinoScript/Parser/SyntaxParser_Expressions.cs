@@ -211,6 +211,8 @@ namespace DinoScript.Parser
                 ">" => BinaryOperator.GreaterThan,
                 "<" => BinaryOperator.LessThan,
                 // 논리 연산자
+                "&&" => BinaryOperator.And,
+                "||" => BinaryOperator.Or,
                 "and" => BinaryOperator.And,
                 "or" => BinaryOperator.Or,
 

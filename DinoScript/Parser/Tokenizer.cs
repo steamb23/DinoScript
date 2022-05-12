@@ -38,7 +38,7 @@ namespace DinoScript.Parser
             new TokenDefinition(TokenType.Keyword,
                 "^(?:func|for|in|if|else|var|do|until|while|not|this|get|set)"),
             new TokenDefinition(TokenType.Operator,
-                "^(?:\\+|-|\\*|/|%|\\^|==|!=|<=|>=|<|>|\\?|:|\\+\\+|--|!)"),
+                "^(?:\\+|-|\\*|/|%|\\^|==|!=|<=|>=|<|>|\\?|:|\\+\\+|--|!|&&|\\|\\||and|or)"),
             new TokenDefinition(TokenType.Mark,
                 "^(?:\\(|\\)|\\[|\\])"),
             new TokenDefinition(TokenType.NumberLiteral,
