@@ -256,7 +256,7 @@ public class ParserTest
 
             parser.Next();
 
-            var codes = parser.CodeGenerator.Codes;
+            var codes = parser.CodeGeneratorLegacy.Codes;
             testOutputHelper.WriteLine("Actual: ");
             foreach (var code in codes)
             {

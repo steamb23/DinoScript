@@ -15,7 +15,7 @@ namespace DinoScript.Parser
         {
             SubExpression(out _, uint.MaxValue);
             // 표현식 코드 생성이 안됬을 경우 강제 생성 (PrimaryExpression만 있고 연산자가 없는 경우)
-            CodeGenerator.GenerateExpression(BinaryOperator.NoBinaryOperator);
+            CodeGeneratorLegacy.GenerateExpression(BinaryOperator.NoBinaryOperator);
         }
 
         private void GroupExpression()
@@ -79,7 +79,7 @@ namespace DinoScript.Parser
                             }
 
                             // 토큰에 해당하는 값을 코드 생성 큐에 추가함
-                            CodeGenerator.AccessTokenEnqueue(token);
+                            CodeGeneratorLegacy.AccessTokenEnqueue(token);
                             return;
                         }
                     }
@@ -136,7 +136,7 @@ namespace DinoScript.Parser
                 // UnaryExpression
                 Tokenizer.NextWithIgnoreWhiteSpace();
                 SubExpression(out _, (uint)ExpressionTypes.Unary);
-                CodeGenerator.UnaryTokenEnqueue(unaryOperator, token!);
+                CodeGeneratorLegacy.UnaryTokenEnqueue(unaryOperator, token!);
             }
             else
             {
@@ -152,13 +152,13 @@ namespace DinoScript.Parser
                    (operatorPriority = binaryOperatorPriorityTable[binaryOperator]) <= priority)
             {
                 // 연산자를 코드 생성 스택에 우선 푸시해둠.
-                CodeGenerator.OperatorTokenPush(binaryOperator, token!);
+                CodeGeneratorLegacy.OperatorTokenPush(binaryOperator, token!);
                 Tokenizer.NextWithIgnoreWhiteSpace();
 
                 SubExpression(out var nextOperator, operatorPriority);
 
                 // SubExpression의 재귀가 끝나면 식을 코드화함
-                CodeGenerator.GenerateExpression(binaryOperator, token);
+                CodeGeneratorLegacy.GenerateExpression(binaryOperator, token);
                 // 처리되지 않은 오퍼레이터를 받아 다시 처리 시작
                 binaryOperator = nextOperator;
             }

@@ -14,7 +14,7 @@ namespace DinoScript.Parser
 
         private List<InternalCode> codes = new List<InternalCode>();
 
-        public CodeGenerator CodeGenerator { get; } = new CodeGenerator();
+        public CodeGeneratorLegacy CodeGeneratorLegacy { get; } = new CodeGeneratorLegacy();
 
         public ParserMode ParserMode { get; }
 

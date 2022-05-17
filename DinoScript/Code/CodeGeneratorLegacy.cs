@@ -5,7 +5,7 @@ using DinoScript.Syntax;
 
 namespace DinoScript.Code
 {
-    public class CodeGenerator
+    public class CodeGeneratorLegacy
     {
         private List<InternalCode> codes = new List<InternalCode>();
 

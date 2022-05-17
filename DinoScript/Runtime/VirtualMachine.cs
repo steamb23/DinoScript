@@ -8,7 +8,7 @@ namespace DinoScript.Runtime
 {
     public partial class VirtualMachine : IDisposable
     {
-        public IReadOnlyList<InternalCode> InternalCodes => Parser.CodeGenerator.Codes;
+        public IReadOnlyList<InternalCode> InternalCodes => Parser.CodeGeneratorLegacy.Codes;
         private int internalCodeIndex = 0;
 
         public SyntaxParser Parser { get; private set; }
