@@ -105,7 +105,8 @@ public class ParserTest
                 Make(Opcode.LoadConstantInteger, null, (long)4),
                 Make(Opcode.Add, null),
                 Make(Opcode.Divide, null),
-            }
+            },
+            "(1, 9) : '@' is invalid token."
         },
         new object[]
         {
@@ -142,9 +143,32 @@ public class ParserTest
             "not true",
             new[]
             {
-                Make(Opcode.LoadConstantBoolean, null, (long)1),
                 Make(Opcode.LoadConstantBoolean, null, (long)0),
-                Make(Opcode.Equal, null),
+            }
+        },
+        new object[]
+        {
+            "not 10 > 5",
+            new[]
+            {
+                /*00*/Make(Opcode.LoadConstantInteger, null, (long)10),
+                /*01*/Make(Opcode.LoadConstantInteger, null, (long)5),
+                /*02*/Make(Opcode.GreaterThan, null),
+                /*03*/Make(Opcode.LoadConstantBoolean, null, (long)0),
+                /*04*/Make(Opcode.Equal, null),
+            },
+            "(1, 1) : A constant of type number cannot be prefixed with a 'not' symbol."
+        },
+        new object[]
+        {
+            "not (10 > 5)",
+            new[]
+            {
+                /*00*/Make(Opcode.LoadConstantInteger, null, (long)10),
+                /*01*/Make(Opcode.LoadConstantInteger, null, (long)5),
+                /*02*/Make(Opcode.GreaterThan, null),
+                /*03*/Make(Opcode.LoadConstantBoolean, null, (long)0),
+                /*04*/Make(Opcode.Equal, null),
             }
         },
         new object[]
@@ -269,7 +293,7 @@ public class ParserTest
 
     [Theory]
     [MemberData(nameof(ExpressionTestDataList))]
-    public void ExpressionTest(string text, InternalCode[] expectedCodes)
+    public void ExpressionTest(string text, InternalCode[] expectedCodes, string? exceptionMessage = null)
     {
         try
         {
@@ -299,7 +323,7 @@ public class ParserTest
                 Assert.Equal(expectedCodes[i].Operands, codes[i].Operands);
             }
         }
-        catch (SyntaxErrorException e)
+        catch (SyntaxErrorException e) when (e.Message == exceptionMessage)
         {
             testOutputHelper.WriteLine("문법 오류 예외 체크");
             testOutputHelper.WriteLine(e.ToString());

@@ -78,7 +78,7 @@ namespace DinoScript.Parser
 
                             CodeGenerator.ExpressionInitialize(
                                 out expressionDescription,
-                                ExpressionKind.LocalVariable,
+                                ExpressionKind.Variable,
                                 0,
                                 token);
                             return;

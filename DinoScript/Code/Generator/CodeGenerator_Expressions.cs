@@ -198,10 +198,11 @@ namespace DinoScript.Code.Generator
                         {
                             case DinoType.Boolean:
                                 var boolValue = !(bool)exprDesc.Value;
-                                exprDesc.Value = boolValue;
                                 Codes[exprDesc.ValueCodeIndex] =
-                                    InternalCode.Make(Opcode.LoadConstantBoolean, targetCode.Token, boolValue ? 1 : 0);
+                                    InternalCode.Make(Opcode.LoadConstantBoolean, targetCode.Token,
+                                        (long)(boolValue ? 1 : 0));
                                 break;
+                            case DinoType.Integer:
                             case DinoType.Number:
                                 throw new SyntaxErrorException(token,
                                     $"A constant of type number cannot be prefixed with a '{token.Text}' symbol.");
@@ -212,7 +213,8 @@ namespace DinoScript.Code.Generator
                     else
                     {
                         //TODO 변수 타입 체크 기능 추가 필요
-                        Codes.Add(InternalCode.Make(Opcode.Negative, token));
+                        Codes.Add(InternalCode.Make(Opcode.LoadConstantBoolean, token, (long)0));
+                        Codes.Add(InternalCode.Make(Opcode.Equal, token));
                     }
 
                     break;
@@ -305,6 +307,8 @@ namespace DinoScript.Code.Generator
                     exprDesc = subExprDesc;
                     break;
             }
+            
+            exprDesc.Kind = ExpressionKind.Variable;
         }
     }
 }

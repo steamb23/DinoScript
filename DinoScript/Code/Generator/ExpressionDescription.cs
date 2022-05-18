@@ -35,8 +35,7 @@ namespace DinoScript.Code.Generator
     {
         None,
         Constant,
-        LocalVariable,
-        GlobalVariable,
+        Variable,
         Branch,
         FunctionCall,
     }
