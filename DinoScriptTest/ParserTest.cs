@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using DinoScript.Code;
+using DinoScript.Code.Generator;
 using DinoScript.Parser;
 using Xunit;
 using Xunit.Abstractions;
@@ -21,6 +22,20 @@ public class ParserTest
 
     public static IEnumerable<object[]> ExpressionTestDataList => new[]
     {
+        new object[]
+        {
+            "1 + 2 + 3 + 4",
+            new[]
+            {
+                Make(Opcode.LoadConstantInteger, null, (long)1),
+                Make(Opcode.LoadConstantInteger, null, (long)2),
+                Make(Opcode.Add, null),
+                Make(Opcode.LoadConstantInteger, null, (long)3),
+                Make(Opcode.Add, null),
+                Make(Opcode.LoadConstantInteger, null, (long)4),
+                Make(Opcode.Add, null),
+            }
+        },
         new object[]
         {
             "1 + 2 * 3 + 4",
@@ -119,8 +134,7 @@ public class ParserTest
             "-10",
             new[]
             {
-                Make(Opcode.LoadConstantInteger, null, (long)10),
-                Make(Opcode.Negative, null)
+                Make(Opcode.LoadConstantInteger, null, (long)-10),
             }
         },
         new object[]
@@ -147,7 +161,6 @@ public class ParserTest
                 /*06*/Make(Opcode.GreaterThan, null),
                 /*07*/Make(Opcode.Branch, null, 0x09),
                 /*08*/Make(Opcode.LoadConstantBoolean, null, (long)0), // 실패 처리
-                /*09*/Make(Opcode.NoOperation, null),
             }
         },
         new object[]
@@ -169,7 +182,6 @@ public class ParserTest
                 /*0A*/Make(Opcode.GreaterThan, null),
                 /*0B*/Make(Opcode.Branch, null, 0x0d),
                 /*0C*/Make(Opcode.LoadConstantBoolean, null, (long)0), // 실패 처리
-                /*0D*/Make(Opcode.NoOperation, null),
             }
         },
         new object[]
@@ -186,7 +198,6 @@ public class ParserTest
                 /*06*/Make(Opcode.GreaterThan, null),
                 /*07*/Make(Opcode.Branch, null, 0x09),
                 /*08*/Make(Opcode.LoadConstantBoolean, null, (long)1), // 성공 처리
-                /*09*/Make(Opcode.NoOperation, null),
             }
         },
         new object[]
@@ -208,7 +219,6 @@ public class ParserTest
                 /*0A*/Make(Opcode.GreaterThan, null),
                 /*0B*/Make(Opcode.Branch, null, 0x0d),
                 /*0C*/Make(Opcode.LoadConstantBoolean, null, (long)1), // 성공 처리
-                /*0D*/Make(Opcode.NoOperation, null),
             }
         },
         new object[]
@@ -220,10 +230,9 @@ public class ParserTest
                 /*01*/Make(Opcode.BranchIfFalse, null, 0x04), // and
                 /*02*/Make(Opcode.LoadConstantBoolean, null, (long)0),
                 /*03*/Make(Opcode.BranchIfTrue, null, 0x06), // or
-                /*04*/Make(Opcode.LoadConstantBoolean, null, (long)1),
+                /*04*/Make(Opcode.LoadConstantBoolean, null, (long)1), // and skip
                 /*05*/Make(Opcode.Branch, null, 0x07),
-                /*06*/Make(Opcode.LoadConstantBoolean, null, (long)1),
-                /*07*/Make(Opcode.NoOperation, null),
+                /*06*/Make(Opcode.LoadConstantBoolean, null, (long)1), // or skip
             }
         },
         new object[]
@@ -237,12 +246,25 @@ public class ParserTest
                 /*03*/Make(Opcode.BranchIfFalse, null, 0x06), // and
                 /*04*/Make(Opcode.LoadConstantBoolean, null, (long)1),
                 /*05*/Make(Opcode.Branch, null, 0x07),
-                /*06*/Make(Opcode.LoadConstantBoolean, null, (long)0),
+                /*06*/Make(Opcode.LoadConstantBoolean, null, (long)0), // and skip
                 /*07*/Make(Opcode.Branch, null, 0x09),
-                /*08*/Make(Opcode.LoadConstantBoolean, null, (long)1),
-                /*09*/Make(Opcode.NoOperation, null),
+                /*08*/Make(Opcode.LoadConstantBoolean, null, (long)1), // or skip
             }
-        }
+        },
+        new object[]
+        {
+            "false and true or false",
+            new[]
+            {
+                /*00*/Make(Opcode.LoadConstantBoolean, null, (long)0),
+                /*01*/Make(Opcode.BranchIfFalse, null, 0x04), // and
+                /*02*/Make(Opcode.LoadConstantBoolean, null, (long)1),
+                /*03*/Make(Opcode.BranchIfTrue, null, 0x06), // or
+                /*04*/Make(Opcode.LoadConstantBoolean, null, (long)0), // and skip
+                /*05*/Make(Opcode.Branch, null, 0x07),
+                /*06*/Make(Opcode.LoadConstantBoolean, null, (long)1), // or skip
+            }
+        },
     };
 
     [Theory]
@@ -252,11 +274,11 @@ public class ParserTest
         try
         {
             var textReader = new StringReader(text);
-            var parser = new SyntaxParser(textReader, ParserMode.ExpressionTest);
+            var parser = new SyntaxParser(textReader, new CodeGenerator(), ParserMode.ExpressionTest);
 
             parser.Next();
 
-            var codes = parser.CodeGeneratorLegacy.Codes;
+            var codes = parser.CodeGenerator.Codes;
             testOutputHelper.WriteLine("Actual: ");
             foreach (var code in codes)
             {

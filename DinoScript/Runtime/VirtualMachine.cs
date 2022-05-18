@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.IO;
 using DinoScript.Code;
+using DinoScript.Code.Generator;
 using DinoScript.Parser;
 
 namespace DinoScript.Runtime
 {
     public partial class VirtualMachine : IDisposable
     {
-        public IReadOnlyList<InternalCode> InternalCodes => Parser.CodeGeneratorLegacy.Codes;
+        public IReadOnlyList<InternalCode> InternalCodes => Parser.CodeGenerator.Codes;
         private int internalCodeIndex = 0;
 
         public SyntaxParser Parser { get; private set; }
@@ -19,7 +20,7 @@ namespace DinoScript.Runtime
 
             Memory = new VirtualMemory(options.StackSize);
 
-            Parser = new SyntaxParser(textReader, options.ParserMode);
+            Parser = new SyntaxParser(textReader, new CodeGenerator(), options.ParserMode);
             textReader.ReadLine();
             internalCodeIndex = 0;
         }

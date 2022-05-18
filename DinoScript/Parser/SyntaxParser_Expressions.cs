@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using DinoScript.Code.Generator;
+using DinoScript.Runtime;
 using DinoScript.Syntax;
 
 namespace DinoScript.Parser
@@ -11,14 +13,15 @@ namespace DinoScript.Parser
         // 해당 액션에 맞는 구문 노드가 생성되었을 경우 true,
         // 그렇지 않을 경우 구문 오류를 뜻하는 false를 반환합니다.
 
-        private void Expression()
+        private void Expression(ref ExpressionDescription expressionDescription)
         {
-            SubExpression(out _, uint.MaxValue);
+            SubExpression(out _, ref expressionDescription, uint.MaxValue);
+            CodeGenerator.ExpressionEnd(ref expressionDescription);
             // 표현식 코드 생성이 안됬을 경우 강제 생성 (PrimaryExpression만 있고 연산자가 없는 경우)
-            CodeGeneratorLegacy.GenerateExpression(BinaryOperator.NoBinaryOperator);
+            // CodeGeneratorLegacy.GenerateExpression(BinaryOperator.NoBinaryOperator);
         }
 
-        private void GroupExpression()
+        private void GroupExpression(ref ExpressionDescription expressionDescription)
         {
             var token = Tokenizer.Current();
 
@@ -26,7 +29,7 @@ namespace DinoScript.Parser
             {
                 // 토큰 넘어가기
                 Tokenizer.NextWithIgnoreWhiteSpace();
-                Expression();
+                Expression(ref expressionDescription);
                 token = Tokenizer.Current();
                 // TODO: 오류 메시지 처리를 위한 루아 스크립트의 check_match함수와 유사한 함수 구현 필요.
                 if (token?.Value == ")")
@@ -41,45 +44,73 @@ namespace DinoScript.Parser
             throw new SyntaxErrorException(Tokenizer.Current(), $"{token} is not group expression.");
         }
 
-        private void PrimaryExpression()
+        private void PrimaryExpression(ref ExpressionDescription expressionDescription)
         {
             // PreAccessExpression{ . PostAccessExpression}
-            void AccessExpression()
+            void AccessExpression(ref ExpressionDescription expressionDescription)
             {
                 var token = Tokenizer.Current();
 
-                void PreAccessExpression()
+                void PreAccessExpression(ref ExpressionDescription expressionDescription)
                 {
                     // <Identity>
                     switch (token?.Type)
                     {
                         case TokenType.Mark:
                         {
-                            GroupExpression();
+                            GroupExpression(ref expressionDescription);
                             return;
                         }
                     }
 
-                    PostAccessExpression();
+                    PostAccessExpression(ref expressionDescription);
                 }
 
-                void PostAccessExpression()
+                void PostAccessExpression(ref ExpressionDescription expressionDescription)
                 {
                     switch (token?.Type)
                     {
                         case TokenType.Identifier:
-                        case TokenType.NumberLiteral:
-                        case TokenType.BooleanLiteral:
                         {
-                            if (token.Type == TokenType.Identifier)
+                            // 심볼 테이블에 존재하는지 체크
+                            if (token.Value != null && !SymbolTable.ContainsKey(token.Value))
+                                throw new SyntaxErrorException(token, $"'{token.Value}' symbol does not exist.");
+
+                            CodeGenerator.ExpressionInitialize(
+                                out expressionDescription,
+                                ExpressionKind.LocalVariable,
+                                0,
+                                token);
+                            return;
+                        }
+                        case TokenType.NumberLiteral:
+                        {
+                            if (long.TryParse(token.Value!, out var longValue))
                             {
-                                // 심볼 테이블에 존재하는지 체크
-                                if (token.Value != null && !SymbolTable.ContainsKey(token.Value))
-                                    throw new SyntaxErrorException(token, $"'{token.Value}' symbol does not exist.");
+                                CodeGenerator.ExpressionInitialize(
+                                    out expressionDescription,
+                                    ExpressionKind.Constant,
+                                    longValue,
+                                    token);
+                            }
+                            else
+                            {
+                                CodeGenerator.ExpressionInitialize(
+                                    out expressionDescription,
+                                    ExpressionKind.Constant,
+                                    double.Parse(token.Value!),
+                                    token);
                             }
 
-                            // 토큰에 해당하는 값을 코드 생성 큐에 추가함
-                            CodeGeneratorLegacy.AccessTokenEnqueue(token);
+                            return;
+                        }
+                        case TokenType.BooleanLiteral:
+                        {
+                            CodeGenerator.ExpressionInitialize(
+                                out expressionDescription,
+                                ExpressionKind.Constant,
+                                bool.Parse(token.Value!),
+                                token);
                             return;
                         }
                     }
@@ -87,11 +118,11 @@ namespace DinoScript.Parser
                     throw new SyntaxErrorException(token);
                 }
 
-                PreAccessExpression();
+                PreAccessExpression(ref expressionDescription);
             } // end of AccessExpression
 
             // <AccessExpression>
-            AccessExpression();
+            AccessExpression(ref expressionDescription);
         }
 
 
@@ -112,7 +143,7 @@ namespace DinoScript.Parser
                 [BinaryOperator.LessThanOrEqual] = (uint)ExpressionTypes.Comparison,
                 [BinaryOperator.GreaterThan] = (uint)ExpressionTypes.Comparison,
                 [BinaryOperator.LessThan] = (uint)ExpressionTypes.Comparison,
-                
+
                 [BinaryOperator.And] = (uint)ExpressionTypes.LogicalAnd,
                 [BinaryOperator.Or] = (uint)ExpressionTypes.LogicalOr,
             };
@@ -124,23 +155,25 @@ namespace DinoScript.Parser
         /// <param name="priority">연산자의 우선순위입니다. 값이 작을 수록 높은 연산 우선 순위를 나타냅니다.</param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        private void SubExpression(out BinaryOperator binaryOperator, uint priority)
+        private void SubExpression(
+            out BinaryOperator binaryOperator,
+            ref ExpressionDescription exprDesc,
+            uint priority)
         {
             // (<PrimaryExpression>|<UnaryExpression>){ BinaryOperator SubExpression}
 
-            // TODO: UnaryExpression에 대한 코드 추가 필요 (Lua스크립트의 lparser 코드 참조)
             var token = Tokenizer.Current();
             var unaryOperator = CheckUnaryOperator(token);
             if (unaryOperator != UnaryOperator.NoUnaryOperator)
             {
                 // UnaryExpression
                 Tokenizer.NextWithIgnoreWhiteSpace();
-                SubExpression(out _, (uint)ExpressionTypes.Unary);
-                CodeGeneratorLegacy.UnaryTokenEnqueue(unaryOperator, token!);
+                SubExpression(out _, ref exprDesc, (uint)ExpressionTypes.Unary);
+                CodeGenerator.ExpressionPreProcessing(unaryOperator, ref exprDesc, token!);
             }
             else
             {
-                PrimaryExpression();
+                PrimaryExpression(ref exprDesc);
             }
 
             token = Tokenizer.NextWithIgnoreWhiteSpace();
@@ -149,16 +182,16 @@ namespace DinoScript.Parser
             // 토큰이 연산자가 아닐경우 GetNextBinaryOperatorToken에 의해 null 임
             uint operatorPriority;
             while (binaryOperator != BinaryOperator.NoBinaryOperator &&
-                   (operatorPriority = binaryOperatorPriorityTable[binaryOperator]) <= priority)
+                   (operatorPriority = binaryOperatorPriorityTable[binaryOperator]) < priority)
             {
-                // 연산자를 코드 생성 스택에 우선 푸시해둠.
-                CodeGeneratorLegacy.OperatorTokenPush(binaryOperator, token!);
+                var subExprDesc = ExpressionDescription.Empty;
+                CodeGenerator.ExpressionInterProcessing(binaryOperator, ref exprDesc, token!);
                 Tokenizer.NextWithIgnoreWhiteSpace();
 
-                SubExpression(out var nextOperator, operatorPriority);
+                SubExpression(out var nextOperator, ref subExprDesc, operatorPriority);
 
                 // SubExpression의 재귀가 끝나면 식을 코드화함
-                CodeGeneratorLegacy.GenerateExpression(binaryOperator, token);
+                CodeGenerator.ExpressionPostProcessing(binaryOperator, ref exprDesc, ref subExprDesc, token!);
                 // 처리되지 않은 오퍼레이터를 받아 다시 처리 시작
                 binaryOperator = nextOperator;
             }

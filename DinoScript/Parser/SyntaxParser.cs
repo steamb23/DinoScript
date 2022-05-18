@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using DinoScript.Code;
+using DinoScript.Code.Generator;
 
 namespace DinoScript.Parser
 {
@@ -14,13 +15,16 @@ namespace DinoScript.Parser
 
         private List<InternalCode> codes = new List<InternalCode>();
 
-        public CodeGeneratorLegacy CodeGeneratorLegacy { get; } = new CodeGeneratorLegacy();
+        // public CodeGeneratorLegacy CodeGeneratorLegacy { get; } = new CodeGeneratorLegacy();
+        
+        public CodeGenerator CodeGenerator { get; }
 
         public ParserMode ParserMode { get; }
 
-        public SyntaxParser(TextReader textReader, ParserMode parserMode = ParserMode.Full)
+        public SyntaxParser(TextReader textReader, CodeGenerator codeGenerator, ParserMode parserMode = ParserMode.Full)
         {
             Tokenizer = new Tokenizer(textReader);
+            CodeGenerator = codeGenerator;
             ParserMode = parserMode;
         }
 
@@ -44,7 +48,8 @@ namespace DinoScript.Parser
             {
                 case ParserMode.ExpressionTest:
                 {
-                    Expression();
+                    ExpressionDescription expressionDescription = ExpressionDescription.Empty;
+                    Expression(ref expressionDescription);
                     break;
                 }
                 case ParserMode.Full:
