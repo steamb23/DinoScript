@@ -6,6 +6,9 @@ namespace DinoScript.Runtime
 {
     public class VirtualMemory
     {
+        public const int MinimalFunctionStackSize = 16;
+        public const int MinimalOperationStackSize = 16;
+        
         private readonly Dictionary<ulong, object> objectTable = new Dictionary<ulong, object>();
 
         // address 난독화에 사용될 임의의 값
@@ -14,11 +17,16 @@ namespace DinoScript.Runtime
         // 데이터 추가 및 관리에 사용되는 내부 아이디
         private ulong autoAddress = 0;
 
-        public VirtualStack Stack { get; }
+        public FunctionStack FunctionStack { get; }
+        
+        public Stack<DinoValue> OperationStack { get; }
 
-        public VirtualMemory(int stackSize = VirtualStack.MinimalStackSize)
+        public VirtualMemory(
+            int operationStackSize = MinimalOperationStackSize,
+            int functionStackSize = MinimalFunctionStackSize)
         {
-            Stack = new VirtualStack(stackSize);
+            OperationStack = new Stack<DinoValue>(operationStackSize);
+            FunctionStack = new FunctionStack(functionStackSize);
         }
 
         public object this[ulong address] => objectTable[unchecked(address - randomizeValue)];

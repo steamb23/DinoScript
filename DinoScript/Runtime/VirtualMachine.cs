@@ -18,7 +18,7 @@ namespace DinoScript.Runtime
         {
             options ??= VirtualMachineOptions.Default;
 
-            Memory = new VirtualMemory(options.StackSize);
+            Memory = new VirtualMemory(options.OperationStackSize, options.FunctionStackSize);
 
             Parser = new SyntaxParser(textReader, new CodeGenerator(), options.ParserMode);
             textReader.ReadLine();

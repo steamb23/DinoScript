@@ -27,7 +27,7 @@ namespace DinoScript.Runtime
 
                 case Opcode.Pop:
                 {
-                    Memory.Stack.Pop();
+                    Memory.OperationStack.Pop();
                     internalCodeIndex++;
                     break;
                 }
@@ -36,38 +36,38 @@ namespace DinoScript.Runtime
 
                 case Opcode.LoadConstantNumber:
                 {
-                    Memory.Stack.Push(DinoValue.Number((double)code.Operands[0]));
+                    Memory.OperationStack.Push(DinoValue.Number((double)code.Operands[0]));
                     internalCodeIndex++;
                     break;
                 }
 
                 case Opcode.LoadConstantInteger:
                 {
-                    Memory.Stack.Push(DinoValue.Integer((long)code.Operands[0]));
+                    Memory.OperationStack.Push(DinoValue.Integer((long)code.Operands[0]));
                     internalCodeIndex++;
                     break;
                 }
 
                 case Opcode.LoadConstantBoolean:
                 {
-                    Memory.Stack.Push(DinoValue.Boolean((long)code.Operands[0]));
+                    Memory.OperationStack.Push(DinoValue.Boolean((long)code.Operands[0]));
                     internalCodeIndex++;
                     break;
                 }
 
                 case Opcode.LoadFromLocal:
                 {
-                    var localIndex = (int)code.Operands[0];
-                    var stackIndex = Memory.Stack.CurrentStackFrameIndex;
-                    Memory.Stack.Push(Memory.Stack[stackIndex]);
+                    // var localIndex = (int)code.Operands[0];
+                    // var stackIndex = Memory.OperationStack.CurrentStackFrameIndex;
+                    // Memory.OperationStack.Push(Memory.OperationStack[stackIndex]);
                     break;
                 }
 
                 case Opcode.StoreToLocal:
                 {
-                    var localIndex = (int)code.Operands[0];
-                    var stackIndex = Memory.Stack.CurrentStackFrameIndex;
-                    Memory.Stack[stackIndex] = Memory.Stack.Pop();
+                    // var localIndex = (int)code.Operands[0];
+                    // var stackIndex = Memory.OperationStack.CurrentStackFrameIndex;
+                    // Memory.OperationStack[stackIndex] = Memory.OperationStack.Pop();
                     break;
                 }
 
@@ -77,29 +77,29 @@ namespace DinoScript.Runtime
 
                 case Opcode.Add:
                 {
-                    var v2 = Memory.Stack.Pop();
-                    var v1 = Memory.Stack.Pop();
+                    var v2 = Memory.OperationStack.Pop();
+                    var v1 = Memory.OperationStack.Pop();
 
                     if (v2.Type == DinoType.Number)
                     {
                         if (v1.Type == DinoType.Number)
                         {
-                            Memory.Stack.Push((double)v1 + (double)v2);
+                            Memory.OperationStack.Push((double)v1 + (double)v2);
                         }
                         else
                         {
-                            Memory.Stack.Push((long)v1 + (double)v2);
+                            Memory.OperationStack.Push((long)v1 + (double)v2);
                         }
                     }
                     else // v2.Type == DinoType.Integer or etc
                     {
                         if (v1.Type == DinoType.Number)
                         {
-                            Memory.Stack.Push((double)v1 + (long)v2);
+                            Memory.OperationStack.Push((double)v1 + (long)v2);
                         }
                         else
                         {
-                            Memory.Stack.Push((long)v1 + (long)v2);
+                            Memory.OperationStack.Push((long)v1 + (long)v2);
                         }
                     }
 
@@ -108,29 +108,29 @@ namespace DinoScript.Runtime
                 }
                 case Opcode.Subtract:
                 {
-                    var v2 = Memory.Stack.Pop();
-                    var v1 = Memory.Stack.Pop();
+                    var v2 = Memory.OperationStack.Pop();
+                    var v1 = Memory.OperationStack.Pop();
 
                     if (v2.Type == DinoType.Number)
                     {
                         if (v1.Type == DinoType.Number)
                         {
-                            Memory.Stack.Push((double)v1 - (double)v2);
+                            Memory.OperationStack.Push((double)v1 - (double)v2);
                         }
                         else
                         {
-                            Memory.Stack.Push((long)v1 - (double)v2);
+                            Memory.OperationStack.Push((long)v1 - (double)v2);
                         }
                     }
                     else // v2.Type == DinoType.Integer or etc
                     {
                         if (v1.Type == DinoType.Number)
                         {
-                            Memory.Stack.Push((double)v1 - (long)v2);
+                            Memory.OperationStack.Push((double)v1 - (long)v2);
                         }
                         else
                         {
-                            Memory.Stack.Push((long)v1 - (long)v2);
+                            Memory.OperationStack.Push((long)v1 - (long)v2);
                         }
                     }
 
@@ -139,29 +139,29 @@ namespace DinoScript.Runtime
                 }
                 case Opcode.Multiply:
                 {
-                    var v2 = Memory.Stack.Pop();
-                    var v1 = Memory.Stack.Pop();
+                    var v2 = Memory.OperationStack.Pop();
+                    var v1 = Memory.OperationStack.Pop();
 
                     if (v2.Type == DinoType.Number)
                     {
                         if (v1.Type == DinoType.Number)
                         {
-                            Memory.Stack.Push((double)v1 * (double)v2);
+                            Memory.OperationStack.Push((double)v1 * (double)v2);
                         }
                         else
                         {
-                            Memory.Stack.Push((long)v1 * (double)v2);
+                            Memory.OperationStack.Push((long)v1 * (double)v2);
                         }
                     }
                     else // v2.Type == DinoType.Integer or etc
                     {
                         if (v1.Type == DinoType.Number)
                         {
-                            Memory.Stack.Push((double)v1 * (long)v2);
+                            Memory.OperationStack.Push((double)v1 * (long)v2);
                         }
                         else
                         {
-                            Memory.Stack.Push((long)v1 * (long)v2);
+                            Memory.OperationStack.Push((long)v1 * (long)v2);
                         }
                     }
 
@@ -170,29 +170,29 @@ namespace DinoScript.Runtime
                 }
                 case Opcode.Divide:
                 {
-                    var v2 = Memory.Stack.Pop();
-                    var v1 = Memory.Stack.Pop();
+                    var v2 = Memory.OperationStack.Pop();
+                    var v1 = Memory.OperationStack.Pop();
 
                     if (v2.Type == DinoType.Number)
                     {
                         if (v1.Type == DinoType.Number)
                         {
-                            Memory.Stack.Push((double)v1 / (double)v2);
+                            Memory.OperationStack.Push((double)v1 / (double)v2);
                         }
                         else
                         {
-                            Memory.Stack.Push((long)v1 / (double)v2);
+                            Memory.OperationStack.Push((long)v1 / (double)v2);
                         }
                     }
                     else // v2.Type == DinoType.Integer or etc
                     {
                         if (v1.Type == DinoType.Number)
                         {
-                            Memory.Stack.Push((double)v1 / (long)v2);
+                            Memory.OperationStack.Push((double)v1 / (long)v2);
                         }
                         else
                         {
-                            Memory.Stack.Push((double)(long)v1 / (long)v2);
+                            Memory.OperationStack.Push((double)(long)v1 / (long)v2);
                         }
                     }
 
@@ -201,29 +201,29 @@ namespace DinoScript.Runtime
                 }
                 case Opcode.Modulo:
                 {
-                    var v2 = Memory.Stack.Pop();
-                    var v1 = Memory.Stack.Pop();
+                    var v2 = Memory.OperationStack.Pop();
+                    var v1 = Memory.OperationStack.Pop();
 
                     if (v2.Type == DinoType.Number)
                     {
                         if (v1.Type == DinoType.Number)
                         {
-                            Memory.Stack.Push((double)v1 % (double)v2);
+                            Memory.OperationStack.Push((double)v1 % (double)v2);
                         }
                         else
                         {
-                            Memory.Stack.Push((long)v1 % (double)v2);
+                            Memory.OperationStack.Push((long)v1 % (double)v2);
                         }
                     }
                     else // v2.Type == DinoType.Integer or etc
                     {
                         if (v1.Type == DinoType.Number)
                         {
-                            Memory.Stack.Push((double)v1 % (long)v2);
+                            Memory.OperationStack.Push((double)v1 % (long)v2);
                         }
                         else
                         {
-                            Memory.Stack.Push((long)v1 % (long)v2);
+                            Memory.OperationStack.Push((long)v1 % (long)v2);
                         }
                     }
 
@@ -232,11 +232,11 @@ namespace DinoScript.Runtime
                 }
                 case Opcode.Negative:
                 {
-                    var v1 = Memory.Stack.Pop();
+                    var v1 = Memory.OperationStack.Pop();
                     if (v1.Type == DinoType.Number)
-                        Memory.Stack.Push(-(double)v1);
+                        Memory.OperationStack.Push(-(double)v1);
                     else
-                        Memory.Stack.Push(-(long)v1);
+                        Memory.OperationStack.Push(-(long)v1);
                     internalCodeIndex++;
                     break;
                 }
@@ -248,29 +248,29 @@ namespace DinoScript.Runtime
                 // ReSharper disable CompareOfFloatsByEqualityOperator
                 case Opcode.Equal:
                 {
-                    var v2 = Memory.Stack.Pop();
-                    var v1 = Memory.Stack.Pop();
+                    var v2 = Memory.OperationStack.Pop();
+                    var v1 = Memory.OperationStack.Pop();
 
                     if (v2.Type == DinoType.Number)
                     {
                         if (v1.Type == DinoType.Number)
                         {
-                            Memory.Stack.Push((double)v1 == (double)v2);
+                            Memory.OperationStack.Push((double)v1 == (double)v2);
                         }
                         else
                         {
-                            Memory.Stack.Push((long)v1 == (double)v2);
+                            Memory.OperationStack.Push((long)v1 == (double)v2);
                         }
                     }
                     else // v2.Type == DinoType.Integer or etc
                     {
                         if (v1.Type == DinoType.Number)
                         {
-                            Memory.Stack.Push((double)v1 == (long)v2);
+                            Memory.OperationStack.Push((double)v1 == (long)v2);
                         }
                         else
                         {
-                            Memory.Stack.Push((long)v1 == (long)v2);
+                            Memory.OperationStack.Push((long)v1 == (long)v2);
                         }
                     }
 
@@ -279,29 +279,29 @@ namespace DinoScript.Runtime
                 }
                 case Opcode.NotEqual:
                 {
-                    var v2 = Memory.Stack.Pop();
-                    var v1 = Memory.Stack.Pop();
+                    var v2 = Memory.OperationStack.Pop();
+                    var v1 = Memory.OperationStack.Pop();
 
                     if (v2.Type == DinoType.Number)
                     {
                         if (v1.Type == DinoType.Number)
                         {
-                            Memory.Stack.Push((double)v1 != (double)v2);
+                            Memory.OperationStack.Push((double)v1 != (double)v2);
                         }
                         else
                         {
-                            Memory.Stack.Push((long)v1 != (double)v2);
+                            Memory.OperationStack.Push((long)v1 != (double)v2);
                         }
                     }
                     else // v2.Type == DinoType.Integer or etc
                     {
                         if (v1.Type == DinoType.Number)
                         {
-                            Memory.Stack.Push((double)v1 != (long)v2);
+                            Memory.OperationStack.Push((double)v1 != (long)v2);
                         }
                         else
                         {
-                            Memory.Stack.Push((long)v1 != (long)v2);
+                            Memory.OperationStack.Push((long)v1 != (long)v2);
                         }
                     }
 
@@ -310,29 +310,29 @@ namespace DinoScript.Runtime
                 }
                 case Opcode.GreaterThanOrEqual:
                 {
-                    var v2 = Memory.Stack.Pop();
-                    var v1 = Memory.Stack.Pop();
+                    var v2 = Memory.OperationStack.Pop();
+                    var v1 = Memory.OperationStack.Pop();
 
                     if (v2.Type == DinoType.Number)
                     {
                         if (v1.Type == DinoType.Number)
                         {
-                            Memory.Stack.Push((double)v1 >= (double)v2);
+                            Memory.OperationStack.Push((double)v1 >= (double)v2);
                         }
                         else
                         {
-                            Memory.Stack.Push((long)v1 >= (double)v2);
+                            Memory.OperationStack.Push((long)v1 >= (double)v2);
                         }
                     }
                     else // v2.Type == DinoType.Integer or etc
                     {
                         if (v1.Type == DinoType.Number)
                         {
-                            Memory.Stack.Push((double)v1 >= (long)v2);
+                            Memory.OperationStack.Push((double)v1 >= (long)v2);
                         }
                         else
                         {
-                            Memory.Stack.Push((long)v1 >= (long)v2);
+                            Memory.OperationStack.Push((long)v1 >= (long)v2);
                         }
                     }
 
@@ -341,29 +341,29 @@ namespace DinoScript.Runtime
                 }
                 case Opcode.LessThanOrEqual:
                 {
-                    var v2 = Memory.Stack.Pop();
-                    var v1 = Memory.Stack.Pop();
+                    var v2 = Memory.OperationStack.Pop();
+                    var v1 = Memory.OperationStack.Pop();
 
                     if (v2.Type == DinoType.Number)
                     {
                         if (v1.Type == DinoType.Number)
                         {
-                            Memory.Stack.Push((double)v1 <= (double)v2);
+                            Memory.OperationStack.Push((double)v1 <= (double)v2);
                         }
                         else
                         {
-                            Memory.Stack.Push((long)v1 <= (double)v2);
+                            Memory.OperationStack.Push((long)v1 <= (double)v2);
                         }
                     }
                     else // v2.Type == DinoType.Integer or etc
                     {
                         if (v1.Type == DinoType.Number)
                         {
-                            Memory.Stack.Push((double)v1 <= (long)v2);
+                            Memory.OperationStack.Push((double)v1 <= (long)v2);
                         }
                         else
                         {
-                            Memory.Stack.Push((long)v1 <= (long)v2);
+                            Memory.OperationStack.Push((long)v1 <= (long)v2);
                         }
                     }
 
@@ -372,29 +372,29 @@ namespace DinoScript.Runtime
                 }
                 case Opcode.GreaterThan:
                 {
-                    var v2 = Memory.Stack.Pop();
-                    var v1 = Memory.Stack.Pop();
+                    var v2 = Memory.OperationStack.Pop();
+                    var v1 = Memory.OperationStack.Pop();
 
                     if (v2.Type == DinoType.Number)
                     {
                         if (v1.Type == DinoType.Number)
                         {
-                            Memory.Stack.Push((double)v1 > (double)v2);
+                            Memory.OperationStack.Push((double)v1 > (double)v2);
                         }
                         else
                         {
-                            Memory.Stack.Push((long)v1 > (double)v2);
+                            Memory.OperationStack.Push((long)v1 > (double)v2);
                         }
                     }
                     else // v2.Type == DinoType.Integer or etc
                     {
                         if (v1.Type == DinoType.Number)
                         {
-                            Memory.Stack.Push((double)v1 > (long)v2);
+                            Memory.OperationStack.Push((double)v1 > (long)v2);
                         }
                         else
                         {
-                            Memory.Stack.Push((long)v1 > (long)v2);
+                            Memory.OperationStack.Push((long)v1 > (long)v2);
                         }
                     }
 
@@ -403,29 +403,29 @@ namespace DinoScript.Runtime
                 }
                 case Opcode.LessThan:
                 {
-                    var v2 = Memory.Stack.Pop();
-                    var v1 = Memory.Stack.Pop();
+                    var v2 = Memory.OperationStack.Pop();
+                    var v1 = Memory.OperationStack.Pop();
 
                     if (v2.Type == DinoType.Number)
                     {
                         if (v1.Type == DinoType.Number)
                         {
-                            Memory.Stack.Push((double)v1 < (double)v2);
+                            Memory.OperationStack.Push((double)v1 < (double)v2);
                         }
                         else
                         {
-                            Memory.Stack.Push((long)v1 < (double)v2);
+                            Memory.OperationStack.Push((long)v1 < (double)v2);
                         }
                     }
                     else // v2.Type == DinoType.Integer or etc
                     {
                         if (v1.Type == DinoType.Number)
                         {
-                            Memory.Stack.Push((double)v1 < (long)v2);
+                            Memory.OperationStack.Push((double)v1 < (long)v2);
                         }
                         else
                         {
-                            Memory.Stack.Push((long)v1 < (long)v2);
+                            Memory.OperationStack.Push((long)v1 < (long)v2);
                         }
                     }
 
@@ -445,7 +445,7 @@ namespace DinoScript.Runtime
                 }
                 case Opcode.BranchIfTrue:
                 {
-                    var v1 = Memory.Stack.Pop();
+                    var v1 = Memory.OperationStack.Pop();
                     if (v1.Int64 != 0)
                         internalCodeIndex = (int)code.Operands[0];
                     else
@@ -454,7 +454,7 @@ namespace DinoScript.Runtime
                 }
                 case Opcode.BranchIfFalse:
                 {
-                    var v1 = Memory.Stack.Pop();
+                    var v1 = Memory.OperationStack.Pop();
                     if (v1.Int64 == 0)
                         internalCodeIndex = (int)code.Operands[0];
                     else

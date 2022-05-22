@@ -13,7 +13,7 @@ namespace DinoScript
 
         internal ResultView(VirtualMemory memory)
         {
-            value = memory.Stack.Peek();
+            value = memory.OperationStack.Peek();
             this.memory = memory;
         }
 

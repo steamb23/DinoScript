@@ -2,18 +2,15 @@
 
 namespace DinoScript.Runtime
 {
-    public class VirtualStack
+    public class FunctionStack
     {
-        public const int MinimalStackSize = 64;
-
-
         private readonly List<DinoValue> stackArray;
         private readonly Stack<int> stackFrame;
 
-        public VirtualStack(int stackSize = MinimalStackSize)
+        public FunctionStack(int stackSize = VirtualMemory.MinimalFunctionStackSize)
         {
             stackArray = new List<DinoValue>(stackSize);
-            stackFrame = new Stack<int>(MinimalStackSize / 4);
+            stackFrame = new Stack<int>(VirtualMemory.MinimalFunctionStackSize / 2);
         }
 
         public DinoValue this[int index]
