@@ -57,9 +57,9 @@ namespace DinoScript.Runtime
 
                 case Opcode.LoadFromLocal:
                 {
-                    // var localIndex = (int)code.Operands[0];
-                    // var stackIndex = Memory.OperationStack.CurrentStackFrameIndex;
-                    // Memory.OperationStack.Push(Memory.OperationStack[stackIndex]);
+                    var localIndex = (int)code.Operands[0];
+                    var functionStackIndex = Memory.FunctionStack.CurrentStackFrameIndex + localIndex;
+                    Memory.OperationStack.Push(Memory.FunctionStack[functionStackIndex]);
                     break;
                 }
 
@@ -68,6 +68,9 @@ namespace DinoScript.Runtime
                     // var localIndex = (int)code.Operands[0];
                     // var stackIndex = Memory.OperationStack.CurrentStackFrameIndex;
                     // Memory.OperationStack[stackIndex] = Memory.OperationStack.Pop();
+                    var localIndex = (int)code.Operands[0];
+                    var functionStackIndex = Memory.FunctionStack.CurrentStackFrameIndex + localIndex;
+                    Memory.FunctionStack[functionStackIndex] = Memory.OperationStack.Pop();
                     break;
                 }
 

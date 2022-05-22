@@ -2,6 +2,9 @@
 
 namespace DinoScript.Runtime
 {
+    /// <summary>
+    /// 함수의 변수 및 호출 데이터가 저장되는 스택입니다.
+    /// </summary>
     public class FunctionStack
     {
         private readonly List<DinoValue> stackArray;

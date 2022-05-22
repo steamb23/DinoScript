@@ -17,8 +17,14 @@ namespace DinoScript.Runtime
         // 데이터 추가 및 관리에 사용되는 내부 아이디
         private ulong autoAddress = 0;
 
+        /// <summary>
+        /// 함수의 변수 및 호출 데이터가 저장되는 스택을 가져옵니다.
+        /// </summary>
         public FunctionStack FunctionStack { get; }
         
+        /// <summary>
+        /// 연산 데이터가 저장되는 스택을 가져옵니다.
+        /// </summary>
         public Stack<DinoValue> OperationStack { get; }
 
         public VirtualMemory(
