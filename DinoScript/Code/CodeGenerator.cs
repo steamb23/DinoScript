@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using DinoScript.Runtime;
 
-namespace DinoScript.Code.Generator
+namespace DinoScript.Code
 {
     public sealed partial class CodeGenerator
     {

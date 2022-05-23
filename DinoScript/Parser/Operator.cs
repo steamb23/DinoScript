@@ -18,7 +18,12 @@
         LessThan,
         // 논리 연산자
         And,
-        Or
+        Or,
+        // 조건부 연산자
+        Conditional,
+        ConditionalElse,
+        // 할당 연산자
+        Assign
     }
 
     public enum UnaryOperator

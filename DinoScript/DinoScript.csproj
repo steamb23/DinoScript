@@ -17,9 +17,6 @@
       <Compile Update="Runtime\VirtualMachine_Execution.cs">
         <DependentUpon>VirtualMachine.cs</DependentUpon>
       </Compile>
-      <Compile Update="Code\Generator\CodeGenerator_Expressions.cs">
-        <DependentUpon>CodeGenerator.cs</DependentUpon>
-      </Compile>
     </ItemGroup>
 
 </Project>

@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel;
 
-namespace DinoScript.Code
+namespace DinoScript.Parser
 {
     /// <summary>
     /// 함수 호출 시의 함수의 상태 정보를 나타냅니다.
@@ -10,17 +9,21 @@ namespace DinoScript.Code
     {
         public FunctionState()
         {
+            GlobalRoot = this;
         }
 
         public FunctionState(FunctionState parent, int stackFrameIndex)
         {
             this.Parent = parent;
+            this.GlobalRoot = parent.GlobalRoot;
             this.StackFrameIndex = stackFrameIndex;
         }
 
-        public Dictionary<string, long> LocalSymbolTable { get; } = new Dictionary<string, long>();
+        public Dictionary<string, int> SymbolTable { get; } = new Dictionary<string, int>();
 
         public FunctionState? Parent { get; }
+        
+        public FunctionState GlobalRoot { get; }
 
         public int StackFrameIndex { get; }
     }

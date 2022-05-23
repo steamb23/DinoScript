@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using DinoScript.Code.Generator;
-using DinoScript.Runtime;
 using DinoScript.Syntax;
 
 namespace DinoScript.Parser
@@ -46,12 +44,12 @@ namespace DinoScript.Parser
 
         #region PrimaryExpression
 
-        private void PrimaryExpression(ref ExpressionDescription expressionDescription)
+        private void PrimaryExpression(ref ExpressionDescription expressionDescription, bool stackPush)
         {
-            PreAccessExpression(ref expressionDescription);
+            PreAccessExpression(ref expressionDescription, stackPush);
         }
 
-        void PreAccessExpression(ref ExpressionDescription expressionDescription)
+        void PreAccessExpression(ref ExpressionDescription expressionDescription, bool stackPush)
         {
             var token = Tokenizer.Current();
 
@@ -65,10 +63,10 @@ namespace DinoScript.Parser
                 }
             }
 
-            PostAccessExpression(ref expressionDescription);
+            PostAccessExpression(ref expressionDescription, stackPush);
         }
 
-        void PostAccessExpression(ref ExpressionDescription expressionDescription)
+        void PostAccessExpression(ref ExpressionDescription expressionDescription, bool stackPush)
         {
             var token = Tokenizer.Current();
 
@@ -77,13 +75,14 @@ namespace DinoScript.Parser
                 case TokenType.Identifier:
                 {
                     // 심볼 테이블에 존재하는지 체크
-                    if (token.Value != null && !CurrentFunctionState.LocalSymbolTable.ContainsKey(token.Value))
+                    if (token.Value != null && !CurrentFunctionState.SymbolTable.ContainsKey(token.Value))
                         throw new SyntaxErrorException(token, $"'{token.Value}' symbol does not exist.");
 
                     expressionDescription = CodeGenerator.ExpressionInitialize(
-                        ExpressionKind.Variable,
+                        ExpressionKind.LocalVariable,
                         0,
-                        token);
+                        token,
+                        stackPush);
                     return;
                 }
                 case TokenType.NumberLiteral:
@@ -91,16 +90,18 @@ namespace DinoScript.Parser
                     if (long.TryParse(token.Value!, out var longValue))
                     {
                         expressionDescription = CodeGenerator.ExpressionInitialize(
-                            ExpressionKind.Constant,
+                            ExpressionKind.ConstantInteger,
                             longValue,
-                            token);
+                            token,
+                            stackPush);
                     }
                     else
                     {
                         expressionDescription = CodeGenerator.ExpressionInitialize(
-                            ExpressionKind.Constant,
+                            ExpressionKind.ConstantNumber,
                             double.Parse(token.Value!),
-                            token);
+                            token,
+                            stackPush);
                     }
 
                     return;
@@ -108,9 +109,10 @@ namespace DinoScript.Parser
                 case TokenType.BooleanLiteral:
                 {
                     expressionDescription = CodeGenerator.ExpressionInitialize(
-                        ExpressionKind.Constant,
+                        ExpressionKind.ConstantBoolean,
                         bool.Parse(token.Value!),
-                        token);
+                        token,
+                        stackPush);
                     return;
                 }
             }
@@ -119,7 +121,7 @@ namespace DinoScript.Parser
         }
 
         #endregion
-        
+
         private readonly IReadOnlyDictionary<BinaryOperator, uint> binaryOperatorPriorityTable =
             new Dictionary<BinaryOperator, uint>()
             {
@@ -167,7 +169,7 @@ namespace DinoScript.Parser
             }
             else
             {
-                PrimaryExpression(ref exprDesc);
+                PrimaryExpression(ref exprDesc, true);
             }
 
             token = Tokenizer.NextWithIgnoreWhiteSpace();
@@ -216,6 +218,7 @@ namespace DinoScript.Parser
             return token?.Value switch
             {
                 "not" => UnaryOperator.Not,
+                "!" => UnaryOperator.Not,
                 "-" => UnaryOperator.Minus,
                 "+" => UnaryOperator.Plus,
                 _ => UnaryOperator.NoUnaryOperator
@@ -247,6 +250,67 @@ namespace DinoScript.Parser
 
                 _ => BinaryOperator.NoBinaryOperator
             };
+        }
+
+        /// <summary>
+        /// 할당을 포함하는 식을 파싱합니다.
+        /// </summary>
+        public void AssignExpression(FunctionState funcState)
+        {
+            // <Identifier> = <Expression>
+
+            var token = Tokenizer.Current();
+
+            if (token == null)
+                return;
+
+
+            bool newLocal = false;
+            //Token? identifierToken;
+            int tokenIndex;
+            
+            ExpressionKind exprKind;
+            
+            switch (token.Type)
+            {
+                case TokenType.Keyword when token.Value == "let":
+                    newLocal = true;
+                    token = Tokenizer.NextWithIgnoreWhiteSpace();
+                    if (token is { Type: TokenType.Identifier })
+                        goto case TokenType.Identifier;
+                    else
+                        throw new SyntaxErrorException(token);
+                    
+                case TokenType.Identifier:
+                    if (token.Value == null)
+                        throw new SyntaxErrorException(token);
+                    if (funcState.SymbolTable.TryGetValue(token.Value, out tokenIndex))
+                        exprKind = ExpressionKind.LocalVariable;
+                    else if (funcState.GlobalRoot.SymbolTable.TryGetValue(token.Value, out tokenIndex))
+                        exprKind = ExpressionKind.GlobalVariable;
+                    else
+                        throw new SyntaxErrorException(token, $"Could not find symbol '{token.Text}'.");
+                    break;
+                
+                default:
+                    throw new SyntaxErrorException(token);
+            }
+
+            token = Tokenizer.NextWithIgnoreWhiteSpace();
+            if (!(token is { Type: TokenType.Operator, Value: "=" }))
+            {
+                throw new SyntaxErrorException(token);
+            }
+
+            Tokenizer.NextWithIgnoreWhiteSpace();
+            var subExprDesc = ExpressionDescription.Empty;
+            
+            // 식 코드 생성
+            Expression(ref subExprDesc);
+            
+            // 할당 코드 생성
+            var exprDesc = new ExpressionDescription(exprKind, tokenIndex);
+            CodeGenerator.Assign(ref exprDesc, newLocal, token);
         }
     }
 }

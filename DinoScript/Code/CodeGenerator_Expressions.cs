@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
 using DinoScript.Parser;
 using DinoScript.Runtime;
 using DinoScript.Syntax;
 
-namespace DinoScript.Code.Generator
+namespace DinoScript.Code
 {
     public partial class CodeGenerator
     {
@@ -103,7 +100,7 @@ namespace DinoScript.Code.Generator
         }
 
         public ExpressionDescription ExpressionInitialize(ExpressionKind kind, DinoValue value,
-            in Token token)
+            in Token token, bool stackPush)
         {
             var codeIndex = Codes.Count;
 
@@ -112,18 +109,20 @@ namespace DinoScript.Code.Generator
             exprDesc.Value = value;
             exprDesc.ValueCodeIndex = codeIndex;
 
-
-            switch (exprDesc.Value.Type)
+            if (stackPush)
             {
-                case DinoType.Number:
-                    Codes.Add(InternalCode.Make(Opcode.LoadConstantNumber, token, (double)exprDesc.Value));
-                    break;
-                case DinoType.Integer:
-                    Codes.Add(InternalCode.Make(Opcode.LoadConstantInteger, token, (long)exprDesc.Value));
-                    break;
-                case DinoType.Boolean:
-                    Codes.Add(InternalCode.Make(Opcode.LoadConstantBoolean, token, (long)exprDesc.Value));
-                    break;
+                switch (exprDesc.Value.Type)
+                {
+                    case DinoType.Number:
+                        Codes.Add(InternalCode.Make(Opcode.LoadConstantNumber, token, (double)exprDesc.Value));
+                        break;
+                    case DinoType.Integer:
+                        Codes.Add(InternalCode.Make(Opcode.LoadConstantInteger, token, (long)exprDesc.Value));
+                        break;
+                    case DinoType.Boolean:
+                        Codes.Add(InternalCode.Make(Opcode.LoadConstantBoolean, token, (long)exprDesc.Value));
+                        break;
+                }
             }
 
             return exprDesc;
@@ -163,60 +162,54 @@ namespace DinoScript.Code.Generator
             switch (unaryOperator)
             {
                 case UnaryOperator.Minus:
-                    if (exprDesc.Kind == ExpressionKind.Constant)
+                    switch (exprDesc.Kind)
                     {
-                        switch (exprDesc.Value.Type)
-                        {
-                            case DinoType.Integer:
-                                var longValue = -(long)exprDesc.Value;
-                                exprDesc.Value = longValue;
-                                Codes[exprDesc.ValueCodeIndex] =
-                                    InternalCode.Make(Opcode.LoadConstantInteger, targetCode.Token, longValue);
-                                break;
-                            case DinoType.Number:
-                                var doubleValue = -(double)exprDesc.Value;
-                                exprDesc.Value = doubleValue;
-                                Codes[exprDesc.ValueCodeIndex] =
-                                    InternalCode.Make(Opcode.LoadConstantNumber, targetCode.Token, doubleValue);
-                                break;
-                            case DinoType.Boolean:
-                                throw new SyntaxErrorException(token,
-                                    $"A constant of type boolean cannot be prefixed with a '{token.Text}' symbol.");
-                            default:
-                                throw new SyntaxErrorException(token);
-                        }
-                    }
-                    else
-                    {
-                        //TODO 변수 타입 체크 기능 추가 필요
-                        Codes.Add(InternalCode.Make(Opcode.Negative, token));
+                        case ExpressionKind.ConstantInteger:
+                            var longValue = -(long)exprDesc.Value;
+                            exprDesc.Value = longValue;
+                            Codes[exprDesc.ValueCodeIndex] =
+                                InternalCode.Make(Opcode.LoadConstantInteger, targetCode.Token, longValue);
+                            break;
+                        case ExpressionKind.ConstantNumber:
+                            var doubleValue = -(double)exprDesc.Value;
+                            exprDesc.Value = doubleValue;
+                            Codes[exprDesc.ValueCodeIndex] =
+                                InternalCode.Make(Opcode.LoadConstantNumber, targetCode.Token, doubleValue);
+                            break;
+                        case ExpressionKind.ConstantBoolean:
+                            throw new SyntaxErrorException(token,
+                                $"A constant of type boolean cannot be prefixed with a '{token.Text}' symbol.");
+                        case ExpressionKind.LocalVariable:
+                        case ExpressionKind.FunctionCall:
+                            //TODO 변수 타입 체크 기능 추가 필요
+                            Codes.Add(InternalCode.Make(Opcode.Negative, token));
+                            break;
+                        default:
+                            throw new SyntaxErrorException(token);
                     }
 
                     break;
                 case UnaryOperator.Not:
-                    if (exprDesc.Kind == ExpressionKind.Constant)
+                    switch (exprDesc.Kind)
                     {
-                        switch (exprDesc.Value.Type)
-                        {
-                            case DinoType.Boolean:
-                                var boolValue = !(bool)exprDesc.Value;
-                                Codes[exprDesc.ValueCodeIndex] =
-                                    InternalCode.Make(Opcode.LoadConstantBoolean, targetCode.Token,
-                                        (long)(boolValue ? 1 : 0));
-                                break;
-                            case DinoType.Integer:
-                            case DinoType.Number:
-                                throw new SyntaxErrorException(token,
-                                    $"A constant of type number cannot be prefixed with a '{token.Text}' symbol.");
-                            default:
-                                throw new ArgumentOutOfRangeException(nameof(exprDesc.Value.Type));
-                        }
-                    }
-                    else
-                    {
-                        //TODO 변수 타입 체크 기능 추가 필요
-                        Codes.Add(InternalCode.Make(Opcode.LoadConstantBoolean, token, (long)0));
-                        Codes.Add(InternalCode.Make(Opcode.Equal, token));
+                        case ExpressionKind.ConstantBoolean:
+                            var boolValue = !(bool)exprDesc.Value;
+                            Codes[exprDesc.ValueCodeIndex] =
+                                InternalCode.Make(Opcode.LoadConstantBoolean, targetCode.Token,
+                                    (long)(boolValue ? 1 : 0));
+                            break;
+                        case ExpressionKind.ConstantInteger:
+                        case ExpressionKind.ConstantNumber:
+                            throw new SyntaxErrorException(token,
+                                $"A constant of type number cannot be prefixed with a '{token.Text}' symbol.");
+                        case ExpressionKind.LocalVariable:
+                        case ExpressionKind.FunctionCall:
+                            //TODO 변수 타입 체크 기능 추가 필요
+                            Codes.Add(InternalCode.Make(Opcode.LoadConstantBoolean, token, (long)0));
+                            Codes.Add(InternalCode.Make(Opcode.Equal, token));
+                            break;
+                        default:
+                            throw new SyntaxErrorException(token);
                     }
 
                     break;
@@ -309,8 +302,23 @@ namespace DinoScript.Code.Generator
                     exprDesc = subExprDesc;
                     break;
             }
-            
-            exprDesc.Kind = ExpressionKind.Variable;
+
+            exprDesc.Kind = ExpressionKind.LocalVariable;
+        }
+
+        public void Assign(ref ExpressionDescription exprDesc, bool newLocal, in Token token)
+        {
+            switch (exprDesc.Kind)
+            {
+                case ExpressionKind.GlobalVariable:
+                    throw new NotImplementedException();
+                case ExpressionKind.LocalVariable:
+                    Codes.Add(InternalCode.Make(Opcode.StoreToLocal, token, (int)exprDesc.Value));
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException($"{nameof(exprDesc)}.{nameof(exprDesc.Kind)}",
+                        exprDesc.Kind, null);
+            }
         }
     }
 }

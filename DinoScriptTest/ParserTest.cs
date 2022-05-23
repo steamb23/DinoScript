@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using DinoScript.Code;
-using DinoScript.Code.Generator;
 using DinoScript.Parser;
 using Xunit;
 using Xunit.Abstractions;

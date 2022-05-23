@@ -1,6 +1,6 @@
 ﻿using DinoScript.Runtime;
 
-namespace DinoScript.Code.Generator
+namespace DinoScript.Parser
 {
     public struct ExpressionDescription
     {
@@ -30,8 +30,11 @@ namespace DinoScript.Code.Generator
     public enum ExpressionKind
     {
         None,
-        Constant,
-        Variable,
+        ConstantNumber,
+        ConstantInteger,
+        ConstantBoolean,
+        LocalVariable,
+        GlobalVariable,
         Branch,
         FunctionCall,
     }

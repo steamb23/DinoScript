@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using DinoScript.Code;
-using DinoScript.Code.Generator;
 
 namespace DinoScript.Parser
 {
