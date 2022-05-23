@@ -74,6 +74,12 @@ namespace DinoScript.Runtime
                     break;
                 }
 
+                case Opcode.StoreToNewLocal:
+                {
+                    Memory.FunctionStack.Push(Memory.OperationStack.Pop());
+                    break;
+                }
+
                 #endregion
 
                 #region 수식 연산
