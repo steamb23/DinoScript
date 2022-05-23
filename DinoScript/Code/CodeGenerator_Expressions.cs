@@ -257,7 +257,6 @@ namespace DinoScript.Code
             ref ExpressionDescription subExprDesc,
             in Token token)
         {
-            int codeIndex;
             switch (binaryOperator)
             {
                 case BinaryOperator.Add:

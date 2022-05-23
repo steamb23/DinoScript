@@ -18,7 +18,7 @@ namespace DinoScript.Parser
         public ParserMode ParserMode { get; }
 
         public FunctionState RootFunctionState { get; } = new FunctionState();
-        
+
         public FunctionState CurrentFunctionState { get; internal set; }
 
         public SyntaxParser(TextReader textReader, CodeGenerator codeGenerator, ParserMode parserMode = ParserMode.Full)
@@ -26,6 +26,8 @@ namespace DinoScript.Parser
             Tokenizer = new Tokenizer(textReader);
             CodeGenerator = codeGenerator;
             ParserMode = parserMode;
+            
+            CurrentFunctionState = RootFunctionState;
         }
 
         public bool IsEndOfText => Tokenizer.IsEndOfText;
