@@ -73,7 +73,7 @@ namespace DinoScript.Parser
                         case TokenType.Identifier:
                         {
                             // 심볼 테이블에 존재하는지 체크
-                            if (token.Value != null && !SymbolTable.ContainsKey(token.Value))
+                            if (token.Value != null && !CurrentFunctionState.LocalSymbolTable.ContainsKey(token.Value))
                                 throw new SyntaxErrorException(token, $"'{token.Value}' symbol does not exist.");
 
                             CodeGenerator.ExpressionInitialize(

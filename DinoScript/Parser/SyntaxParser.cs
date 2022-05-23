@@ -10,9 +10,6 @@ namespace DinoScript.Parser
     {
         private Tokenizer Tokenizer { get; }
 
-        // TODO: 심볼테이블 형식 변경 예정
-        private Dictionary<string, object> SymbolTable { get; } = new Dictionary<string, object>();
-
         private List<InternalCode> codes = new List<InternalCode>();
 
         // public CodeGeneratorLegacy CodeGeneratorLegacy { get; } = new CodeGeneratorLegacy();
@@ -20,6 +17,10 @@ namespace DinoScript.Parser
         public CodeGenerator CodeGenerator { get; }
 
         public ParserMode ParserMode { get; }
+
+        public FunctionState RootFunctionState { get; } = new FunctionState();
+        
+        public FunctionState CurrentFunctionState { get; internal set; }
 
         public SyntaxParser(TextReader textReader, CodeGenerator codeGenerator, ParserMode parserMode = ParserMode.Full)
         {
