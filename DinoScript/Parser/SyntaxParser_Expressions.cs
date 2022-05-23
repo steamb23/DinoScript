@@ -44,88 +44,86 @@ namespace DinoScript.Parser
             throw new SyntaxErrorException(Tokenizer.Current(), $"{token} is not group expression.");
         }
 
+        #region PrimaryExpression
+
         private void PrimaryExpression(ref ExpressionDescription expressionDescription)
         {
-            // PreAccessExpression{ . PostAccessExpression}
-            void AccessExpression(ref ExpressionDescription expressionDescription)
-            {
-                var token = Tokenizer.Current();
-
-                void PreAccessExpression(ref ExpressionDescription expressionDescription)
-                {
-                    // <Identity>
-                    switch (token?.Type)
-                    {
-                        case TokenType.Mark:
-                        {
-                            GroupExpression(ref expressionDescription);
-                            return;
-                        }
-                    }
-
-                    PostAccessExpression(ref expressionDescription);
-                }
-
-                void PostAccessExpression(ref ExpressionDescription expressionDescription)
-                {
-                    switch (token?.Type)
-                    {
-                        case TokenType.Identifier:
-                        {
-                            // 심볼 테이블에 존재하는지 체크
-                            if (token.Value != null && !CurrentFunctionState.LocalSymbolTable.ContainsKey(token.Value))
-                                throw new SyntaxErrorException(token, $"'{token.Value}' symbol does not exist.");
-
-                            CodeGenerator.ExpressionInitialize(
-                                out expressionDescription,
-                                ExpressionKind.Variable,
-                                0,
-                                token);
-                            return;
-                        }
-                        case TokenType.NumberLiteral:
-                        {
-                            if (long.TryParse(token.Value!, out var longValue))
-                            {
-                                CodeGenerator.ExpressionInitialize(
-                                    out expressionDescription,
-                                    ExpressionKind.Constant,
-                                    longValue,
-                                    token);
-                            }
-                            else
-                            {
-                                CodeGenerator.ExpressionInitialize(
-                                    out expressionDescription,
-                                    ExpressionKind.Constant,
-                                    double.Parse(token.Value!),
-                                    token);
-                            }
-
-                            return;
-                        }
-                        case TokenType.BooleanLiteral:
-                        {
-                            CodeGenerator.ExpressionInitialize(
-                                out expressionDescription,
-                                ExpressionKind.Constant,
-                                bool.Parse(token.Value!),
-                                token);
-                            return;
-                        }
-                    }
-
-                    throw new SyntaxErrorException(token);
-                }
-
-                PreAccessExpression(ref expressionDescription);
-            } // end of AccessExpression
-
-            // <AccessExpression>
-            AccessExpression(ref expressionDescription);
+            PreAccessExpression(ref expressionDescription);
         }
 
+        void PreAccessExpression(ref ExpressionDescription expressionDescription)
+        {
+            var token = Tokenizer.Current();
 
+            // <Identity>
+            switch (token?.Type)
+            {
+                case TokenType.Mark:
+                {
+                    GroupExpression(ref expressionDescription);
+                    return;
+                }
+            }
+
+            PostAccessExpression(ref expressionDescription);
+        }
+
+        void PostAccessExpression(ref ExpressionDescription expressionDescription)
+        {
+            var token = Tokenizer.Current();
+
+            switch (token?.Type)
+            {
+                case TokenType.Identifier:
+                {
+                    // 심볼 테이블에 존재하는지 체크
+                    if (token.Value != null && !CurrentFunctionState.LocalSymbolTable.ContainsKey(token.Value))
+                        throw new SyntaxErrorException(token, $"'{token.Value}' symbol does not exist.");
+
+                    CodeGenerator.ExpressionInitialize(
+                        out expressionDescription,
+                        ExpressionKind.Variable,
+                        0,
+                        token);
+                    return;
+                }
+                case TokenType.NumberLiteral:
+                {
+                    if (long.TryParse(token.Value!, out var longValue))
+                    {
+                        CodeGenerator.ExpressionInitialize(
+                            out expressionDescription,
+                            ExpressionKind.Constant,
+                            longValue,
+                            token);
+                    }
+                    else
+                    {
+                        CodeGenerator.ExpressionInitialize(
+                            out expressionDescription,
+                            ExpressionKind.Constant,
+                            double.Parse(token.Value!),
+                            token);
+                    }
+
+                    return;
+                }
+                case TokenType.BooleanLiteral:
+                {
+                    CodeGenerator.ExpressionInitialize(
+                        out expressionDescription,
+                        ExpressionKind.Constant,
+                        bool.Parse(token.Value!),
+                        token);
+                    return;
+                }
+            }
+
+            throw new SyntaxErrorException(token);
+        }
+
+        #endregion
+        
         private readonly IReadOnlyDictionary<BinaryOperator, uint> binaryOperatorPriorityTable =
             new Dictionary<BinaryOperator, uint>()
             {
@@ -151,7 +149,8 @@ namespace DinoScript.Parser
         /// <summary>
         /// 우선 순위에 의한 하위 표현식 구조를 표현합니다.
         /// </summary>
-        /// <param name="binaryOperator"></param>
+        /// <param name="binaryOperator">함수 내에서 처리되지 않은 연산자를 반환합니다.</param>
+        /// <param name="exprDesc">식의 설명자입니다.</param>
         /// <param name="priority">연산자의 우선순위입니다. 값이 작을 수록 높은 연산 우선 순위를 나타냅니다.</param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
