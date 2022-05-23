@@ -123,23 +123,23 @@ namespace DinoScript.Parser
         private readonly IReadOnlyDictionary<BinaryOperator, uint> binaryOperatorPriorityTable =
             new Dictionary<BinaryOperator, uint>()
             {
-                [BinaryOperator.Multiply] = (uint)ExpressionTypes.Multiplicative,
-                [BinaryOperator.Divide] = (uint)ExpressionTypes.Multiplicative,
-                [BinaryOperator.Modulo] = (uint)ExpressionTypes.Multiplicative,
+                [BinaryOperator.Multiply] = (uint)OperationTypes.Multiplicative,
+                [BinaryOperator.Divide] = (uint)OperationTypes.Multiplicative,
+                [BinaryOperator.Modulo] = (uint)OperationTypes.Multiplicative,
 
-                [BinaryOperator.Add] = (uint)ExpressionTypes.Addictive,
-                [BinaryOperator.Subtract] = (uint)ExpressionTypes.Addictive,
+                [BinaryOperator.Add] = (uint)OperationTypes.Addictive,
+                [BinaryOperator.Subtract] = (uint)OperationTypes.Addictive,
 
-                [BinaryOperator.Equal] = (uint)ExpressionTypes.Equality,
-                [BinaryOperator.NotEqual] = (uint)ExpressionTypes.Equality,
+                [BinaryOperator.Equal] = (uint)OperationTypes.Equality,
+                [BinaryOperator.NotEqual] = (uint)OperationTypes.Equality,
 
-                [BinaryOperator.GreaterThanOrEqual] = (uint)ExpressionTypes.Comparison,
-                [BinaryOperator.LessThanOrEqual] = (uint)ExpressionTypes.Comparison,
-                [BinaryOperator.GreaterThan] = (uint)ExpressionTypes.Comparison,
-                [BinaryOperator.LessThan] = (uint)ExpressionTypes.Comparison,
+                [BinaryOperator.GreaterThanOrEqual] = (uint)OperationTypes.Comparison,
+                [BinaryOperator.LessThanOrEqual] = (uint)OperationTypes.Comparison,
+                [BinaryOperator.GreaterThan] = (uint)OperationTypes.Comparison,
+                [BinaryOperator.LessThan] = (uint)OperationTypes.Comparison,
 
-                [BinaryOperator.And] = (uint)ExpressionTypes.LogicalAnd,
-                [BinaryOperator.Or] = (uint)ExpressionTypes.LogicalOr,
+                [BinaryOperator.And] = (uint)OperationTypes.LogicalAnd,
+                [BinaryOperator.Or] = (uint)OperationTypes.LogicalOr,
             };
 
         /// <summary>
@@ -162,7 +162,7 @@ namespace DinoScript.Parser
             {
                 // UnaryExpression
                 Tokenizer.NextWithIgnoreWhiteSpace();
-                SubExpression(ref exprDesc, (uint)ExpressionTypes.Unary);
+                SubExpression(ref exprDesc, (uint)OperationTypes.Unary);
                 CodeGenerator.ExpressionPreProcessing(unaryOperator, ref exprDesc, token!);
             }
             else
