@@ -102,12 +102,12 @@ namespace DinoScript.Code.Generator
             }
         }
 
-        public void ExpressionInitialize(out ExpressionDescription exprDesc, ExpressionKind kind, DinoValue value,
+        public ExpressionDescription ExpressionInitialize(ExpressionKind kind, DinoValue value,
             in Token token)
         {
             var codeIndex = Codes.Count;
 
-            exprDesc = ExpressionDescription.Empty;
+            var exprDesc = ExpressionDescription.Empty;
             exprDesc.Kind = kind;
             exprDesc.Value = value;
             exprDesc.ValueCodeIndex = codeIndex;
@@ -125,6 +125,8 @@ namespace DinoScript.Code.Generator
                     Codes.Add(InternalCode.Make(Opcode.LoadConstantBoolean, token, (long)exprDesc.Value));
                     break;
             }
+
+            return exprDesc;
         }
 
         public void ExpressionEnd(ref ExpressionDescription exprDesc)

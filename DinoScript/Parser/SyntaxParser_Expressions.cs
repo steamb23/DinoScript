@@ -15,7 +15,7 @@ namespace DinoScript.Parser
 
         private void Expression(ref ExpressionDescription expressionDescription)
         {
-            SubExpression(out _, ref expressionDescription, uint.MaxValue);
+            SubExpression(ref expressionDescription, uint.MaxValue);
             CodeGenerator.ExpressionEnd(ref expressionDescription);
             // 표현식 코드 생성이 안됬을 경우 강제 생성 (PrimaryExpression만 있고 연산자가 없는 경우)
             // CodeGeneratorLegacy.GenerateExpression(BinaryOperator.NoBinaryOperator);
@@ -80,8 +80,7 @@ namespace DinoScript.Parser
                     if (token.Value != null && !CurrentFunctionState.LocalSymbolTable.ContainsKey(token.Value))
                         throw new SyntaxErrorException(token, $"'{token.Value}' symbol does not exist.");
 
-                    CodeGenerator.ExpressionInitialize(
-                        out expressionDescription,
+                    expressionDescription = CodeGenerator.ExpressionInitialize(
                         ExpressionKind.Variable,
                         0,
                         token);
@@ -91,16 +90,14 @@ namespace DinoScript.Parser
                 {
                     if (long.TryParse(token.Value!, out var longValue))
                     {
-                        CodeGenerator.ExpressionInitialize(
-                            out expressionDescription,
+                        expressionDescription = CodeGenerator.ExpressionInitialize(
                             ExpressionKind.Constant,
                             longValue,
                             token);
                     }
                     else
                     {
-                        CodeGenerator.ExpressionInitialize(
-                            out expressionDescription,
+                        expressionDescription = CodeGenerator.ExpressionInitialize(
                             ExpressionKind.Constant,
                             double.Parse(token.Value!),
                             token);
@@ -110,8 +107,7 @@ namespace DinoScript.Parser
                 }
                 case TokenType.BooleanLiteral:
                 {
-                    CodeGenerator.ExpressionInitialize(
-                        out expressionDescription,
+                    expressionDescription = CodeGenerator.ExpressionInitialize(
                         ExpressionKind.Constant,
                         bool.Parse(token.Value!),
                         token);
@@ -154,8 +150,7 @@ namespace DinoScript.Parser
         /// <param name="priority">연산자의 우선순위입니다. 값이 작을 수록 높은 연산 우선 순위를 나타냅니다.</param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        private void SubExpression(
-            out BinaryOperator binaryOperator,
+        private BinaryOperator SubExpression(
             ref ExpressionDescription exprDesc,
             uint priority)
         {
@@ -167,7 +162,7 @@ namespace DinoScript.Parser
             {
                 // UnaryExpression
                 Tokenizer.NextWithIgnoreWhiteSpace();
-                SubExpression(out _, ref exprDesc, (uint)ExpressionTypes.Unary);
+                SubExpression(ref exprDesc, (uint)ExpressionTypes.Unary);
                 CodeGenerator.ExpressionPreProcessing(unaryOperator, ref exprDesc, token!);
             }
             else
@@ -176,7 +171,7 @@ namespace DinoScript.Parser
             }
 
             token = Tokenizer.NextWithIgnoreWhiteSpace();
-            binaryOperator = CheckBinaryOperator(token);
+            var binaryOperator = CheckBinaryOperator(token);
             // 확인된 이항 연산자 우선순위가 현재 표현식 우선순위 보다 높으면 재귀 처리
             // 토큰이 연산자가 아닐경우 GetNextBinaryOperatorToken에 의해 null 임
             uint operatorPriority;
@@ -187,13 +182,15 @@ namespace DinoScript.Parser
                 CodeGenerator.ExpressionInterProcessing(binaryOperator, ref exprDesc, token!);
                 Tokenizer.NextWithIgnoreWhiteSpace();
 
-                SubExpression(out var nextOperator, ref subExprDesc, operatorPriority);
+                var nextOperator = SubExpression(ref subExprDesc, operatorPriority);
 
                 // SubExpression의 재귀가 끝나면 식을 코드화함
                 CodeGenerator.ExpressionPostProcessing(binaryOperator, ref exprDesc, ref subExprDesc, token!);
                 // 처리되지 않은 오퍼레이터를 받아 다시 처리 시작
                 binaryOperator = nextOperator;
             }
+
+            return binaryOperator;
         }
 
         private Token? GetOperatorToken()
