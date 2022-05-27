@@ -19,7 +19,7 @@ namespace DinoScript.Parser
             this.StackFrameIndex = stackFrameIndex;
         }
 
-        public Dictionary<string, int> SymbolTable { get; } = new Dictionary<string, int>();
+        public Dictionary<string, LocalSymbolDescription> SymbolTable { get; } = new Dictionary<string, LocalSymbolDescription>();
 
         public FunctionState? Parent { get; }
         

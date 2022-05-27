@@ -267,7 +267,7 @@ namespace DinoScript.Parser
 
             bool newLocal = false;
             //Token? identifierToken;
-            int tokenIndex;
+            LocalSymbolDescription symbolDesc;
             
             ExpressionKind exprKind;
             
@@ -284,9 +284,9 @@ namespace DinoScript.Parser
                 case TokenType.Identifier:
                     if (token.Value == null)
                         throw new SyntaxErrorException(token);
-                    if (funcState.SymbolTable.TryGetValue(token.Value, out tokenIndex))
+                    if (funcState.SymbolTable.TryGetValue(token.Value, out symbolDesc))
                         exprKind = ExpressionKind.LocalVariable;
-                    else if (funcState.GlobalRoot.SymbolTable.TryGetValue(token.Value, out tokenIndex))
+                    else if (funcState.GlobalRoot.SymbolTable.TryGetValue(token.Value, out symbolDesc))
                         exprKind = ExpressionKind.GlobalVariable;
                     else
                         throw new SyntaxErrorException(token, $"Could not find symbol '{token.Text}'.");
@@ -309,7 +309,7 @@ namespace DinoScript.Parser
             Expression(ref subExprDesc);
             
             // 할당 코드 생성
-            var exprDesc = new ExpressionDescription(exprKind, tokenIndex);
+            var exprDesc = new ExpressionDescription(exprKind, symbolDesc.LocalIndex);
             CodeGenerator.Assign(ref exprDesc, newLocal, token);
         }
     }
