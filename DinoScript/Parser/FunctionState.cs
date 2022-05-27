@@ -5,7 +5,7 @@ namespace DinoScript.Parser
     /// <summary>
     /// 함수 호출 시의 함수의 상태 정보를 나타냅니다.
     /// </summary>
-    public class FunctionState
+    public sealed class FunctionState
     {
         public FunctionState()
         {
