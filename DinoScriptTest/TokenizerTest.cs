@@ -117,6 +117,19 @@ public class TokenizerTest
                 MakeTestToken(TokenType.Mark,
                     ")")
             }
+        },
+        new object[]
+        {
+            "test\\\r\na",
+            new[]
+            {
+                MakeTestToken(TokenType.Identifier,
+                    "test"),
+                MakeTestToken(TokenType.WhiteSpace,
+                    "\\\r\n"),
+                MakeTestToken(TokenType.Identifier,
+                    "a")
+            }
         }
     };
 

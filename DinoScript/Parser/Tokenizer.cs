@@ -31,10 +31,10 @@ namespace DinoScript.Parser
             // new(TokenType.StringLiteral,
             //     // "{singleCharacter}"
             //     "^\"[^\"]*\""),
+            new TokenDefinition(TokenType.WhiteSpace,
+                "^(?: +|\t+|\u3000+|\\\\(?:\r?\n|\r|\u0085|\u2028|\u2029))"),
             new TokenDefinition(TokenType.EndOfLine,
                 "^(?:\r?\n|\r|\u0085|\u2028|\u2029)"),
-            new TokenDefinition(TokenType.WhiteSpace,
-                "^(?: +|\t+|\u3000+)"),
             new TokenDefinition(TokenType.Keyword,
                 "^(?:func|for|in|if|else|var|do|until|while|not|this|get|set)"),
             new TokenDefinition(TokenType.Operator,
