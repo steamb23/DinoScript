@@ -255,7 +255,7 @@ namespace DinoScript.Parser
         /// <summary>
         /// 할당을 포함하는 식을 파싱합니다.
         /// </summary>
-        public void AssignExpression(FunctionState funcState)
+        public void AssignExpression(FunctionState funcState, bool canNewLocal = false)
         {
             // <Identifier> = <Expression>
 
@@ -273,7 +273,7 @@ namespace DinoScript.Parser
             
             switch (token.Type)
             {
-                case TokenType.Keyword when token.Value == "let":
+                case TokenType.Keyword when canNewLocal && token.Value == "let":
                     newLocal = true;
                     token = Tokenizer.NextWithIgnoreWhiteSpace();
                     if (token is { Type: TokenType.Identifier })
