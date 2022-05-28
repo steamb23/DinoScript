@@ -24,7 +24,7 @@ namespace DinoScript.Parser
             BranchFalseCodeIndex = branchFalseCodeIndex;
         }
 
-        public static ExpressionDescription Empty => new ExpressionDescription(ExpressionKind.None);
+        public static ExpressionDescription Empty { get; } = new ExpressionDescription(ExpressionKind.None);
     }
 
     public enum ExpressionKind

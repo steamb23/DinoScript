@@ -253,7 +253,7 @@ namespace DinoScript.Parser
         }
 
         /// <summary>
-        /// 할당을 포함하는 식을 파싱합니다.
+        /// 할당을 포함하는 식을 파싱합니다. 최상위 식으로 볼 수 있습니다.
         /// </summary>
         public void AssignExpression(FunctionState funcState, bool canNewLocal = false)
         {
