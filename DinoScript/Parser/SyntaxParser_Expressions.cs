@@ -286,7 +286,7 @@ namespace DinoScript.Parser
                         throw new SyntaxErrorException(token);
                     if (funcState.SymbolTable.TryGetValue(token.Value, out symbolDesc))
                         exprKind = ExpressionKind.LocalVariable;
-                    else if (funcState.GlobalRoot.SymbolTable.TryGetValue(token.Value, out symbolDesc))
+                    else if(RootFunctionState.SymbolTable.TryGetValue(token.Value, out symbolDesc))
                         exprKind = ExpressionKind.GlobalVariable;
                     else
                         throw new SyntaxErrorException(token, $"Could not find symbol '{token.Text}'.");

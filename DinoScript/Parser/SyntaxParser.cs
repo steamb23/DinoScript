@@ -17,7 +17,7 @@ namespace DinoScript.Parser
 
         public ParserMode ParserMode { get; }
 
-        public FunctionState RootFunctionState { get; } = new FunctionState();
+        public FunctionState RootFunctionState { get; } = new FunctionState(0);
 
         public FunctionState CurrentFunctionState { get; internal set; }
 

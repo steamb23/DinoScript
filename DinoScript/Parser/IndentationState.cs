@@ -1,18 +1,17 @@
 ﻿namespace DinoScript.Parser
 {
-    public sealed class IndentationState
+    public readonly struct IndentationState
     {
-        public IndentationState(int indentCount, int depth, IndentationState? parent = null)
+        public IndentationState(int indentCount, int depth)
         {
             IndentCount = indentCount;
             Depth = depth;
-            Parent = parent;
         }
 
         public int IndentCount { get; }
 
         public int Depth { get; }
 
-        public IndentationState? Parent { get; }
+        public static IndentationState Empty { get; } = new IndentationState(0, 0);
     }
 }

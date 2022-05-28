@@ -5,25 +5,21 @@ namespace DinoScript.Parser
     /// <summary>
     /// 함수 호출 시의 함수의 상태 정보를 나타냅니다.
     /// </summary>
-    public sealed class FunctionState
+    public readonly struct FunctionState
     {
-        public FunctionState()
+        public FunctionState(int stackFrameIndex)
         {
-            GlobalRoot = this;
+            StackFrameIndex = stackFrameIndex;
+            SymbolTable = new Dictionary<string, LocalSymbolDescription>();
         }
-
-        public FunctionState(FunctionState parent, int stackFrameIndex)
-        {
-            this.Parent = parent;
-            this.GlobalRoot = parent.GlobalRoot;
-            this.StackFrameIndex = stackFrameIndex;
-        }
-
-        public Dictionary<string, LocalSymbolDescription> SymbolTable { get; } = new Dictionary<string, LocalSymbolDescription>();
-
-        public FunctionState? Parent { get; }
         
-        public FunctionState GlobalRoot { get; }
+        public FunctionState(int stackFrameIndex, Dictionary<string, LocalSymbolDescription> symbolTable)
+        {
+            StackFrameIndex = stackFrameIndex;
+            SymbolTable = symbolTable;
+        }
+
+        public Dictionary<string, LocalSymbolDescription> SymbolTable { get; }
 
         public int StackFrameIndex { get; }
     }
