@@ -57,6 +57,7 @@ namespace DinoScript.Code
                 case Opcode.Branch:
                 case Opcode.BranchIfFalse:
                 case Opcode.BranchIfTrue:
+                case Opcode.StoreToLocal:
                     return new InternalCode(opcode, token, value);
                 default:
                     throw new ArgumentException(null, nameof(opcode));

@@ -312,7 +312,10 @@ namespace DinoScript.Code
                 case ExpressionKind.GlobalVariable:
                     throw new NotImplementedException();
                 case ExpressionKind.LocalVariable:
-                    Codes.Add(InternalCode.Make(Opcode.StoreToLocal, token, (int)exprDesc.Value));
+                    if (newLocal)
+                        Codes.Add(InternalCode.Make(Opcode.StoreToNewLocal, token));
+                    else
+                        Codes.Add(InternalCode.Make(Opcode.StoreToLocal, token, (int)exprDesc.Value));
                     break;
                 default:
                     throw new ArgumentOutOfRangeException($"{nameof(exprDesc)}.{nameof(exprDesc.Kind)}",

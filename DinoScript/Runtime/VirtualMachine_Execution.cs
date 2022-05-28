@@ -50,16 +50,19 @@ namespace DinoScript.Runtime
                         Memory.FunctionStack[
                             Memory.FunctionStack.CurrentStackFrameIndex + (int)code.Operands[0]]);
 
+                    internalCodeIndex++;
                     break;
 
                 case Opcode.StoreToLocal:
                     Memory.FunctionStack[
                         Memory.FunctionStack.CurrentStackFrameIndex + (int)code.Operands[0]
                     ] = Memory.OperationStack.Pop();
+                    internalCodeIndex++;
                     break;
 
                 case Opcode.StoreToNewLocal:
                     Memory.FunctionStack.Push(Memory.OperationStack.Pop());
+                    internalCodeIndex++;
                     break;
 
                 #endregion

@@ -12,7 +12,7 @@ namespace DinoScript.Parser
         private List<InternalCode> codes = new List<InternalCode>();
 
         // public CodeGeneratorLegacy CodeGeneratorLegacy { get; } = new CodeGeneratorLegacy();
-        
+
         public CodeGenerator CodeGenerator { get; }
 
         public ParserMode ParserMode { get; }
@@ -26,7 +26,7 @@ namespace DinoScript.Parser
             Tokenizer = new Tokenizer(textReader);
             CodeGenerator = codeGenerator;
             ParserMode = parserMode;
-            
+
             CurrentFunctionState = RootFunctionState;
         }
 
@@ -50,12 +50,33 @@ namespace DinoScript.Parser
             {
                 case ParserMode.ExpressionTest:
                 {
-                    ExpressionDescription expressionDescription = ExpressionDescription.Empty;
-                    Expression(ref expressionDescription);
+                    RootExpressionTest();
+                    break;
+                }
+                case ParserMode.StatementTest:
+                {
+                    RootStatementTest();
                     break;
                 }
                 case ParserMode.Full:
                     throw new NotImplementedException();
+            }
+
+            void RootExpressionTest()
+            {
+                ExpressionDescription expressionDescription = ExpressionDescription.Empty;
+                Expression(ref expressionDescription);
+                var token = Tokenizer.Current();
+                if (token != null)
+                    throw new SyntaxErrorException(token);
+            }
+
+            void RootStatementTest()
+            {
+                Statement(IndentationState.Empty, RootFunctionState);
+                var token = Tokenizer.Current();
+                if (token != null)
+                    throw new SyntaxErrorException(token);
             }
         }
 

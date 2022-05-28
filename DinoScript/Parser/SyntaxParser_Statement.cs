@@ -14,10 +14,12 @@ namespace DinoScript.Parser
         {
             int count = 0;
             startToken = Tokenizer.Current();
+            var token = startToken;
 
-            while (Tokenizer.Next()?.Type == TokenType.WhiteSpace)
+            while (token?.Type == TokenType.WhiteSpace)
             {
                 count += 1;
+                token = Tokenizer.Next();
             }
 
             return count;
@@ -46,13 +48,13 @@ namespace DinoScript.Parser
         void CheckEndOfLine()
         {
             var token = Tokenizer.Current();
-            if (!(token is { Type: TokenType.EndOfLine }))
+            if (token != null && !(token is { Type: TokenType.EndOfLine }))
             {
                 throw new SyntaxErrorException(token);
             }
         }
 
-        public void Statement(ref IndentationState indentationState, ref FunctionState funcState)
+        public void Statement(in IndentationState indentationState, in FunctionState funcState)
         {
             if (GetIndentationDifference(in indentationState, out var indentCount, out var token) != 0)
                 throw new IndentationException(token, indentCount);
@@ -68,12 +70,13 @@ namespace DinoScript.Parser
                     switch (token.Value)
                     {
                         case "let":
-                            AssignStatement(ref funcState);
+                            AssignStatement(funcState);
                             break;
                     }
+
                     break;
                 case TokenType.Identifier:
-                    AssignStatement(ref funcState);
+                    AssignStatement(funcState);
                     break;
             }
 
@@ -83,7 +86,7 @@ namespace DinoScript.Parser
         /// <summary>
         /// 할당문을 파싱합니다.
         /// </summary>
-        public void AssignStatement(ref FunctionState funcState)
+        public void AssignStatement(in FunctionState funcState)
         {
             AssignExpression(funcState, true);
         }

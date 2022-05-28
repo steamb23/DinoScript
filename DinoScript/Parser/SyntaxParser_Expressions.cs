@@ -255,7 +255,7 @@ namespace DinoScript.Parser
         /// <summary>
         /// 할당을 포함하는 식을 파싱합니다. 최상위 식으로 볼 수 있습니다.
         /// </summary>
-        public void AssignExpression(FunctionState funcState, bool canNewLocal = false)
+        public void AssignExpression(in FunctionState funcState, bool canNewLocal = false)
         {
             // <Identifier> = <Expression>
 
@@ -268,30 +268,35 @@ namespace DinoScript.Parser
             bool newLocal = false;
             //Token? identifierToken;
             LocalSymbolDescription symbolDesc;
-            
+
             ExpressionKind exprKind;
-            
+
             switch (token.Type)
             {
                 case TokenType.Keyword when canNewLocal && token.Value == "let":
                     newLocal = true;
                     token = Tokenizer.NextWithIgnoreWhiteSpace();
                     if (token is { Type: TokenType.Identifier })
+                    {
+                        // 공간 확보
+                        // TODO: LocalSymbolDescription에 대한 세부 데이터 필요
+                        funcState.SymbolTable.Add(token.Value!, new LocalSymbolDescription(0, 0));
                         goto case TokenType.Identifier;
+                    }
                     else
                         throw new SyntaxErrorException(token);
-                    
+
                 case TokenType.Identifier:
                     if (token.Value == null)
                         throw new SyntaxErrorException(token);
                     if (funcState.SymbolTable.TryGetValue(token.Value, out symbolDesc))
                         exprKind = ExpressionKind.LocalVariable;
-                    else if(RootFunctionState.SymbolTable.TryGetValue(token.Value, out symbolDesc))
+                    else if (RootFunctionState.SymbolTable.TryGetValue(token.Value, out symbolDesc))
                         exprKind = ExpressionKind.GlobalVariable;
                     else
                         throw new SyntaxErrorException(token, $"Could not find symbol '{token.Text}'.");
                     break;
-                
+
                 default:
                     throw new SyntaxErrorException(token);
             }
@@ -304,10 +309,10 @@ namespace DinoScript.Parser
 
             Tokenizer.NextWithIgnoreWhiteSpace();
             var subExprDesc = ExpressionDescription.Empty;
-            
+
             // 식 코드 생성
             Expression(ref subExprDesc);
-            
+
             // 할당 코드 생성
             var exprDesc = new ExpressionDescription(exprKind, symbolDesc.LocalIndex);
             CodeGenerator.Assign(ref exprDesc, newLocal, token);
