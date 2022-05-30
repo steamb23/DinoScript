@@ -17,5 +17,12 @@ namespace DinoScript
             virtualMachine.Run();
             return virtualMachine;
         }
+
+        public static VirtualMachine Init(string script, VirtualMachineOptions? options = null)
+        {
+            var virtualMachine = new VirtualMachine(new StringReader(script), options);
+            virtualMachine.Initialize();
+            return virtualMachine;
+        }
     }
 }

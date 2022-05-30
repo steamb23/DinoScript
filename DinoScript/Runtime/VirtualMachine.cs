@@ -44,6 +44,14 @@ namespace DinoScript.Runtime
             }
         }
 
+        public void Initialize()
+        {
+            while (!Parser.IsEndOfText)
+            {
+                Parser.Next();
+            }
+        }
+
         /// <summary>
         /// 처음부터 끝까지 모든 코드를 실행합니다.
         /// </summary>

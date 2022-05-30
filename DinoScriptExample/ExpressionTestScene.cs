@@ -30,10 +30,11 @@ public class ExpressionTestScene : Scene
             Stopwatch stopwatch = new Stopwatch();
             try
             {
-                stopwatch.Restart();
-                var machine = Script.Run(input, new VirtualMachineOptions(
+                var machine = Script.Init(input, new VirtualMachineOptions(
                     ParserMode.ExpressionTest)
                 );
+                stopwatch.Restart();
+                machine.Run();
                 stopwatch.Stop();
                 var result = machine.Result;
                 switch (result.Value.Type)
