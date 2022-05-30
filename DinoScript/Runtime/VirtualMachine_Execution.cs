@@ -5,7 +5,7 @@ namespace DinoScript.Runtime
 {
     public partial class VirtualMachine
     {
-        public VirtualMemory Memory { get; }
+        public VirtualMemory Memory { get; private set; }
 
         /// <summary>
         /// 코드를 실행합니다.

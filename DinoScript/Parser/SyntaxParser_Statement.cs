@@ -34,7 +34,8 @@ namespace DinoScript.Parser
         int GetIndentationDifference(int sourceIndentCount, int destIndentCount) =>
             destIndentCount - sourceIndentCount;
 
-        int GetIndentationDifference(in IndentationState indentationState, out int indentCount, out Token? startToken, out Token? skippedToken)
+        int GetIndentationDifference(in IndentationState indentationState, out int indentCount, out Token? startToken,
+            out Token? skippedToken)
         {
             if ((startToken = Tokenizer.Current()) is { Type: TokenType.Semicolon })
             {
@@ -81,15 +82,16 @@ namespace DinoScript.Parser
             if (GetIndentationDifference(in indentationState, out var indentCount,
                     out var indentToken, out var token) != 0)
                 throw new IndentationException(indentToken, indentCount);
+
+            if (token is { Type: TokenType.Semicolon })
+            {
+                token = Tokenizer.NextWithIgnoreWhiteSpace();
+            }
+
             if (token == null)
             {
                 // 프로그램 끝
                 return;
-            }
-
-            if (token.Type == TokenType.Semicolon)
-            {
-                token = Tokenizer.NextWithIgnoreWhiteSpace();
             }
 
             switch (token.Type)

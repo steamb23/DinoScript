@@ -10,6 +10,7 @@ namespace DinoScript.Runtime
     {
         public IReadOnlyList<InternalCode> InternalCodes => Parser.CodeGenerator.Codes;
         private int internalCodeIndex = 0;
+        private VirtualMachineOptions options;
 
         public SyntaxParser Parser { get; private set; }
 
@@ -17,10 +18,21 @@ namespace DinoScript.Runtime
         {
             options ??= VirtualMachineOptions.Default;
 
-            Memory = new VirtualMemory(options.OperationStackSize, options.FunctionStackSize);
-
             Parser = new SyntaxParser(textReader, new CodeGenerator(), options.ParserMode);
             textReader.ReadLine();
+
+            this.options = options;
+
+            Memory = new VirtualMemory(options.OperationStackSize, options.FunctionStackSize);
+            internalCodeIndex = 0;
+        }
+
+        /// <summary>
+        /// 메모리를 비우고 실행 상태를 리셋합니다.
+        /// </summary>
+        public void Reset()
+        {
+            Memory = new VirtualMemory(options.OperationStackSize, options.FunctionStackSize);
             internalCodeIndex = 0;
         }
 
