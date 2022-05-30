@@ -17,6 +17,9 @@
       <Compile Update="Runtime\VirtualMachine_Execution.cs">
         <DependentUpon>VirtualMachine.cs</DependentUpon>
       </Compile>
+      <Compile Update="Parser\SyntaxParser_Statement.cs">
+        <DependentUpon>SyntaxParser.cs</DependentUpon>
+      </Compile>
     </ItemGroup>
 
 </Project>

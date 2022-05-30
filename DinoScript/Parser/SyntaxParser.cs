@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using DinoScript.Code;
+using DinoScript.Syntax;
 
 namespace DinoScript.Parser
 {
@@ -73,10 +74,10 @@ namespace DinoScript.Parser
 
             void RootStatementTest()
             {
-                Statement(IndentationState.Empty, RootFunctionState);
+                StatementList(IndentationState.Empty, RootFunctionState);
                 var token = Tokenizer.Current();
-                if (token != null)
-                    throw new SyntaxErrorException(token);
+                // if (!(token is { Type: TokenType.EndOfLine }))
+                //     throw new SyntaxErrorException(token);
             }
         }
 

@@ -10,16 +10,16 @@ namespace DinoScript.Parser
         /// 다음 공백 토큰의 갯수를 측정하고 스킵합니다. 토크나이저 상태가 변경될 수 있습니다.
         /// </summary>
         /// <returns></returns>
-        int GetIndentCount(out Token? startToken)
+        int GetIndentCount(out Token? startToken, out Token? skippedToken)
         {
             int count = 0;
             startToken = Tokenizer.Current();
-            var token = startToken;
+            skippedToken = startToken;
 
-            while (token?.Type == TokenType.WhiteSpace)
+            while (skippedToken?.Type == TokenType.WhiteSpace)
             {
                 count += 1;
-                token = Tokenizer.Next();
+                skippedToken = Tokenizer.Next();
             }
 
             return count;
@@ -34,9 +34,16 @@ namespace DinoScript.Parser
         int GetIndentationDifference(int sourceIndentCount, int destIndentCount) =>
             destIndentCount - sourceIndentCount;
 
-        int GetIndentationDifference(in IndentationState indentationState, out int indentCount, out Token? startToken)
+        int GetIndentationDifference(in IndentationState indentationState, out int indentCount, out Token? startToken, out Token? skippedToken)
         {
-            indentCount = GetIndentCount(out startToken);
+            if ((startToken = Tokenizer.Current()) is { Type: TokenType.Semicolon })
+            {
+                skippedToken = Tokenizer.NextWithIgnoreWhiteSpace();
+                indentCount = indentationState.IndentCount;
+                return 0;
+            }
+
+            indentCount = GetIndentCount(out startToken, out skippedToken);
             var indentDiff = GetIndentationDifference(indentationState.IndentCount, indentCount);
             return indentDiff;
         }
@@ -48,20 +55,41 @@ namespace DinoScript.Parser
         void CheckEndOfLine()
         {
             var token = Tokenizer.Current();
-            if (token != null && !(token is { Type: TokenType.EndOfLine }))
+            if (token != null && token.Type != TokenType.EndOfLine)
             {
+                if (token.Type == TokenType.Semicolon)
+                {
+                    return;
+                }
+
                 throw new SyntaxErrorException(token);
+            }
+
+            Tokenizer.Next();
+        }
+
+        public void StatementList(in IndentationState indentationState, in FunctionState funcState)
+        {
+            while (Tokenizer.Current() != null)
+            {
+                Statement(indentationState, funcState);
             }
         }
 
         public void Statement(in IndentationState indentationState, in FunctionState funcState)
         {
-            if (GetIndentationDifference(in indentationState, out var indentCount, out var token) != 0)
-                throw new IndentationException(token, indentCount);
+            if (GetIndentationDifference(in indentationState, out var indentCount,
+                    out var indentToken, out var token) != 0)
+                throw new IndentationException(indentToken, indentCount);
             if (token == null)
             {
                 // 프로그램 끝
                 return;
+            }
+
+            if (token.Type == TokenType.Semicolon)
+            {
+                token = Tokenizer.NextWithIgnoreWhiteSpace();
             }
 
             switch (token.Type)

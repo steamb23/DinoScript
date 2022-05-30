@@ -11,6 +11,7 @@
         /// </summary>
         UnexpectedToken = 0,
         WhiteSpace,
+        Semicolon,
         EndOfLine,
         Identifier,
         Keyword,

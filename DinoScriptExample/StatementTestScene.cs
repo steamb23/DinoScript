@@ -62,7 +62,6 @@ public class StatementTestScene : Scene
                 // 예외 표시
                 Console.WriteLine("실행중 예외가 발생했습니다:");
                 Console.WriteLine(e);
-                throw;
             }
         }
     }

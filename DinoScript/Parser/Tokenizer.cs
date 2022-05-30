@@ -33,6 +33,8 @@ namespace DinoScript.Parser
             //     "^\"[^\"]*\""),
             new TokenDefinition(TokenType.WhiteSpace,
                 "^(?: +|\t+|\u3000+|\\\\(?:\r?\n|\r|\u0085|\u2028|\u2029))"),
+            new TokenDefinition(TokenType.Semicolon,
+                "^(?:;)"),
             new TokenDefinition(TokenType.EndOfLine,
                 "^(?:\r?\n|\r|\u0085|\u2028|\u2029)"),
             new TokenDefinition(TokenType.Keyword,
@@ -66,6 +68,7 @@ namespace DinoScript.Parser
         public Tokenizer(TextReader textReader)
         {
             this.textBuffer = new TextBuffer(textReader);
+            Next();
         }
 
         public bool IsEndOfText => textBuffer.IsEndOfText;
@@ -77,8 +80,8 @@ namespace DinoScript.Parser
         public Token? Current()
         {
             // 현재 토큰이 없을 경우 다음 토큰을 가져오는 것을 시도
-            if (currentToken == null)
-                return Next();
+            // if (currentToken == null)
+            //     return Next();
             return currentToken;
         }
 
