@@ -111,16 +111,19 @@ namespace DinoScript.Code
 
             if (stackPush)
             {
-                switch (exprDesc.Value.Type)
+                switch (exprDesc.Kind)
                 {
-                    case DinoType.Number:
+                    case ExpressionKind.ConstantNumber:
                         Codes.Add(InternalCode.Make(Opcode.LoadConstantNumber, token, (double)exprDesc.Value));
                         break;
-                    case DinoType.Integer:
+                    case ExpressionKind.ConstantInteger:
                         Codes.Add(InternalCode.Make(Opcode.LoadConstantInteger, token, (long)exprDesc.Value));
                         break;
-                    case DinoType.Boolean:
+                    case ExpressionKind.ConstantBoolean:
                         Codes.Add(InternalCode.Make(Opcode.LoadConstantBoolean, token, (long)exprDesc.Value));
+                        break;
+                    case ExpressionKind.LocalVariable:
+                        Codes.Add(InternalCode.Make(Opcode.LoadFromLocal, token, (int)exprDesc.Value));
                         break;
                 }
             }

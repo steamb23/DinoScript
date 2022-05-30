@@ -75,12 +75,13 @@ namespace DinoScript.Parser
                 case TokenType.Identifier:
                 {
                     // 심볼 테이블에 존재하는지 체크
-                    if (token.Value != null && !CurrentFunctionState.SymbolTable.ContainsKey(token.Value))
+                    // TODO: 현재 Depth와 SymbolTable의 BlockDepth를 체크하는 기능 필요.
+                    if (!CurrentFunctionState.SymbolTable.ContainsKey(token.Value!))
                         throw new SyntaxErrorException(token, $"'{token.Value}' symbol does not exist.");
 
                     expressionDescription = CodeGenerator.ExpressionInitialize(
                         ExpressionKind.LocalVariable,
-                        0,
+                        CurrentFunctionState.SymbolTable[token.Value!].LocalIndex,
                         token,
                         stackPush);
                     return;
@@ -279,8 +280,9 @@ namespace DinoScript.Parser
                     if (token is { Type: TokenType.Identifier })
                     {
                         // 공간 확보
-                        // TODO: LocalSymbolDescription에 대한 세부 데이터 필요
-                        funcState.SymbolTable.Add(token.Value!, new LocalSymbolDescription(0, 0));
+                        // TODO: LocalBlockDepth에 대한 데이터 필요
+                        funcState.SymbolTable.Add(token.Value!,
+                            new LocalSymbolDescription(funcState.SymbolTable.Count, 0));
                         goto case TokenType.Identifier;
                     }
                     else
