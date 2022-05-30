@@ -40,7 +40,7 @@ namespace DinoScript.Parser
             new TokenDefinition(TokenType.Keyword,
                 "^(?:let|func|for|in|if|else|var|do|until|while|not|this|get|set)"),
             new TokenDefinition(TokenType.Operator,
-                "^(?:=|\\+|-|\\*|/|%|\\^|==|!=|<=|>=|<|>|\\?|:|\\+\\+|--|!|&&|\\|\\||and|or)"),
+                "^(?:\\+|-|\\*|/|%|\\^|==|!=|<=|>=|<|>|\\?|:|\\+\\+|--|!|&&|\\|\\||and|or|=)"),
             new TokenDefinition(TokenType.Mark,
                 "^(?:\\(|\\)|\\[|\\])"),
             new TokenDefinition(TokenType.NumberLiteral,
@@ -71,7 +71,7 @@ namespace DinoScript.Parser
             Next();
         }
 
-        public bool IsEndOfText => textBuffer.IsEndOfText;
+        public bool IsEndOfText => currentToken == null && textBuffer.IsEndOfText;
 
         /// <summary>
         /// 현재 토큰을 가져옵니다.
@@ -108,7 +108,7 @@ namespace DinoScript.Parser
 
             if (text[0] == '\"')
             {
-                return StringLiteralProcess(text);
+                return currentToken = StringLiteralProcess(text);
             }
 
             #endregion
@@ -234,7 +234,8 @@ namespace DinoScript.Parser
             return MakeToken(TokenType.Error, builder.ToString(), currentLines, currentColumns);
         }
 
-        private Token MakeToken(TokenType tokenType, string text, long tokeLines, long tokenColumns, string? message = null)
+        private Token MakeToken(TokenType tokenType, string text, long tokeLines, long tokenColumns,
+            string? message = null)
         {
             // 일부 토큰에 대한 가공 처리
             switch (tokenType)

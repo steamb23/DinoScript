@@ -146,12 +146,13 @@ public class TokenizerTest
 
         var length = tokens.Length;
 
+        var token = tokenizer.Current();
         for (int i = 0; i < length; i++)
         {
-            var token = tokenizer.Next();
             Assert.NotNull(token);
             Assert.Equal(token.Type, tokens[i].Type);
             Assert.Equal(token.Value, tokens[i].Value);
+            token = tokenizer.Next();
         }
     }
 }

@@ -26,4 +26,13 @@
       <ProjectReference Include="..\DinoScript\DinoScript.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Update="ParserTest_ExpressionTest.cs">
+        <DependentUpon>ParserTest.cs</DependentUpon>
+      </Compile>
+      <Compile Update="ParserTest_StatementTest.cs">
+        <DependentUpon>ParserTest.cs</DependentUpon>
+      </Compile>
+    </ItemGroup>
+
 </Project>
