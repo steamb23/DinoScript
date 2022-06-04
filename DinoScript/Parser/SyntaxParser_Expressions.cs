@@ -256,7 +256,7 @@ namespace DinoScript.Parser
         /// <summary>
         /// 할당을 포함하는 식을 파싱합니다. 최상위 식으로 볼 수 있습니다.
         /// </summary>
-        public void AssignExpression(in FunctionState funcState, bool canNewLocal = false)
+        public void AssignExpression(in FunctionState funcState, bool canNewLocal = false, bool duplicate = false)
         {
             // <Identifier> = <Expression>
 
@@ -314,6 +314,9 @@ namespace DinoScript.Parser
 
             // 식 코드 생성
             Expression(ref subExprDesc);
+            
+            // 복사 코드 생성
+            if (duplicate) CodeGenerator.Duplicate(token);
 
             // 할당 코드 생성
             var exprDesc = new ExpressionDescription(exprKind, symbolDesc.LocalIndex);
