@@ -64,6 +64,11 @@ namespace DinoScript.Runtime
                     Memory.FunctionStack.Push(Memory.OperationStack.Pop());
                     internalCodeIndex++;
                     break;
+                
+                case Opcode.Duplicate:
+                    Memory.OperationStack.Push(Memory.OperationStack.Peek());
+                    internalCodeIndex++;
+                    break;
 
                 #endregion
 

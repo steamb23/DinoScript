@@ -37,6 +37,11 @@
         /// 계산 스택 맨 위에 있는 값을 팝하고 새 로컬 변수를 만들어 저장합니다.
         /// </summary>
         StoreToNewLocal,
+        
+        /// <summary>
+        /// 계산 스택 맨 위에 있는 값을 복사해서 계산 스택에 푸시합니다.
+        /// </summary>
+        Duplicate,
 
         #endregion
 
