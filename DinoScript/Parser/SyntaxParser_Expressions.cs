@@ -256,7 +256,7 @@ namespace DinoScript.Parser
         /// <summary>
         /// 할당을 포함하는 식을 파싱합니다. 최상위 식으로 볼 수 있습니다.
         /// </summary>
-        public void AssignExpression(in FunctionState funcState, bool canNewLocal = false, bool duplicate = false)
+        public void AssignExpression(in FunctionState funcState, ref ExpressionDescription exprDesc, bool canNewLocal = false, bool duplicate = false)
         {
             // <Identifier> = <Expression>
 
@@ -271,6 +271,7 @@ namespace DinoScript.Parser
             LocalSymbolDescription symbolDesc;
 
             ExpressionKind exprKind;
+            var subExprDesc = ExpressionDescription.Empty;
 
             switch (token.Type)
             {
@@ -300,7 +301,9 @@ namespace DinoScript.Parser
                     break;
 
                 default:
-                    throw new SyntaxErrorException(token);
+                    // 식 코드 생성
+                    Expression(ref subExprDesc);
+                    return;
             }
 
             token = Tokenizer.NextWithIgnoreWhiteSpace();
@@ -310,7 +313,6 @@ namespace DinoScript.Parser
             }
 
             Tokenizer.NextWithIgnoreWhiteSpace();
-            var subExprDesc = ExpressionDescription.Empty;
 
             // 식 코드 생성
             Expression(ref subExprDesc);
@@ -319,7 +321,7 @@ namespace DinoScript.Parser
             if (duplicate) CodeGenerator.Duplicate(token);
 
             // 할당 코드 생성
-            var exprDesc = new ExpressionDescription(exprKind, symbolDesc.LocalIndex);
+            exprDesc = new ExpressionDescription(exprKind, symbolDesc.LocalIndex);
             CodeGenerator.Assign(ref exprDesc, newLocal, token);
         }
     }

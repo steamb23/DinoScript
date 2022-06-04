@@ -1,4 +1,5 @@
 ﻿using System;
+using DinoScript.Code;
 using DinoScript.Syntax;
 
 namespace DinoScript.Parser
@@ -60,6 +61,7 @@ namespace DinoScript.Parser
             {
                 if (token.Type == TokenType.Semicolon)
                 {
+                    Tokenizer.NextWithIgnoreWhiteSpace();
                     return;
                 }
 
@@ -69,30 +71,54 @@ namespace DinoScript.Parser
             Tokenizer.Next();
         }
 
-        public void StatementList(in IndentationState indentationState, in FunctionState funcState)
+        private void StatementList(IndentationState indentationState, in FunctionState funcState,
+            bool addIndent)
         {
+            int indentDiff;
+            int indentCount;
+            Token? indentToken;
+            Token? token;
+
+            if (addIndent && Tokenizer.Current() != null)
+            {
+                indentDiff = GetIndentationDifference(
+                    in indentationState,
+                    out indentCount,
+                    out indentToken,
+                    out token);
+
+                if (indentDiff > 0)
+                    indentationState = new IndentationState(
+                        indentCount,
+                        indentationState.Depth + 1);
+                else
+                    throw new IndentationException(indentToken, indentCount);
+                Statement(indentationState, funcState);
+            }
+
             while (Tokenizer.Current() != null)
             {
+                indentDiff = GetIndentationDifference(
+                    in indentationState,
+                    out indentCount,
+                    out indentToken,
+                    out token);
+                if (indentDiff < 0)
+                    // 구문 목록 종료
+                    return;
+                if (indentDiff != 0)
+                    throw new IndentationException(indentToken, indentCount);
                 Statement(indentationState, funcState);
             }
         }
 
-        public void Statement(in IndentationState indentationState, in FunctionState funcState)
+        private void Statement(in IndentationState indentationState, in FunctionState funcState)
         {
-            if (GetIndentationDifference(in indentationState, out var indentCount,
-                    out var indentToken, out var token) != 0)
-                throw new IndentationException(indentToken, indentCount);
-
-            if (token is { Type: TokenType.Semicolon })
-            {
-                token = Tokenizer.NextWithIgnoreWhiteSpace();
-            }
+            var token = Tokenizer.Current();
 
             if (token == null)
-            {
                 // 프로그램 끝
                 return;
-            }
 
             switch (token.Type)
             {
@@ -101,6 +127,9 @@ namespace DinoScript.Parser
                     {
                         case "let":
                             AssignStatement(funcState);
+                            break;
+                        case "if":
+                            IfStatement(indentationState, funcState);
                             break;
                     }
 
@@ -116,9 +145,67 @@ namespace DinoScript.Parser
         /// <summary>
         /// 할당문을 파싱합니다.
         /// </summary>
-        public void AssignStatement(in FunctionState funcState)
+        private void AssignStatement(in FunctionState funcState)
         {
-            AssignExpression(funcState, true);
+            var exprDesc = ExpressionDescription.Empty;
+            AssignExpression(funcState, ref exprDesc, true);
+        }
+
+        // break 문 추가 필요
+        private int IfElseChain(in IndentationState indentationState, in FunctionState funcState, ref int escapeChain,
+            in Token? ifToken)
+        {
+            var exprDesc = ExpressionDescription.Empty;
+
+            Tokenizer.NextWithIgnoreWhiteSpace();
+            AssignExpression(funcState, ref exprDesc, false, true);
+            var token = Tokenizer.Current();
+            if (!(token is { Type: TokenType.EndOfLine }))
+                throw new SyntaxErrorException(token);
+            Tokenizer.Next();
+
+            var branchPosition = CodeGenerator.IfNotBranch(token);
+            StatementList(indentationState, funcState, true);
+            // if 문 탈출
+            escapeChain = CodeGenerator.IfEscape(ifToken, escapeChain);
+            // if 조건 판정 실패시 넘겨질 위치
+            CodeGenerator.FixBranchToHere(branchPosition);
+            return branchPosition;
+        }
+
+        private void IfStatement(in IndentationState indentationState, in FunctionState funcState)
+        {
+            var ifToken = Tokenizer.Current();
+            int escapeChain = CodeGenerator.NoJump;
+            var ifNotBranchPos = IfElseChain(indentationState, funcState, ref escapeChain, ifToken); // if <cond> ..
+
+            bool isElse;
+            while ((isElse = Tokenizer.Current() is { Value: "else" }) &&
+                   (ifToken = Tokenizer.NextWithIgnoreWhiteSpace()) is { Value: "if" })
+            {
+                IfElseChain(indentationState, funcState, ref escapeChain, ifToken); // else if <cond> ..
+            }
+
+            // else로 끝남
+            bool isElseEnd = false;
+            if (isElse)
+            {
+                Tokenizer.Next();
+                isElseEnd = true;
+                StatementList(indentationState, funcState, true); // else ..
+            }
+
+            // 불필요한 브랜치 제거
+            if (!isElseEnd)
+            {
+                CodeGenerator.Codes.RemoveAt(CodeGenerator.Codes.Count - 1);
+                CodeGenerator.FixBranchToHere(ifNotBranchPos);
+            }
+            else
+            {
+                // 탈출지점
+                CodeGenerator.PatchBranchToHere(escapeChain);
+            }
         }
     }
 }

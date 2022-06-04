@@ -74,7 +74,7 @@ namespace DinoScript.Parser
 
             void RootStatementTest()
             {
-                StatementList(IndentationState.Empty, RootFunctionState);
+                StatementList(IndentationState.Empty, RootFunctionState, false);
                 var token = Tokenizer.Current();
                 // if (!(token is { Type: TokenType.EndOfLine }))
                 //     throw new SyntaxErrorException(token);

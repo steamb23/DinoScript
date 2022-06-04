@@ -20,6 +20,12 @@
       <Compile Update="Parser\SyntaxParser_Statement.cs">
         <DependentUpon>SyntaxParser.cs</DependentUpon>
       </Compile>
+      <Compile Update="Code\CodeGenerator_Expressions.cs">
+        <DependentUpon>CodeGenerator.cs</DependentUpon>
+      </Compile>
+      <Compile Update="Code\CodeGenerator_Statement.cs">
+        <DependentUpon>CodeGenerator.cs</DependentUpon>
+      </Compile>
     </ItemGroup>
 
 </Project>

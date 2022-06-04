@@ -6,6 +6,8 @@ namespace DinoScript.Code
 {
     public sealed partial class CodeGenerator
     {
+        public const int NoJump = -1;
+
         public List<InternalCode> Codes { get; } = new List<InternalCode>();
 
         public void Duplicate(in Token token)

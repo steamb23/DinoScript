@@ -57,5 +57,74 @@ public partial class ParserTest
                 Make(Opcode.StoreToLocal, null, 0)
             }
         },
+        new object[]
+        {
+            "let isRun = true\n" +
+            "if (isRun)\n" +
+            "    let a = 10",
+            new[]
+            {
+                Make(Opcode.LoadConstantBoolean, null, (long)1),
+                Make(Opcode.StoreToNewLocal, null),
+                Make(Opcode.LoadFromLocal, null, 0),
+                Make(Opcode.BranchIfFalse, null, 6),
+                Make(Opcode.LoadConstantInteger, null, (long)10),
+                Make(Opcode.StoreToNewLocal, null),
+            }
+        },
+        new object[]
+        {
+            "let isRun = true\n" +
+            "if (isRun)\n" +
+            "    let a = 10\n" +
+            "else\n" +
+            "    let b = 20\n",
+            new[]
+            {
+                Make(Opcode.LoadConstantBoolean, null, (long)1),
+                Make(Opcode.StoreToNewLocal, null),
+                Make(Opcode.LoadFromLocal, null, 0),
+                Make(Opcode.BranchIfFalse, null, 7),
+                Make(Opcode.LoadConstantInteger, null, (long)10),
+                Make(Opcode.StoreToNewLocal, null),
+                Make(Opcode.Branch, null, 9),
+                Make(Opcode.LoadConstantInteger, null, (long)20),
+                Make(Opcode.StoreToNewLocal, null),
+            }
+        },
+        new object[]
+        {
+            "let a = 10\n" +
+            "let b = 0\n" +
+            "if (a == 10)\n" +
+            "    b = 10\n" +
+            "else if (a == 20)\n" +
+            "    b = 20\n" +
+            "else\n" +
+            "    b = 30\n",
+            new[]
+            {
+                Make(Opcode.LoadConstantInteger, null, (long)10),
+                Make(Opcode.StoreToNewLocal, null),
+                Make(Opcode.LoadConstantInteger, null, (long)0),
+                Make(Opcode.StoreToNewLocal, null),
+                Make(Opcode.LoadFromLocal, null, 0),
+                Make(Opcode.LoadConstantInteger, null, (long)10),
+                Make(Opcode.Equal, null),
+                Make(Opcode.BranchIfFalse, null, 11),
+                Make(Opcode.LoadConstantInteger, null, (long)10),
+                Make(Opcode.StoreToLocal, null, 1),
+                Make(Opcode.Branch, null, 20),
+                Make(Opcode.LoadFromLocal, null, 0),
+                Make(Opcode.LoadConstantInteger, null, (long)20),
+                Make(Opcode.Equal, null),
+                Make(Opcode.BranchIfFalse, null, 18),
+                Make(Opcode.LoadConstantInteger, null, (long)20),
+                Make(Opcode.StoreToLocal, null, 1),
+                Make(Opcode.Branch, null, 20),
+                Make(Opcode.LoadConstantInteger, null, (long)30),
+                Make(Opcode.StoreToLocal, null, 1),
+            }
+        }
     };
 }

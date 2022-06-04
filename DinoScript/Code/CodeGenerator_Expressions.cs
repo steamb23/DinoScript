@@ -7,15 +7,18 @@ namespace DinoScript.Code
 {
     public partial class CodeGenerator
     {
-        private const int NoJump = -1;
-
+        internal void PatchBranchToHere(int branchCodeIndex)
+        {
+            PatchBranch(branchCodeIndex, Codes.Count);
+        }
+        
         /// <summary>
         /// 분기 코드 및 분기 연결 목록의 목적 인덱스를 변경합니다.
         /// </summary>
         /// <param name="branchCodeIndex"></param>
         /// <param name="targetCodeIndex"></param>
         /// <returns></returns>
-        private void PatchBranch(int branchCodeIndex, int targetCodeIndex)
+        internal void PatchBranch(int branchCodeIndex, int targetCodeIndex)
         {
             if (branchCodeIndex == NoJump || targetCodeIndex == NoJump)
             {
@@ -25,21 +28,23 @@ namespace DinoScript.Code
             var next = branchCodeIndex;
             do
             {
-                var current = next;
+                var current = Math.Min(next, Codes.Count - 1);
                 var code = Codes[current];
-                next = (int)code.Operands[0];
                 switch (code.Opcode)
                 {
                     case Opcode.Branch:
                     case Opcode.BranchIfFalse:
                     case Opcode.BranchIfTrue:
+                        next = (int)code.Operands[0];
                         Codes[current] = InternalCode.Make(code.Opcode, code.Token, targetCodeIndex);
                         break;
+                    default:
+                        return;
                 }
             } while (next != NoJump);
         }
 
-        private int GetBranchTargetIndex(int codeIndex)
+        internal int GetBranchTargetIndex(int codeIndex)
         {
             var code = Codes[codeIndex];
             switch (code.Opcode)
@@ -58,7 +63,7 @@ namespace DinoScript.Code
         /// </summary>
         /// <param name="codeIndex"></param>
         /// <param name="targetCodeIndex"></param>
-        private void FixBranch(int codeIndex, int targetCodeIndex)
+        internal void FixBranch(int codeIndex, int targetCodeIndex)
         {
             var code = Codes[codeIndex];
             switch (code.Opcode)
@@ -73,12 +78,17 @@ namespace DinoScript.Code
             }
         }
 
+        internal void FixBranchToHere(int codeIndex)
+        {
+            FixBranch(codeIndex, Codes.Count);
+        }
+
         /// <summary>
         /// 분기 코드 및 분기 연결 목록을 가리키는 <see cref="descCodeIndex"/>를 <see cref="branchCodeIndex"/>가 가리키는 분기 목록에 합칩니다.
         /// </summary>
         /// <param name="branchCodeIndex"></param>
         /// <param name="descCodeIndex"></param>
-        private void BranchLinkConcat(ref int branchCodeIndex, int descCodeIndex)
+        internal void BranchLinkConcat(ref int branchCodeIndex, int descCodeIndex)
         {
             if (descCodeIndex == NoJump)
                 return;

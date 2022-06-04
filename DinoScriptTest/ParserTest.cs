@@ -15,8 +15,9 @@ public partial class ParserTest
         this.testOutputHelper = testOutputHelper;
     }
 
-    private void CommonTest(string text, InternalCode[] expectedCodes, ParserMode parserMode, string? exceptionMessage = null)
-    {        
+    private void CommonTest(string text, InternalCode[] expectedCodes, ParserMode parserMode,
+        string? exceptionMessage = null)
+    {
         try
         {
             var textReader = new StringReader(text);
@@ -26,16 +27,18 @@ public partial class ParserTest
 
             var codes = parser.CodeGenerator.Codes;
             testOutputHelper.WriteLine("Actual: ");
-            foreach (var code in codes)
+            for (var index = 0; index < codes.Count; index++)
             {
-                testOutputHelper.WriteLine(code.ToString());
+                var code = codes[index];
+                testOutputHelper.WriteLine($"{index:0000}: {code.ToString()}");
             }
 
             testOutputHelper.WriteLine("");
             testOutputHelper.WriteLine("Expected: ");
-            foreach (var code in expectedCodes)
+            for (var index = 0; index < expectedCodes.Length; index++)
             {
-                testOutputHelper.WriteLine(code.ToString());
+                var code = expectedCodes[index];
+                testOutputHelper.WriteLine($"{index:0000}: {code.ToString()}");
             }
 
             Assert.Equal(expectedCodes.Length, codes.Count);
