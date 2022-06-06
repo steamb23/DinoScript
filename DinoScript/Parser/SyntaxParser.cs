@@ -74,8 +74,12 @@ namespace DinoScript.Parser
 
             void RootStatementTest()
             {
-                StatementList(IndentationState.Empty, RootFunctionState, false);
+                StatementList(IndentationState.Empty, RootFunctionState, false, out var breakList);
                 var token = Tokenizer.Current();
+                if (breakList?.Count > 0)
+                {
+                    throw new SyntaxErrorException(CodeGenerator.Codes[0].Token, "Unresolved jump.");
+                }
                 // if (!(token is { Type: TokenType.EndOfLine }))
                 //     throw new SyntaxErrorException(token);
             }

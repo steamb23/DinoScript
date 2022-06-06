@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using DinoScript.Code;
 using DinoScript.Syntax;
 
@@ -54,7 +55,7 @@ namespace DinoScript.Parser
         /// 줄바꿈 문자가 있는지 체크합니다. 아닐 경우 예외를 발생시킵니다.
         /// </summary>
         /// <exception cref="SyntaxErrorException"></exception>
-        void CheckEndOfLine()
+        void CheckEndOfLineAndSemicoln()
         {
             var token = Tokenizer.Current();
             if (token != null && token.Type != TokenType.EndOfLine)
@@ -71,13 +72,34 @@ namespace DinoScript.Parser
             Tokenizer.Next();
         }
 
-        private void StatementList(IndentationState indentationState, in FunctionState funcState,
-            bool addIndent)
+        void CheckEndOfLine()
+        {
+            var token = Tokenizer.Current();
+            if (!(token is { Type: TokenType.EndOfLine }))
+                throw new SyntaxErrorException(token);
+            Tokenizer.Next();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="indentationState"></param>
+        /// <param name="funcState"></param>
+        /// <param name="addIndent"></param>
+        /// <returns></returns>
+        /// <exception cref="IndentationException"></exception>
+        private void StatementList(
+            IndentationState indentationState,
+            in FunctionState funcState,
+            bool addIndent,
+            out List<int>? breakList)
         {
             int indentDiff;
             int indentCount;
             Token? indentToken;
             Token? token;
+
+            breakList = null;
 
             if (addIndent && Tokenizer.Current() != null)
             {
@@ -93,7 +115,7 @@ namespace DinoScript.Parser
                         indentationState.Depth + 1);
                 else
                     throw new IndentationException(indentToken, indentCount);
-                Statement(indentationState, funcState);
+                Statement(indentationState, funcState, out _);
             }
 
             while (Tokenizer.Current() != null)
@@ -108,13 +130,14 @@ namespace DinoScript.Parser
                     return;
                 if (indentDiff != 0)
                     throw new IndentationException(indentToken, indentCount);
-                Statement(indentationState, funcState);
+                Statement(indentationState, funcState, out breakList);
             }
         }
 
-        private void Statement(in IndentationState indentationState, in FunctionState funcState)
+        private void Statement(in IndentationState indentationState, in FunctionState funcState, out List<int>? breakList)
         {
             var token = Tokenizer.Current();
+            breakList = null;
 
             if (token == null)
                 // 프로그램 끝
@@ -129,7 +152,13 @@ namespace DinoScript.Parser
                             AssignStatement(funcState);
                             break;
                         case "if":
-                            IfStatement(indentationState, funcState);
+                            IfStatement(indentationState, funcState, out breakList);
+                            break;
+                        case "while":
+                            WhileStatement(indentationState, funcState);
+                            break;
+                        case "break":
+                            BreakStatement(out breakList);
                             break;
                     }
 
@@ -139,7 +168,7 @@ namespace DinoScript.Parser
                     break;
             }
 
-            CheckEndOfLine();
+            CheckEndOfLineAndSemicoln();
         }
 
         /// <summary>
@@ -153,19 +182,17 @@ namespace DinoScript.Parser
 
         // break 문 추가 필요
         private int IfElseChain(in IndentationState indentationState, in FunctionState funcState, ref int escapeChain,
-            in Token? ifToken)
+            in Token? ifToken, out List<int>? breakList)
         {
             var exprDesc = ExpressionDescription.Empty;
 
             Tokenizer.NextWithIgnoreWhiteSpace();
             AssignExpression(funcState, ref exprDesc, false, true);
-            var token = Tokenizer.Current();
-            if (!(token is { Type: TokenType.EndOfLine }))
-                throw new SyntaxErrorException(token);
-            Tokenizer.Next();
 
-            var branchPosition = CodeGenerator.IfNotBranch(token);
-            StatementList(indentationState, funcState, true);
+            CheckEndOfLine();
+
+            var branchPosition = CodeGenerator.IfNotBranch(ifToken);
+            StatementList(indentationState, funcState, true, out breakList);
             // if 문 탈출
             escapeChain = CodeGenerator.IfEscape(ifToken, escapeChain);
             // if 조건 판정 실패시 넘겨질 위치
@@ -173,17 +200,18 @@ namespace DinoScript.Parser
             return branchPosition;
         }
 
-        private void IfStatement(in IndentationState indentationState, in FunctionState funcState)
+        private void IfStatement(in IndentationState indentationState, in FunctionState funcState, out List<int>? breakList)
         {
             var ifToken = Tokenizer.Current();
             int escapeChain = CodeGenerator.NoJump;
-            var ifNotBranchPos = IfElseChain(indentationState, funcState, ref escapeChain, ifToken); // if <cond> ..
+            var ifNotBranchPos = IfElseChain(indentationState, funcState, ref escapeChain, ifToken, out breakList); // if <cond> ..
 
             bool isElse;
             while ((isElse = Tokenizer.Current() is { Value: "else" }) &&
                    (ifToken = Tokenizer.NextWithIgnoreWhiteSpace()) is { Value: "if" })
             {
-                IfElseChain(indentationState, funcState, ref escapeChain, ifToken); // else if <cond> ..
+                IfElseChain(indentationState, funcState, ref escapeChain, ifToken, out var breakList2); // else if <cond> ..
+                breakList =  CodeGenerator.ConcatBreakList(breakList, breakList2);
             }
 
             // else로 끝남
@@ -192,7 +220,8 @@ namespace DinoScript.Parser
             {
                 Tokenizer.Next();
                 isElseEnd = true;
-                StatementList(indentationState, funcState, true); // else ..
+                StatementList(indentationState, funcState, true, out var breakList2); // else ..
+                breakList =  CodeGenerator.ConcatBreakList(breakList, breakList2);
             }
 
             // 불필요한 브랜치 제거
@@ -206,6 +235,31 @@ namespace DinoScript.Parser
                 // 탈출지점
                 CodeGenerator.PatchBranchToHere(escapeChain);
             }
+        }
+
+        private void WhileStatement(in IndentationState indentationState, in FunctionState funcState)
+        {
+            var exprDesc = ExpressionDescription.Empty;
+            var whileToken = Tokenizer.Current();
+
+            Tokenizer.NextWithIgnoreWhiteSpace();
+            AssignExpression(funcState, ref exprDesc, false, true);
+
+            var branchPos = CodeGenerator.IfNotBranch(whileToken);
+
+            CheckEndOfLine();
+
+            StatementList(indentationState, funcState, true, out var breakList);
+
+            CodeGenerator.BreakListPatchToHere(breakList);
+            CodeGenerator.FixBranchToHere(branchPos);
+        }
+
+        private void BreakStatement(out List<int> breakList)
+        {
+            var token = Tokenizer.Current();
+            CodeGenerator.Break(token);
+            breakList = new List<int> { 1 };
         }
     }
 }
