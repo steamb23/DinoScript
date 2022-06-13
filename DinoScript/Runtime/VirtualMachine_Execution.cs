@@ -12,8 +12,9 @@ namespace DinoScript.Runtime
         /// </summary>
         private void RunCode(InternalCode code)
         {
-            DinoValue v2;
-            DinoValue v1;
+            DinoValue v2, v1;
+            double n2, n1;
+            long i2, i1;
             switch (code.Opcode)
             {
                 default:
@@ -64,7 +65,12 @@ namespace DinoScript.Runtime
                     Memory.FunctionStack.Push(Memory.OperationStack.Pop());
                     internalCodeIndex++;
                     break;
-                
+
+                case Opcode.NewLocal:
+                    Memory.FunctionStack.Push(DinoValue.Number(0));
+                    internalCodeIndex++;
+                    break;
+
                 case Opcode.Duplicate:
                     Memory.OperationStack.Push(Memory.OperationStack.Peek());
                     internalCodeIndex++;

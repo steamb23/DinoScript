@@ -134,7 +134,8 @@ namespace DinoScript.Parser
             }
         }
 
-        private void Statement(in IndentationState indentationState, in FunctionState funcState, out List<int>? breakList)
+        private void Statement(in IndentationState indentationState, in FunctionState funcState,
+            out List<int>? breakList)
         {
             var token = Tokenizer.Current();
             breakList = null;
@@ -156,6 +157,9 @@ namespace DinoScript.Parser
                             break;
                         case "while":
                             WhileStatement(indentationState, funcState);
+                            break;
+                        case "for":
+                            ForStatement(indentationState, funcState);
                             break;
                         case "break":
                             BreakStatement(out breakList);
@@ -200,18 +204,21 @@ namespace DinoScript.Parser
             return branchPosition;
         }
 
-        private void IfStatement(in IndentationState indentationState, in FunctionState funcState, out List<int>? breakList)
+        private void IfStatement(in IndentationState indentationState, in FunctionState funcState,
+            out List<int>? breakList)
         {
             var ifToken = Tokenizer.Current();
             int escapeChain = CodeGenerator.NoJump;
-            var ifNotBranchPos = IfElseChain(indentationState, funcState, ref escapeChain, ifToken, out breakList); // if <cond> ..
+            var ifNotBranchPos =
+                IfElseChain(indentationState, funcState, ref escapeChain, ifToken, out breakList); // if <cond> ..
 
             bool isElse;
             while ((isElse = Tokenizer.Current() is { Value: "else" }) &&
                    (ifToken = Tokenizer.NextWithIgnoreWhiteSpace()) is { Value: "if" })
             {
-                IfElseChain(indentationState, funcState, ref escapeChain, ifToken, out var breakList2); // else if <cond> ..
-                breakList =  CodeGenerator.ConcatBreakList(breakList, breakList2);
+                IfElseChain(indentationState, funcState, ref escapeChain, ifToken,
+                    out var breakList2); // else if <cond> ..
+                breakList = CodeGenerator.ConcatBreakList(breakList, breakList2);
             }
 
             // else로 끝남
@@ -221,7 +228,7 @@ namespace DinoScript.Parser
                 Tokenizer.Next();
                 isElseEnd = true;
                 StatementList(indentationState, funcState, true, out var breakList2); // else ..
-                breakList =  CodeGenerator.ConcatBreakList(breakList, breakList2);
+                breakList = CodeGenerator.ConcatBreakList(breakList, breakList2);
             }
 
             // 불필요한 브랜치 제거
@@ -258,6 +265,51 @@ namespace DinoScript.Parser
 
             CodeGenerator.BreakListPatchToHere(breakList);
             CodeGenerator.FixBranchToHere(branchPos);
+        }
+
+        private void ForStatement(in IndentationState indentationState, in FunctionState funcState)
+        {
+            var whileToken = Tokenizer.Current();
+
+            var eachToken = Tokenizer.NextWithIgnoreWhiteSpace();
+            if (!(eachToken is { Value: "each" }))
+                throw new SyntaxErrorException(eachToken);
+
+            var identifierToken = Tokenizer.NextWithIgnoreWhiteSpace();
+            if (!(identifierToken is { Type: TokenType.Identifier }))
+                throw new SyntaxErrorException(identifierToken);
+
+
+            var inToken = Tokenizer.NextWithIgnoreWhiteSpace();
+            if (!(inToken is { Value: "in" }))
+                throw new SyntaxErrorException(inToken);
+
+            // 첫번째 이터레이션 식 파싱
+            var exprDesc = ExpressionDescription.Empty;
+            AssignExpression(funcState, ref exprDesc, false, true);
+
+            var rangeToken = Tokenizer.Next();
+            if (rangeToken is { Value: ".." })
+            {
+                // 변수 생성
+                var identifierIndex = funcState.SymbolTable.Count;
+                funcState.SymbolTable.Add(identifierToken.Value!, new LocalSymbolDescription(identifierIndex, 0));
+                CodeGenerator.Codes.Add(InternalCode.Make(Opcode.StoreToNewLocal, identifierToken));
+
+                // 반복 지점
+                var loopStart = CodeGenerator.Codes.Count;
+                
+                // 두번째 이터레이션 식 파싱
+                exprDesc = ExpressionDescription.Empty;
+                AssignExpression(funcState, ref exprDesc, false, true);
+                
+                // TODO: 이터레이션 구현 필요
+            }
+            else
+            {
+                // 추후 컬렉션 이터레이션 실행
+                throw new SyntaxErrorException(rangeToken);
+            }
         }
 
         private void BreakStatement(out List<int> breakList)

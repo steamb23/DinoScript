@@ -39,6 +39,11 @@
         StoreToNewLocal,
         
         /// <summary>
+        /// 빈 로컬 변수를 만듭니다.
+        /// </summary>
+        NewLocal,
+        
+        /// <summary>
         /// 계산 스택 맨 위에 있는 값을 복사해서 계산 스택에 푸시합니다.
         /// </summary>
         Duplicate,
