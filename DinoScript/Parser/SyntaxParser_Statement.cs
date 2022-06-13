@@ -243,6 +243,9 @@ namespace DinoScript.Parser
             var whileToken = Tokenizer.Current();
 
             Tokenizer.NextWithIgnoreWhiteSpace();
+
+            var loopStart = CodeGenerator.Codes.Count;
+            
             AssignExpression(funcState, ref exprDesc, false, true);
 
             var branchPos = CodeGenerator.IfNotBranch(whileToken);
@@ -250,6 +253,8 @@ namespace DinoScript.Parser
             CheckEndOfLine();
 
             StatementList(indentationState, funcState, true, out var breakList);
+
+            CodeGenerator.Codes.Add(InternalCode.Make(Opcode.Branch, whileToken, loopStart));
 
             CodeGenerator.BreakListPatchToHere(breakList);
             CodeGenerator.FixBranchToHere(branchPos);
