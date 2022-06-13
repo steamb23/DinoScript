@@ -127,35 +127,55 @@ public partial class ParserTest
             }
         },
         // TODO: 변수 스코프 관련 기능 구현 필요
+        // new object[]
+        // {
+        //     "let a = 10\n" +
+        //     "if (a == 10)\n" +
+        //     "    let b = 10\n" +
+        //     "else if (a == 20)\n" +
+        //     "    let b = 20\n" +
+        //     "else\n" +
+        //     "    let b = 30\n",
+        //     new[]
+        //     {
+        //         Make(Opcode.LoadConstantInteger, null, (long)10),
+        //         Make(Opcode.StoreToNewLocal, null),
+        //         Make(Opcode.LoadFromLocal, null, 0),
+        //         Make(Opcode.LoadConstantInteger, null, (long)10),
+        //         Make(Opcode.Equal, null),
+        //         Make(Opcode.BranchIfFalse, null, 11),
+        //         Make(Opcode.LoadConstantInteger, null, (long)10),
+        //         Make(Opcode.StoreToNewLocal, null, 1),
+        //         Make(Opcode.Branch, null, 20),
+        //         Make(Opcode.LoadFromLocal, null, 0),
+        //         Make(Opcode.LoadConstantInteger, null, (long)20),
+        //         Make(Opcode.Equal, null),
+        //         Make(Opcode.BranchIfFalse, null, 18),
+        //         Make(Opcode.LoadConstantInteger, null, (long)20),
+        //         Make(Opcode.StoreToLocal, null, 1),
+        //         Make(Opcode.Branch, null, 20),
+        //         Make(Opcode.LoadConstantInteger, null, (long)30),
+        //         Make(Opcode.StoreToLocal, null, 1),
+        //     }
+        // }
         new object[]
         {
-            "let a = 10\n" +
-            "if (a == 10)\n" +
-            "    let b = 10\n" +
-            "else if (a == 20)\n" +
-            "    let b = 20\n" +
-            "else\n" +
-            "    let b = 30\n",
+            "let a = 0\n" +
+            "while (a < 10)\n" +
+            "    a = a + 1",
             new[]
             {
-                Make(Opcode.LoadConstantInteger, null, (long)10),
+                Make(Opcode.LoadConstantInteger, null, (long)0),
                 Make(Opcode.StoreToNewLocal, null),
                 Make(Opcode.LoadFromLocal, null, 0),
                 Make(Opcode.LoadConstantInteger, null, (long)10),
-                Make(Opcode.Equal, null),
+                Make(Opcode.LessThan, null),
                 Make(Opcode.BranchIfFalse, null, 11),
-                Make(Opcode.LoadConstantInteger, null, (long)10),
-                Make(Opcode.StoreToNewLocal, null, 1),
-                Make(Opcode.Branch, null, 20),
                 Make(Opcode.LoadFromLocal, null, 0),
-                Make(Opcode.LoadConstantInteger, null, (long)20),
-                Make(Opcode.Equal, null),
-                Make(Opcode.BranchIfFalse, null, 18),
-                Make(Opcode.LoadConstantInteger, null, (long)20),
-                Make(Opcode.StoreToLocal, null, 1),
-                Make(Opcode.Branch, null, 20),
-                Make(Opcode.LoadConstantInteger, null, (long)30),
-                Make(Opcode.StoreToLocal, null, 1),
+                Make(Opcode.LoadConstantInteger, null, (long)1),
+                Make(Opcode.Add, null),
+                Make(Opcode.StoreToLocal, null, 0),
+                Make(Opcode.Branch, null, 2)
             }
         }
     };
