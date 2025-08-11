@@ -68,11 +68,11 @@ public partial class Tokenizer
     /// <summary>
     /// 공백 토큰 정의입니다.
     /// </summary>
-    private static readonly TokenDefinition WhiteSpaceTokenDefinition = new(TokenType.WhiteSpace);
+    private static readonly TokenDefinition WhitespaceTokenDefinition = new(TokenType.Whitespace);
 
     private static readonly List<TokenDefinition> TokenDefinitions =
     [
-        WhiteSpaceTokenDefinition,
+        WhitespaceTokenDefinition,
         new(TokenType.Semicolon),
         EndOfLineTokenDefinition,
         new(TokenType.Keyword),
@@ -87,7 +87,7 @@ public partial class Tokenizer
     ];
 
     // 규격 외 공백 문자 제거
-    private readonly List<Regex> _skipRegexes = [WhitespaceRegex()];
+    private readonly List<Regex> _skipRegexes = [ExtraWhitespaceFilterRegex()];
 
     /// <summary>
     /// 스크립트 문자열을 토큰화하는 클래스입니다.
@@ -133,7 +133,7 @@ public partial class Tokenizer
             // 내부 데이터 관련 연산
             switch (tokenDefinition.Type)
             {
-                case TokenType.WhiteSpace:
+                case TokenType.Whitespace:
                     // No Operations
                     break;
                 case TokenType.EndOfLine:
@@ -248,18 +248,16 @@ public partial class Tokenizer
             }
 
             // skipNextWhitespaces가 참일 경우
-            if (skipNextWhitespaces &&
-                i < scriptBufferSpan.Length - 1 &&
-                !WhiteSpaceTokenDefinition.Regex.IsMatch(scriptBufferSpan[i..(i + 1)]))
+            if (skipNextWhitespaces)
             {
                 // Regex에 선언된 Whitespace 문자가 안올때까지 스킵함
+                if (i + 1 <= scriptBufferSpan.Length && // i + 1이 Length와 같을 경우 처리가 의미 없어짐...
+                    WhitespaceTokenDefinition.Regex.IsMatch(scriptBufferSpan[i..(i + 1)]))
+                    continue;
                 skipNextWhitespaces = false;
-                builder.Append(scriptBufferSpan[i]);
             }
-            else
-            {
-                builder.Append(scriptBufferSpan[i]);
-            }
+
+            builder.Append(scriptBufferSpan[i]);
         }
 
         // 따옴표 찾는데 실패함.
@@ -293,6 +291,6 @@ public partial class Tokenizer
             tokenColumns);
     }
 
-    [GeneratedRegex("^(\\s)+")]
-    private static partial Regex WhitespaceRegex();
+    [GeneratedRegex("^(?:\\s)+")]
+    private static partial Regex ExtraWhitespaceFilterRegex();
 }

@@ -40,7 +40,7 @@ public enum TokenType
     /// <summary>
     /// 공백 문자를 나타내는 토큰의 타입입니다.
     /// </summary>
-    WhiteSpace,
+    Whitespace,
     /// <summary>
     /// 세미콜론(;)을 나타내는 토큰의 타입입니다.
     /// </summary>

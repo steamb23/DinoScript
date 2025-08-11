@@ -42,8 +42,8 @@ internal static partial class Regexes
     {
         switch (type)
         {
-            case TokenType.WhiteSpace:
-                return WhiteSpaceRegex();
+            case TokenType.Whitespace:
+                return WhitespaceRegex();
             case TokenType.Semicolon:
                 return SemicolonRegex();
             case TokenType.EndOfLine:
@@ -82,7 +82,7 @@ internal static partial class Regexes
     [GeneratedRegex("""
                     ^(?: +|\t+|\u3000+|\\(?:\r?\n|\r|\u0085|\u2028|\u2029))
                     """, RegexOptions.Singleline)]
-    public static partial Regex WhiteSpaceRegex();
+    public static partial Regex WhitespaceRegex();
 
     /// <summary>
     /// 세미콜론(;)을 인식하는 정규식입니다.
@@ -186,7 +186,8 @@ internal static partial class Regexes
     /// 큰따옴표로 둘러싸인 문자열을 인식합니다.
     /// </summary>
     [GeneratedRegex("""
-                    ^"[^"]*"
-                    """, RegexOptions.Singleline)]
+                    "(?:\\.|[^"\\])*"
+                    """
+        , RegexOptions.Singleline)]
     public static partial Regex StringLiteralRegex();
 }
