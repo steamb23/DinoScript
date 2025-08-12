@@ -8,6 +8,7 @@ public class TokenizerTest(ITestOutputHelper testOutputHelper)
 {
     public sealed class TokenizeCase : IXunitSerializable
     {
+        // ReSharper disable once UnusedMember.Global
         public TokenizeCase()
         {
         }
@@ -160,19 +161,23 @@ public class TokenizerTest(ITestOutputHelper testOutputHelper)
 
         testOutputHelper.WriteLine($"InputText:\n{tokenizeCase.InputText}");
 
-        var actualToken = tokenizer.NextToken();
+        using var tokenizerEnumerator = tokenizer.GetEnumerator();
+
         Assert.NotNull(tokenizeCase.ExpectedTokens);
         foreach (var expectedToken in tokenizeCase.ExpectedTokens)
         {
-            Assert.NotNull(actualToken);
+            Assert.True(tokenizerEnumerator.MoveNext());
+            var actualToken = tokenizerEnumerator.Current;
             testOutputHelper.WriteLine($"""
                                         ExpectedToken: {expectedToken}
                                         ActualToken: {actualToken}
                                         """);
-            Assert.Equal(expectedToken.Type, actualToken.Value.Type);
-            Assert.Equal(expectedToken.RawText, actualToken.Value.RawText);
-            Assert.Equal(expectedToken.Value, actualToken.Value.Value);
-            actualToken = tokenizer.NextToken();
+            Assert.Equal(expectedToken.Type, actualToken.Type);
+            Assert.Equal(expectedToken.RawText, actualToken.RawText);
+            Assert.Equal(expectedToken.Value, actualToken.Value);
         }
+
+        // 토큰 갯수 일치 체크
+        Assert.False(tokenizerEnumerator.MoveNext());
     }
 }

@@ -21,23 +21,21 @@
 
 #endregion
 
+using System.Collections;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using DinoScript.Internal;
 using DinoScript.Syntax;
-using Microsoft.Extensions.ObjectPool;
 
 namespace DinoScript.Parser;
 
 /// <summary>
 /// 스크립트 문자열을 토큰화하는 클래스입니다.
 /// </summary>
-public partial class Tokenizer
+public partial class Tokenizer : IEnumerable<Token>
 {
-    /// <summary>
-    /// 현재 처리된 토큰입니다.
-    /// </summary>
-    private Token _currentToken;
+    private readonly string? _rawScript;
 
     /// <summary>
     /// 현재 처리 중인 줄 번호입니다.
@@ -53,12 +51,6 @@ public partial class Tokenizer
     /// 처리할 스크립트 버퍼입니다.
     /// </summary>
     private ReadOnlyMemory<char> _scriptBuffer;
-
-    /// <summary>
-    /// 문자열 처리를 위한 StringBuilder ObjectPool입니다.
-    /// </summary>
-    private readonly ObjectPool<StringBuilder> _stringBuilderPool =
-        new DefaultObjectPool<StringBuilder>(new StringBuilderPooledObjectPolicy());
 
     /// <summary>
     /// 줄 끝 토큰 정의입니다.
@@ -96,23 +88,29 @@ public partial class Tokenizer
     public Tokenizer(string? rawScript)
     {
         ArgumentNullException.ThrowIfNull(rawScript);
+        _rawScript = rawScript;
         _scriptBuffer = rawScript.AsMemory();
     }
 
-    public Token? CurrentToken => _currentToken;
+    /// <summary>
+    /// 현재 처리된 토큰입니다.
+    /// </summary>
+    public Token? CurrentToken { get; private set; }
 
     /// <summary>
     /// 다음 토큰을 가져옵니다.
     /// </summary>
     /// <returns>다음 토큰입니다. 스크립트의 끝에 도달하면 null을 반환합니다.</returns>
     /// <exception cref="SyntaxErrorException">구문 분석 중 오류가 발생한 경우 발생합니다.</exception>
+    ///
+    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public Token? NextToken()
     {
         var scriptBufferSpan = _scriptBuffer.Span;
 
         // 문자열의 끝
         if (scriptBufferSpan.Length == 0)
-            return _currentToken = default;
+            return CurrentToken = null;
 
         // 줄 및 열 백업
         // 이 데이터는 현재 토큰의 위치 값으로 사용
@@ -123,7 +121,7 @@ public partial class Tokenizer
 
         if (scriptBufferSpan[0] == '\"')
         {
-            return _currentToken = StringLiteralProcess(scriptBufferSpan);
+            return CurrentToken = StringLiteralProcess(scriptBufferSpan);
         }
 
         #endregion
@@ -151,7 +149,7 @@ public partial class Tokenizer
 
             var scriptBuffer = _scriptBuffer;
             _scriptBuffer = _scriptBuffer[match.Length..];
-            return _currentToken = MakeToken(
+            return CurrentToken = MakeToken(
                 tokenDefinition.Type,
                 scriptBuffer[..match.Length],
                 null,
@@ -169,13 +167,13 @@ public partial class Tokenizer
         }
 
         // 알 수 없는 토큰
-        _currentToken = MakeToken(
+        CurrentToken = MakeToken(
             TokenType.UnexpectedToken,
             _scriptBuffer.Length > 0 ? _scriptBuffer[..1] : _scriptBuffer,
             null,
             currentLines,
             currentColumns);
-        throw new SyntaxErrorException(_currentToken);
+        throw new SyntaxErrorException(CurrentToken);
     }
 
     /// <summary>
@@ -185,7 +183,7 @@ public partial class Tokenizer
     /// <returns></returns>
     private Token StringLiteralProcess(ReadOnlySpan<char> scriptBufferSpan)
     {
-        var builder = _stringBuilderPool.Get();
+        var builder = ObjectPools.StringBuilderPool.Get();
 
         try
         {
@@ -193,7 +191,7 @@ public partial class Tokenizer
         }
         finally
         {
-            _stringBuilderPool.Return(builder);
+            ObjectPools.StringBuilderPool.Return(builder);
         }
     }
 
@@ -227,7 +225,7 @@ public partial class Tokenizer
                 // 두번 찾았으면 토큰 리턴
                 // rawText: 가공처리되지 않은 문자열 리터럴
                 // text: 가공처리된 문자열 리터럴
-                var rawText = _scriptBuffer[..i];
+                var rawText = _scriptBuffer[..(i + 1)];
                 _scriptBuffer = _scriptBuffer[(i + 1)..];
                 return MakeToken(
                     TokenType.StringLiteral,
@@ -242,9 +240,9 @@ public partial class Tokenizer
             {
                 // 매칭된 개행 문자 빌더에 추가
                 builder.Append(scriptBufferSpan[i..(i + match.Length)]);
-                
+
                 i += Math.Max(0, match.Length - 1);
-                
+
                 _lines++;
                 _columns = 0;
                 // 다음 공백문자들은 무시
@@ -274,6 +272,12 @@ public partial class Tokenizer
             currentColumns);
     }
 
+
+    public void Reset()
+    {
+        _scriptBuffer = _rawScript.AsMemory();
+    }
+
     private static Token MakeToken(TokenType tokenType, ReadOnlyMemory<char> rawText, string? text, long tokeLines,
         long tokenColumns)
     {
@@ -298,4 +302,57 @@ public partial class Tokenizer
 
     [GeneratedRegex("^(?:\\s)+")]
     private static partial Regex ExtraWhitespaceFilterRegex();
+
+
+    #region Enumerator
+
+    public Enumerator GetEnumerator()
+    {
+        return new Enumerator(this);
+    }
+
+    IEnumerator<Token> IEnumerable<Token>.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
+
+    public struct Enumerator(Tokenizer tokenizer) : IEnumerator<Token>
+    {
+        private Tokenizer? _tokenizer = tokenizer;
+
+        public void Dispose()
+        {
+            _tokenizer = null;
+        }
+
+        public bool MoveNext()
+        {
+            ObjectDisposedException.ThrowIf(_tokenizer is null, nameof(Enumerator));
+            return _tokenizer.NextToken() is not null;
+        }
+
+        public void Reset()
+        {
+            ObjectDisposedException.ThrowIf(_tokenizer is null, nameof(Enumerator));
+            _tokenizer.Reset();
+        }
+
+        public Token Current
+        {
+            get
+            {
+                ObjectDisposedException.ThrowIf(_tokenizer is null, nameof(Enumerator));
+                return _tokenizer.CurrentToken.GetValueOrDefault();
+            }
+        }
+
+        object IEnumerator.Current => Current;
+    }
+
+    #endregion
 }
