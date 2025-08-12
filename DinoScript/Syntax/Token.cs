@@ -34,30 +34,35 @@ namespace DinoScript.Syntax;
 public readonly record struct Token(
     TokenType Type,
     ReadOnlyMemory<char> RawText,
-    string? RedefinedText,
-    long Lines,
-    long Columns)
+    string? RedefinedText = null,
+    long Lines = 0,
+    long Columns = 0)
 {
     /// <summary>
     /// 토큰의 유형입니다.
     /// </summary>
     public TokenType Type { get; } = Type;
+
     /// <summary>
     /// 토큰의 원시 텍스트입니다.
     /// </summary>
     public ReadOnlyMemory<char> RawText { get; } = RawText;
+
     /// <summary>
     /// 토큰의 재정의된 텍스트입니다.
     /// </summary>
     public string? RedefinedText { get; } = RedefinedText;
+
     /// <summary>
     /// 토큰이 위치한 줄 번호입니다.
     /// </summary>
     public long Lines { get; } = Lines;
+
     /// <summary>
     /// 토큰이 위치한 열 번호입니다.
     /// </summary>
     public long Columns { get; } = Columns;
+
     /// <summary>
     /// 토큰이 나타내는 실제 값입니다. RedefinedText가 null인 경우 RawText를 반환합니다.
     /// </summary>
@@ -70,5 +75,16 @@ public readonly record struct Token(
     public bool IsValid()
     {
         return Type is not TokenType.Error and not TokenType.UnexpectedToken;
+    }
+
+    public override string ToString()
+    {
+        return
+            $$"""{{{EscapeNewLine(Type.ToString())}}, '{{EscapeNewLine(RawText.ToString())}}', '{{EscapeNewLine(Value.ToString())}}'}""";
+
+        static string EscapeNewLine(string value)
+        {
+            return value.Replace("\n", "\\n").Replace("\r", "\\r").Replace("'", "\\'");
+        }
     }
 }

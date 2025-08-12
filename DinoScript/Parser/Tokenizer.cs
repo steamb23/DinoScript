@@ -93,18 +93,20 @@ public partial class Tokenizer
     /// 스크립트 문자열을 토큰화하는 클래스입니다.
     /// </summary>
     /// <param name="rawScript">토큰화할 스크립트 문자열입니다.</param>
-    public Tokenizer(string rawScript)
+    public Tokenizer(string? rawScript)
     {
         ArgumentNullException.ThrowIfNull(rawScript);
         _scriptBuffer = rawScript.AsMemory();
     }
+
+    public Token? CurrentToken => _currentToken;
 
     /// <summary>
     /// 다음 토큰을 가져옵니다.
     /// </summary>
     /// <returns>다음 토큰입니다. 스크립트의 끝에 도달하면 null을 반환합니다.</returns>
     /// <exception cref="SyntaxErrorException">구문 분석 중 오류가 발생한 경우 발생합니다.</exception>
-    public Token? Next()
+    public Token? NextToken()
     {
         var scriptBufferSpan = _scriptBuffer.Span;
 
@@ -163,7 +165,7 @@ public partial class Tokenizer
         {
             if (!regex.FirstValueMatch(scriptBufferSpan, out var match)) continue;
             _scriptBuffer = _scriptBuffer[match.Length..];
-            return Next();
+            return NextToken();
         }
 
         // 알 수 없는 토큰
@@ -220,7 +222,7 @@ public partial class Tokenizer
                 }
 
                 // 쌍따옴표 두개를 찾아야 이 로직이 끝남
-                if (quotationMarkFind++ < 2) continue;
+                if (++quotationMarkFind < 2) continue;
 
                 // 두번 찾았으면 토큰 리턴
                 // rawText: 가공처리되지 않은 문자열 리터럴
@@ -238,8 +240,11 @@ public partial class Tokenizer
             // 개행 문자 처리
             if (EndOfLineTokenDefinition.Regex.FirstValueMatch(scriptBufferSpan[i..], out var match))
             {
-                i += Math.Max(0, match.Index - 1);
-
+                // 매칭된 개행 문자 빌더에 추가
+                builder.Append(scriptBufferSpan[i..(i + match.Length)]);
+                
+                i += Math.Max(0, match.Length - 1);
+                
                 _lines++;
                 _columns = 0;
                 // 다음 공백문자들은 무시

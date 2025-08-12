@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DinoScript", "DinoScript\DinoScript.csproj", "{502626EF-E208-44EC-9179-D404C233B105}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DinoScript.Test", "DinoScript.Test\DinoScript.Test.csproj", "{9C206280-B46F-4407-8C63-6626F48D3547}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{502626EF-E208-44EC-9179-D404C233B105}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{502626EF-E208-44EC-9179-D404C233B105}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{502626EF-E208-44EC-9179-D404C233B105}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C206280-B46F-4407-8C63-6626F48D3547}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C206280-B46F-4407-8C63-6626F48D3547}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C206280-B46F-4407-8C63-6626F48D3547}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C206280-B46F-4407-8C63-6626F48D3547}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
