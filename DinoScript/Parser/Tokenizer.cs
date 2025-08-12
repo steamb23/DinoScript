@@ -26,7 +26,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using DinoScript.Internal;
-using DinoScript.Syntax;
+using DinoScript.Parser.Syntax;
 
 namespace DinoScript.Parser;
 

@@ -21,10 +21,9 @@
 
 #endregion
 
-using System.Text.RegularExpressions;
 using DinoScript.Internal;
 
-namespace DinoScript.Syntax;
+namespace DinoScript.Parser.Syntax;
 
 /// <summary>
 /// 토큰을 나타내는 구조체입니다.

@@ -21,7 +21,7 @@
 
 #endregion
 
-using DinoScript.Syntax;
+using DinoScript.Parser.Syntax;
 
 namespace DinoScript.Parser;
 

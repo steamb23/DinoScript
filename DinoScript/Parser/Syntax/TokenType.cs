@@ -21,7 +21,7 @@
 
 #endregion
 
-namespace DinoScript.Syntax;
+namespace DinoScript.Parser.Syntax;
 
 /// <summary>
 /// 토큰의 타입을 열거합니다.

@@ -23,7 +23,7 @@
 
 using System.Text.RegularExpressions;
 
-namespace DinoScript.Syntax;
+namespace DinoScript.Parser.Syntax;
 
 /// <summary>
 /// 토큰 정의를 나타내는 구조체입니다.
@@ -34,7 +34,7 @@ public readonly struct TokenDefinition(TokenType type)
     /// <summary>
     /// 토큰을 인식하기 위한 정규식입니다.
     /// </summary>
-    public Regex Regex { get; } = Regexes.GetRegex(type);
+    public Regex Regex { get; } = Parser.Syntax.Regexes.GetRegex(type);
 
     /// <summary>
     /// 토큰의 유형입니다.
