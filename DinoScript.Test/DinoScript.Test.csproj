@@ -19,7 +19,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\DinoScript\DinoScript.csproj" />
+        <ProjectReference Include="..\DinoScript\DinoScript.csproj"/>
     </ItemGroup>
 
 </Project>
