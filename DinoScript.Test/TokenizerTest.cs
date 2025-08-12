@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using DinoScript.Parser;
+﻿using DinoScript.Parser;
 using DinoScript.Syntax;
 using Xunit.Abstractions;
 
@@ -76,7 +75,7 @@ public class TokenizerTest(ITestOutputHelper testOutputHelper)
             """,
             [
                 MakeTestToken(TokenType.StringLiteral,
-                    "Hello, "),
+                    "\"Hello, \"", "Hello, "),
                 MakeTestToken(TokenType.Whitespace,
                     " "),
                 MakeTestToken(TokenType.Operator,
@@ -84,7 +83,7 @@ public class TokenizerTest(ITestOutputHelper testOutputHelper)
                 MakeTestToken(TokenType.Whitespace,
                     " "),
                 MakeTestToken(TokenType.StringLiteral,
-                    "World!")
+                    "\"World!\"", "World!")
             ]),
         new("멀티라인 문자열",
             """
@@ -93,8 +92,63 @@ public class TokenizerTest(ITestOutputHelper testOutputHelper)
             """,
             [
                 MakeTestToken(TokenType.StringLiteral,
-                    "Hello,\r\n  World!",
+                    "\"Hello,\r\n  World!\"",
                     "Hello,\r\nWorld!")
+            ]),
+        new("복합 수식",
+            "( a + b ) * 10",
+            [
+                MakeTestToken(TokenType.Mark,
+                    "("),
+                MakeTestToken(TokenType.Whitespace,
+                    " "),
+                MakeTestToken(TokenType.Identifier,
+                    "a"),
+                MakeTestToken(TokenType.Whitespace,
+                    " "),
+                MakeTestToken(TokenType.Operator,
+                    "+"),
+                MakeTestToken(TokenType.Whitespace,
+                    " "),
+                MakeTestToken(TokenType.Identifier,
+                    "b"),
+                MakeTestToken(TokenType.Whitespace,
+                    " "),
+                MakeTestToken(TokenType.Mark,
+                    ")"),
+                MakeTestToken(TokenType.Whitespace,
+                    " "),
+                MakeTestToken(TokenType.Operator,
+                    "*"),
+                MakeTestToken(TokenType.Whitespace,
+                    " "),
+                MakeTestToken(TokenType.NumberLiteral,
+                    "10")
+            ]),
+        new("공백 문자 및 괄호",
+            "( \t)",
+            [
+                MakeTestToken(TokenType.Mark,
+                    "("),
+                MakeTestToken(TokenType.Whitespace,
+                    " "),
+                MakeTestToken(TokenType.Whitespace,
+                    "\t"),
+                MakeTestToken(TokenType.Mark,
+                    ")")
+            ]),
+        new("줄 넘김",
+            """
+            test\
+            a
+            """,
+            [
+                MakeTestToken(TokenType.Identifier,
+                    "test"),
+                MakeTestToken(TokenType.Whitespace,
+                    "\\\r\n"),
+                MakeTestToken(TokenType.Identifier,
+                    "a")
             ])
     ];
 
@@ -116,6 +170,7 @@ public class TokenizerTest(ITestOutputHelper testOutputHelper)
                                         ActualToken: {actualToken}
                                         """);
             Assert.Equal(expectedToken.Type, actualToken.Value.Type);
+            Assert.Equal(expectedToken.RawText, actualToken.Value.RawText);
             Assert.Equal(expectedToken.Value, actualToken.Value.Value);
             actualToken = tokenizer.NextToken();
         }

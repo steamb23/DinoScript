@@ -21,6 +21,9 @@
 
 #endregion
 
+using System.Text.RegularExpressions;
+using DinoScript.Internal;
+
 namespace DinoScript.Syntax;
 
 /// <summary>
@@ -80,11 +83,6 @@ public readonly record struct Token(
     public override string ToString()
     {
         return
-            $$"""{{{EscapeNewLine(Type.ToString())}}, '{{EscapeNewLine(RawText.ToString())}}', '{{EscapeNewLine(Value.ToString())}}'}""";
-
-        static string EscapeNewLine(string value)
-        {
-            return value.Replace("\n", "\\n").Replace("\r", "\\r").Replace("'", "\\'");
-        }
+            $$"""{{{StringUtils.Escape(Type.ToString())}}, '{{StringUtils.Escape(RawText.ToString())}}', '{{StringUtils.Escape(Value.ToString())}}'}""";
     }
 }
