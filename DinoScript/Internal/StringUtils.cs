@@ -21,12 +21,18 @@
 
 #endregion
 
-using System.Text;
-
 namespace DinoScript.Internal;
 
+/// <summary>
+/// 문자열 처리 관련 유틸리티를 제공하는 클래스입니다.
+/// </summary>
 public static class StringUtils
 {
+    /// <summary>
+    /// 입력된 문자열의 특수 문자를 이스케이프 처리하여 반환합니다.
+    /// </summary>
+    /// <param name="input">이스케이프 처리를 수행할 문자열입니다. null일 경우 예외가 발생합니다.</param>
+    /// <returns>특수 문자가 이스케이프 처리된 문자열을 반환합니다.</returns>
     public static string Escape(string input)
     {
         ArgumentNullException.ThrowIfNull(input);

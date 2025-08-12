@@ -26,8 +26,22 @@ using Microsoft.Extensions.ObjectPool;
 
 namespace DinoScript.Internal;
 
-internal class ObjectPools
+/// <summary>
+/// 객체 풀을 관리하는 static 클래스입니다.
+/// </summary>
+/// <remarks>
+/// 주로 재사용 가능한 객체를 효율적으로 관리하기 위해 객체 풀링을 제공합니다.
+/// 이 클래스에서는 StringBuilder 객체를 재사용하기 위한 풀을 제공합니다.
+/// </remarks>
+internal static class ObjectPools
 {
+    /// <summary>
+    /// StringBuilder 객체를 풀링하여 효율적으로 재사용하기 위한 풀입니다.
+    /// </summary>
+    /// <remarks>
+    /// 다수의 문자열 결합 작업에서 StringBuilder의 인스턴스 생성 및 GC 부담을 줄이기 위해 사용됩니다.
+    /// 생성된 StringBuilder 인스턴스는 작업 후 반드시 반환되어야 하며, 반환되지 않으면 리소스 누수가 발생할 수 있습니다.
+    /// </remarks>
     public static readonly ObjectPool<StringBuilder> StringBuilderPool =
         new DefaultObjectPool<StringBuilder>(new StringBuilderPooledObjectPolicy());
 }

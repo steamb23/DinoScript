@@ -25,6 +25,10 @@ using System.Text.RegularExpressions;
 
 namespace DinoScript.Internal;
 
+/// <summary>
+/// RegexExtensions 클래스는 Regex 관련 기능을 확장하는 정적 메서드를 제공합니다.
+/// 이 클래스는 내부적으로 사용되며, 정규 표현식을 활용한 문자열 매칭 작업을 수행합니다.
+/// </summary>
 internal static class RegexExtensions
 {
     /// <summary>

@@ -62,6 +62,9 @@ public partial class Tokenizer : IEnumerable<Token>
     /// </summary>
     private static readonly TokenDefinition WhitespaceTokenDefinition = new(TokenType.Whitespace);
 
+    /// <summary>
+    /// 토큰 정의 목록을 나타내며, 토큰화 과정에서 사용할 규칙의 집합입니다.
+    /// </summary>
     private static readonly List<TokenDefinition> TokenDefinitions =
     [
         WhitespaceTokenDefinition,
@@ -79,6 +82,9 @@ public partial class Tokenizer : IEnumerable<Token>
     ];
 
     // 규격 외 공백 문자 제거
+    /// <summary>
+    /// 스크립트를 토큰화하는 과정에서 특정 규격 외 데이터를 스킵하기 위한 정규식 목록입니다.
+    /// </summary>
     private readonly List<Regex> _skipRegexes = [ExtraWhitespaceFilterRegex()];
 
     /// <summary>
@@ -177,10 +183,10 @@ public partial class Tokenizer : IEnumerable<Token>
     }
 
     /// <summary>
-    /// 문자열 리터럴에 대한 토큰화 처리를 진행합니다.
+    /// 문자열 리터럴을 처리하여 토큰을 생성합니다.
     /// </summary>
-    /// <param name="scriptBufferSpan"></param>
-    /// <returns></returns>
+    /// <param name="scriptBufferSpan">문자열 리터럴이 포함된 스크립트의 읽기 전용 범위입니다.</param>
+    /// <returns>처리된 문자열 리터럴을 나타내는 토큰입니다.</returns>
     private Token StringLiteralProcess(ReadOnlySpan<char> scriptBufferSpan)
     {
         var builder = ObjectPools.StringBuilderPool.Get();
@@ -195,6 +201,12 @@ public partial class Tokenizer : IEnumerable<Token>
         }
     }
 
+    /// <summary>
+    /// 문자열 리터럴을 처리하여 토큰을 생성하는 메서드입니다.
+    /// </summary>
+    /// <param name="scriptBufferSpan">입력 스크립트의 현재 처리를 위한 문자 버퍼입니다.</param>
+    /// <param name="builder">문자열 리터럴의 가공된 내용을 축적하기 위한 StringBuilder 객체입니다.</param>
+    /// <returns>생성된 문자열 리터럴 토큰을 반환합니다. 처리 실패 시에는 오류 토큰을 반환합니다.</returns>
     private Token StringLiteralProcess(ReadOnlySpan<char> scriptBufferSpan, StringBuilder builder)
     {
         // 현재 줄 및 컬럼 저장
@@ -273,11 +285,23 @@ public partial class Tokenizer : IEnumerable<Token>
     }
 
 
+    /// <summary>
+    /// 토크나이저 상태를 초기 상태로 재설정합니다.
+    /// </summary>
     public void Reset()
     {
         _scriptBuffer = _rawScript.AsMemory();
     }
 
+    /// <summary>
+    /// 주어진 데이터로 새로운 토큰을 생성합니다.
+    /// </summary>
+    /// <param name="tokenType">생성할 토큰의 타입입니다.</param>
+    /// <param name="rawText">토큰의 원시 문자열 데이터입니다.</param>
+    /// <param name="text">재정의된 텍스트입니다. null일 경우 특정 타입에 따라 처리됩니다.</param>
+    /// <param name="tokeLines">토큰이 위치한 줄 번호입니다.</param>
+    /// <param name="tokenColumns">토큰이 위치한 열 번호입니다.</param>
+    /// <returns>생성된 토큰 객체를 반환합니다.</returns>
     private static Token MakeToken(TokenType tokenType, ReadOnlyMemory<char> rawText, string? text, long tokeLines,
         long tokenColumns)
     {
@@ -300,48 +324,86 @@ public partial class Tokenizer : IEnumerable<Token>
             tokenColumns);
     }
 
+    /// <summary>
+    /// 규격 외의 공백 문자를 필터링하기 위한 정규식입니다.
+    /// </summary>
+    /// <returns>공백 문자 필터링에 사용될 정규식 객체입니다.</returns>
     [GeneratedRegex("^(?:\\s)+")]
     private static partial Regex ExtraWhitespaceFilterRegex();
 
 
     #region Enumerator
 
+    /// <summary>
+    /// 토크나이저의 열거자를 반환합니다.
+    /// </summary>
+    /// <returns>Token 열거자를 반환합니다.</returns>
     public Enumerator GetEnumerator()
     {
         return new Enumerator(this);
     }
 
+    /// <summary>
+    /// 토큰 열거자를 반환하는 메서드입니다.
+    /// </summary>
+    /// <returns>
+    /// 토큰화된 스크립트를 열거할 수 있는 열거자를 반환합니다.
+    /// </returns>
     IEnumerator<Token> IEnumerable<Token>.GetEnumerator()
     {
         return GetEnumerator();
     }
 
+    /// <summary>
+    /// 토크나이저의 열거자를 반환합니다.
+    /// </summary>
+    /// <returns>토크나이저의 열거자입니다.</returns>
     IEnumerator IEnumerable.GetEnumerator()
     {
         return GetEnumerator();
     }
 
+    /// <summary>
+    /// 토크나이저에 대한 열거 작업을 지원하는 구조체입니다.
+    /// </summary>
     public struct Enumerator(Tokenizer tokenizer) : IEnumerator<Token>
     {
+        /// <summary>
+        /// 토큰화 작업을 수행하는 Tokenizer 객체에 대한 참조입니다.
+        /// </summary>
         private Tokenizer? _tokenizer = tokenizer;
 
+        /// <summary>
+        /// Enumerator가 사용 중인 리소스를 해제하고 관리되지 않는 리소스를 정리합니다.
+        /// </summary>
         public void Dispose()
         {
             _tokenizer = null;
         }
 
+        /// <summary>
+        /// 열거자를 다음 위치로 이동합니다.
+        /// </summary>
+        /// <returns>다음 위치로 성공적으로 이동하면 true를 반환하며, 그렇지 않으면 false를 반환합니다.</returns>
+        /// <exception cref="ObjectDisposedException">열거자 또는 연결된 토크나이저가 이미 해제된 경우 발생합니다.</exception>
         public bool MoveNext()
         {
             ObjectDisposedException.ThrowIf(_tokenizer is null, nameof(Enumerator));
             return _tokenizer.NextToken() is not null;
         }
 
+        /// <summary>
+        /// 토크나이저 상태를 초기 상태로 재설정합니다.
+        /// </summary>
         public void Reset()
         {
             ObjectDisposedException.ThrowIf(_tokenizer is null, nameof(Enumerator));
             _tokenizer.Reset();
         }
 
+        /// <summary>
+        /// 열거자의 현재 위치에서 반환되는 토큰입니다.
+        /// </summary>
         public Token Current
         {
             get
@@ -351,6 +413,9 @@ public partial class Tokenizer : IEnumerable<Token>
             }
         }
 
+        /// <summary>
+        /// 현재 열거자가 가리키는 토큰입니다.
+        /// </summary>
         object IEnumerator.Current => Current;
     }
 
