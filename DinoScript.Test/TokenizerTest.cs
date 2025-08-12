@@ -21,8 +21,7 @@
 
 #endregion
 
-using DinoScript.Parser;
-using DinoScript.Parser.Syntax;
+using DinoScript.Lexer;
 using Xunit.Abstractions;
 
 namespace DinoScript.Test;

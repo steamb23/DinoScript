@@ -25,7 +25,7 @@ using System.Text.RegularExpressions;
 
 // ReSharper disable MemberCanBePrivate.Global
 
-namespace DinoScript.Parser.Syntax;
+namespace DinoScript.Lexer;
 
 /// <summary>
 /// DinoScript 언어의 토큰화에 사용되는 정규식들을 정의합니다.

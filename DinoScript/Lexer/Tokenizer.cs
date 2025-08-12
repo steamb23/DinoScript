@@ -26,9 +26,8 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using DinoScript.Internal;
-using DinoScript.Parser.Syntax;
 
-namespace DinoScript.Parser;
+namespace DinoScript.Lexer;
 
 /// <summary>
 /// 스크립트 문자열을 토큰화하는 클래스입니다.

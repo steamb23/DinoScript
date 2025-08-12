@@ -21,36 +21,23 @@
 
 #endregion
 
-using DinoScript.Parser.Syntax;
+using System.Text.RegularExpressions;
 
-namespace DinoScript.Parser;
+namespace DinoScript.Lexer;
 
 /// <summary>
-/// 구문 분석 중 발생하는 구문 오류에 대한 예외입니다.
+/// 토큰 정의를 나타내는 구조체입니다.
 /// </summary>
-public class SyntaxErrorException(Token? token, string message, Exception? innerException = null)
-    : Exception(message, innerException)
+/// <param name="type">토큰의 유형입니다.</param>
+public readonly struct TokenDefinition(TokenType type)
 {
     /// <summary>
-    /// 지정된 토큰으로 <see cref="SyntaxErrorException"/> 클래스의 새 인스턴스를 초기화합니다.
+    /// 토큰을 인식하기 위한 정규식입니다.
     /// </summary>
-    /// <param name="token">구문 오류를 발생시킨 토큰입니다.</param>
-    public SyntaxErrorException(Token? token)
-        : this(token, token == null
-            ? "No token."
-            : $"'{token.Value.RawText}' is invalid token.")
-    {
-        Token = token;
-    }
+    public Regex Regex { get; } = Lexer.Regexes.GetRegex(type);
 
     /// <summary>
-    /// 현재 예외를 설명하는 메시지를 가져옵니다. 토큰이 있는 경우 토큰의 위치 정보를 포함합니다.
+    /// 토큰의 유형입니다.
     /// </summary>
-    public override string Message =>
-        Token == null ? base.Message : $"({Token.Value.Lines}, {Token.Value.Columns}) : {base.Message}";
-
-    /// <summary>
-    /// 구문 오류를 발생시킨 토큰을 가져옵니다.
-    /// </summary>
-    public Token? Token { get; } = token;
+    public TokenType Type { get; } = type;
 }

@@ -23,7 +23,7 @@
 
 using DinoScript.Internal;
 
-namespace DinoScript.Parser.Syntax;
+namespace DinoScript.Lexer;
 
 /// <summary>
 /// 토큰을 나타내는 구조체입니다.
